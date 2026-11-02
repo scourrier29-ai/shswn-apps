@@ -38,18 +38,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,Roboto,san
 .tabbtn.active{color:var(--gold)}
 .portrait-wrap{position:relative;border-radius:16px;overflow:hidden;border:2px solid var(--gold);box-shadow:0 0 24px var(--gold-glow);margin-bottom:12px}
 .portrait-wrap img{width:100%;display:block}
-.sheriff-badge{position:absolute!important;top:42%;right:22%;width:12%!important;max-width:60px;cursor:pointer;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
+.sheriff-badge{position:absolute!important;top:50%;left:63%;width:12%!important;max-width:60px;cursor:pointer;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
 .sheriff-badge:active{transform:scale(.92)}
 .tagline{text-align:center;font-size:13px;letter-spacing:.18em;color:var(--muted);margin-bottom:12px;font-weight:600}
 .card{background:rgba(44,30,18,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(212,162,76,.35);border-radius:14px;padding:16px;margin-bottom:16px}
 .card h2{font-size:13px;letter-spacing:.16em;color:var(--gold);margin-bottom:12px;font-weight:800}
 .pill-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .teams-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
-.teams-2col .card{margin:0}
+.teams-2col .card{margin:0;min-width:0;background:rgba(44,30,18,.25);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .teams-2col .card:first-child{border-color:rgba(212,162,76,.8)}
 .teams-2col .card:last-child{background:rgba(212,162,76,.12);border-color:rgba(212,162,76,.6)}
-@media(max-width:600px){.teams-2col{grid-template-columns:1fr}}
-.pillbtn{padding:12px 8px;border-radius:999px;border:1px solid rgba(212,162,76,.5);background:rgba(62,42,24,.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;text-align:center}
+.pillbtn{padding:10px 6px;border-radius:999px;border:1px solid rgba(212,162,76,.4);background:rgba(62,42,24,.05);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;text-align:center}
 .pillbtn:active{transform:scale(.96)}
 .pillbtn.playing{background:var(--gold);color:#1A120B;border-color:var(--gold)}
 .pillbtn .ptri{font-size:12px;flex:none}
