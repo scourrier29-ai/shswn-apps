@@ -1,0 +1,18 @@
+{
+  "background_color": "#000000",
+  "description": "Shawn's $0 multi-model AI chat \u2014 Gemini, GPT-OSS, Qwen, Mistral, Local M1, Lapis + Courtroom",
+  "display": "standalone",
+  "icons": [
+    {
+      "purpose": "any",
+      "sizes": "any",
+      "src": "icon.svg",
+      "type": "image/svg+xml"
+    }
+  ],
+  "name": "Crosswalk",
+  "orientation": "portrait",
+  "short_name": "Crosswalk",
+  "start_url": "/",
+  "theme_color": "#000000"
+}
