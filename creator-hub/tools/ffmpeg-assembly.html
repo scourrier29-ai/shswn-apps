@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FFmpeg Assembly Utility — Independent</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b0d11;--panel:#1b1d22;--panel2:#23262d;--ink:#fff8df;--muted:#a89f81;--accent:#f9bc31;--border:#2e323b;--green:#3dd68c;--red:#ff6b6b}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,sans-serif;min-height:100vh;padding:16px;max-width:1000px;margin:0 auto}
+h1{font-size:22px;margin-bottom:4px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+h2{font-size:16px;margin:20px 0 10px;color:var(--accent)}
+.seg{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.seg-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.seg-num{font-weight:800;color:var(--accent);font-size:16px}
+.x{background:none;border:0;color:var(--red);font-size:18px;cursor:pointer;padding:4px 8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
+.row label{font-size:12px;color:var(--muted);min-width:86px}
+.row input,.row select{background:var(--panel2);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:8px;font-size:13px}
+.row input[type=text]{flex:1;min-width:180px}
+.row input[type=number]{width:96px}
+.row input[type=range]{flex:1;accent-color:var(--accent)}
+.btn{background:var(--accent);color:#0b0d11;border:0;border-radius:10px;padding:12px 20px;font-size:15px;font-weight:700;cursor:pointer;margin-right:8px;margin-bottom:8px}
+.btn.ghost{background:var(--panel);color:var(--ink);border:1px solid var(--border)}
+.btn.small{padding:8px 14px;font-size:13px}
+#cmd{background:#000;border:1px solid var(--border);border-radius:10px;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:12px;white-space:pre-wrap;word-break:break-all;color:#d7e3f4;max-height:320px;overflow:auto;margin-top:12px}
+#summary{font-size:13px;color:var(--muted);margin:8px 0}
+#errors{margin:8px 0}
+.err{background:#2a1414;border:1px solid var(--red);border-radius:8px;padding:8px 12px;font-size:13px;color:#ffc9c9;margin-bottom:6px}
+.note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.5}
+.empty{color:var(--muted);text-align:center;padding:24px;font-size:14px;border:1px dashed var(--border);border-radius:12px}
+</style>
+</head>
+<body>
+<h1>🎞️ FFmpeg Assembly Utility</h1>
+<p class="sub">List your clips and stills, set trim points and output options — get a ready-to-run <code>ffmpeg</code> command. Runs offline; nothing is uploaded.</p>
+
+<h2>1 · Segments (in order)</h2>
+<div id="segs"></div>
+<div class="row">
+  <button class="btn small ghost" onclick="addSegment('clip')">＋ Add clip</button>
+  <button class="btn small ghost" onclick="addSegment('image')">＋ Add still image</button>
+</div>
+
+<h2>2 · Output settings</h2>
+<div class="seg">
+  <div class="row">
+    <label>Resolution</label>
+    <select id="res" onchange="autosave()">
+      <option value="1920x1080" selected>1920×1080 (Full HD)</option>
+      <option value="1280x720">1280×720 (HD)</option>
+      <option value="1080x1920">1080×1920 (Vertical)</option>
+      <option value="3840x2160">3840×2160 (4K)</option>
+    </select>
+    <label style="min-width:30px">FPS</label>
+    <input type="number" id="fps" value="30" min="1" max="120" onchange="autosave()">
+  </div>
+  <div class="row">
+    <label>Encode preset</label>
+    <select id="preset" onchange="autosave()">
+      <option value="ultrafast">ultrafast (fast, big file)</option>
+      <option value="veryfast">veryfast</option>
+      <option value="medium" selected>medium (balanced)</option>
+      <option value="slow">slow (smaller file)</option>
+      <option value="veryslow">veryslow (smallest file)</option>
+    </select>
+    <label style="min-width:30px">CRF</label>
+    <input type="number" id="crf" value="20" min="0" max="51" onchange="autosave()" title="0 = lossless, 51 = worst. 18–23 is typical.">
+  </div>
+  <div class="row">
+    <label>Audio track</label>
+    <select id="audioMode" onchange="onAudioMode();autosave()">
+      <option value="none" selected>None (silent video)</option>
+      <option value="music">Background music (loops to fit)</option>
+      <option value="voice">Voiceover (silence-padded to fit)</option>
+    </select>
+    <input type="text" id="audioFile" placeholder="music.mp3" style="display:none" onchange="autosave()">
+  </div>
+  <div class="row" id="volRow" style="display:none">
+    <label>Audio volume</label>
+    <input type="range" id="vol" min="0" max="150" value="80" oninput="document.getElementById('volVal').textContent=this.value+'%';autosave()">
+    <span id="volVal" style="font-size:13px">80%</span>
+  </div>
+  <div class="row">
+    <label>Output file</label>
+    <input type="text" id="outFile" value="output.mp4" onchange="autosave()">
+  </div>
+</div>
+
+<h2>3 · Generate</h2>
+<button class="btn" onclick="generate()">⚙️ Generate command</button>
+<button class="btn ghost" onclick="copyCmd()">📋 Copy</button>
+<button class="btn ghost" onclick="dlScript('sh')">⬇️ .sh</button>
+<button class="btn ghost" onclick="dlScript('bat')">⬇️ .bat</button>
+<button class="btn ghost" onclick="saveProject()">💾 Save project</button>
+<button class="btn ghost" onclick="document.getElementById('loadFile').click()">📂 Load project</button>
+<button class="btn ghost" onclick="clearAll()">🗑 Clear</button>
+<input type="file" id="loadFile" accept=".json" style="display:none" onchange="loadProject(this)">
+
+<div id="summary"></div>
+<div id="errors"></div>
+<pre id="cmd" style="display:none"></pre>
+<p class="note">Requires <b>ffmpeg</b> on the machine that runs the command (<code>ffmpeg -version</code> to check). Clips are scaled to fit the output frame with black padding; stills are cropped to fill. Put media files in the same folder as the script, or use full paths. Audio modes need every segment's duration to be known (set clip End times) so the track can be fitted exactly.</p>
+
+<script>
+/* ============ pure logic (no DOM) — unit-testable ============ */
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+/* shell-quote a filename for POSIX sh: 'a'"'"'b' */
+function shQuote(s){
+  return "'"+String(s).replace(/'/g,"'\"'\"'")+"'";
+}
+/* quote for Windows .bat: "a" with % doubled */
+function batQuote(s){
+  return '"'+String(s).replace(/%/g,'%%')+'"';
+}
+
+function validate(p){
+  const errs=[];
+  if(!p.segments.length) errs.push('Add at least one segment.');
+  p.segments.forEach((s,i)=>{
+    const n='Segment '+(i+1);
+    if(!s.file||!s.file.trim()) errs.push(n+': filename is required.');
+    if(s.type==='image'){
+      if(!(s.duration>0)) errs.push(n+': still image needs a duration > 0 seconds.');
+    }else{
+      const a=Number(s.trimIn), b=Number(s.trimOut);
+      if(s.trimIn!==''&&s.trimIn!=null&&!(a>=0)) errs.push(n+': trim In must be >= 0.');
+      if(s.trimOut!==''&&s.trimOut!=null){
+        if(!(b>0)) errs.push(n+': trim Out must be > 0.');
+        else if(s.trimIn!==''&&s.trimIn!=null&&b<=a) errs.push(n+': trim Out must be after trim In.');
+      }
+    }
+  });
+  if(p.settings.audioMode!=='none'){
+    if(!p.settings.audioFile||!p.settings.audioFile.trim())
+      errs.push('Audio track selected but no audio filename given.');
+    const unknown=p.segments.some(s=>s.type==='clip'&&(s.trimOut===''||s.trimOut==null));
+    if(unknown) errs.push('Audio fitting needs every clip to have an End trim time (total duration must be known).');
+  }
+  return errs;
+}
+
+/* segment duration in seconds, or null when unknown */
+function segDur(s,fps){
+  if(s.type==='image') return Number(s.duration);
+  if(s.trimOut!==''&&s.trimOut!=null){
+    const a=(s.trimIn===''||s.trimIn==null)?0:Number(s.trimIn);
+    return Number(s.trimOut)-a;
+  }
+  return null;
+}
+
+function buildCommand(p){
+  const errs=validate(p);
+  const S=p.settings;
+  const W=S.width, H=S.height, fps=S.fps;
+  const inputs=[];            // filenames in order
+  const vchain=[];            // per-segment video filter chains
+  const maps=[];              // [v0][v1]... labels
+  let total=0, totalKnown=true;
+
+  p.segments.forEach((s,i)=>{
+    const idx=inputs.length;
+    inputs.push(s.file.trim());
+    const d=segDur(s,fps);
+    if(d==null) totalKnown=false; else total+=d;
+    const v='['+idx+':v]';
+    if(s.type==='image'){
+      const frames=Math.max(1,Math.round(d*fps)-1);
+      vchain.push(v+'scale='+W+':'+H+':force_original_aspect_ratio=increase,crop='+W+':'+H+
+        ',setsar=1,loop=loop='+frames+':size=1,fps='+fps+',trim=duration='+d+',setpts=PTS-STARTPTS[v'+i+']');
+    }else{
+      let f=v;
+      const hasIn=s.trimIn!==''&&s.trimIn!=null, hasOut=s.trimOut!==''&&s.trimOut!=null;
+      if(hasIn||hasOut){
+        const a=hasIn?('start='+Number(s.trimIn)):'', b=hasOut?('end='+Number(s.trimOut)):'';
+        f+='trim='+[a,b].filter(Boolean).join(':')+',setpts=PTS-STARTPTS,';
+      }
+      f+='scale='+W+':'+H+':force_original_aspect_ratio=decrease,pad='+W+':'+H+':(ow-iw)/2:(oh-ih)/2:color=black,setsar=1,fps='+fps+'[v'+i+']';
+      vchain.push(f);
+    }
+    maps.push('[v'+i+']');
+  });
+
+  let fc=vchain.join(';')+';'+maps.join('')+'concat=n='+p.segments.length+':v=1:a=0[vcat]';
+  const outMaps=['-map "[vcat]"'];
+  let audioNote='';
+
+  if(S.audioMode!=='none'&&errs.length===0){
+    const aidx=inputs.length;
+    inputs.push(S.audioFile.trim());
+    const vol=(Number(S.volume)/100).toFixed(2);
+    if(S.audioMode==='music'){
+      fc+=';['+aidx+':a]aloop=loop=-1:size=2000000000,atrim=duration='+total.toFixed(3)+
+          ',asetpts=PTS-STARTPTS,volume='+vol+'[aout]';
+      audioNote='music looped to '+total.toFixed(1)+'s';
+    }else{
+      fc+=';['+aidx+':a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo'+
+          ',apad=whole_dur='+total.toFixed(3)+',atrim=duration='+total.toFixed(3)+
+          ',asetpts=PTS-STARTPTS,volume='+vol+'[aout]';
+      audioNote='voiceover padded to '+total.toFixed(1)+'s';
+    }
+    outMaps.push('-map "[aout]"');
+  }
+
+  const q=S.shell==='bat'?batQuote:shQuote;
+  const lines=['ffmpeg \\'];
+  inputs.forEach(f=>lines.push('  -i '+q(f)+' \\'));
+  lines.push('  -filter_complex '+q(fc)+' \\');
+  lines.push('  '+outMaps.join(' ')+' \\');
+  lines.push('  -c:v libx264 -preset '+S.preset+' -crf '+S.crf+' -pix_fmt yuv420p -r '+fps+' \\');
+  if(S.audioMode!=='none'&&errs.length===0) lines.push('  -c:a aac -b:a 192k \\');
+  lines.push('  -movflags +faststart '+q((S.output||'output.mp4').trim()));
+  const cmd=lines.join('\n');
+
+  return {cmd, errors:errs,
+    total: totalKnown? total : null,
+    summary: p.segments.length+' segment(s)'+(totalKnown?' · total '+total.toFixed(1)+'s':' · total duration unknown (untrimmed clips)')+(audioNote?' · '+audioNote:'')};
+}
+
+/* ============ DOM layer ============ */
+
+let segments=[];
+let lastCmd='';
+
+function addSegment(type,file){
+  segments.push(type==='image'
+    ? {type:'image', file:file||'', duration:5}
+    : {type:'clip',  file:file||'', trimIn:'', trimOut:''});
+  renderSegs(); autosave();
+}
+function removeSegment(i){ segments.splice(i,1); renderSegs(); autosave(); }
+
+function renderSegs(){
+  const box=document.getElementById('segs');
+  if(!segments.length){ box.innerHTML='<div class="empty">No segments yet — add a clip or a still image above.</div>'; return; }
+  box.innerHTML='';
+  segments.forEach((s,i)=>{
+    const d=document.createElement('div'); d.className='seg';
+    let inner='<div class="seg-head"><span class="seg-num">#'+(i+1)+' '+(s.type==='image'?'🖼️ Still':'🎬 Clip')+'</span>'+
+      '<button class="x" onclick="removeSegment('+i+')" title="Remove">✕</button></div>'+
+      '<div class="row"><label>File</label><input type="text" placeholder="'+(s.type==='image'?'photo.jpg':'clip1.mp4')+'" value="'+esc(s.file)+
+      '" onchange="segments['+i+'].file=this.value;autosave()"></div>';
+    if(s.type==='image'){
+      inner+='<div class="row"><label>Duration (s)</label><input type="number" min="0.1" step="0.1" value="'+esc(s.duration)+
+        '" onchange="segments['+i+'].duration=Number(this.value);autosave()"></div>';
+    }else{
+      inner+='<div class="row"><label>Trim In (s)</label><input type="number" min="0" step="0.1" placeholder="0" value="'+esc(s.trimIn)+
+        '" onchange="segments['+i+'].trimIn=this.value===\'\'?\'\':Number(this.value);autosave()">'+
+        '<label style="min-width:70px">Trim Out (s)</label><input type="number" min="0" step="0.1" placeholder="(full)" value="'+esc(s.trimOut)+
+        '" onchange="segments['+i+'].trimOut=this.value===\'\'?\'\':Number(this.value);autosave()"></div>';
+    }
+    d.innerHTML=inner; box.appendChild(d);
+  });
+}
+
+function readProject(shell){
+  const res=document.getElementById('res').value.split('x').map(Number);
+  return {
+    segments: segments.map(s=>({...s})),
+    settings:{
+      width:res[0], height:res[1],
+      fps:Math.max(1,Number(document.getElementById('fps').value)||30),
+      preset:document.getElementById('preset').value,
+      crf:Math.min(51,Math.max(0,Number(document.getElementById('crf').value)||20)),
+      audioMode:document.getElementById('audioMode').value,
+      audioFile:document.getElementById('audioFile').value,
+      volume:Number(document.getElementById('vol').value),
+      output:document.getElementById('outFile').value,
+      shell:shell||'sh'
+    }
+  };
+}
+
+function onAudioMode(){
+  const m=document.getElementById('audioMode').value;
+  document.getElementById('audioFile').style.display = m==='none'?'none':'';
+  document.getElementById('volRow').style.display = m==='none'?'none':'flex';
+}
+
+function generate(){
+  const r=buildCommand(readProject('sh'));
+  const sum=document.getElementById('summary'), errBox=document.getElementById('errors'), pre=document.getElementById('cmd');
+  sum.textContent=r.summary;
+  if(r.errors.length){
+    errBox.innerHTML=r.errors.map(e=>'<div class="err">⚠ '+esc(e)+'</div>').join('');
+    pre.style.display='none'; lastCmd='';
+  }else{
+    errBox.innerHTML='';
+    pre.textContent=r.cmd; pre.style.display='block'; lastCmd=r.cmd;
+    pre.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+}
+
+function copyCmd(){
+  if(!lastCmd){alert('Generate the command first.');return;}
+  navigator.clipboard.writeText(lastCmd).then(()=>alert('Command copied.'),()=>alert('Copy failed — select the text manually.'));
+}
+
+function dlScript(kind){
+  const r=buildCommand(readProject(kind));
+  if(r.errors.length){alert('Fix the errors first (Generate to see them).');return;}
+  let text=r.cmd, name='assemble.'+kind;
+  if(kind==='bat'){
+    text='@echo off\r\n'+r.cmd.replace(/ \\\n/g,' ^\r\n')+'\r\npause\r\n';
+  }else{
+    text='#!/bin/sh\nset -e\n'+r.cmd+'\n';
+  }
+  const blob=new Blob([text],{type:'text/plain'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+}
+
+function saveProject(){
+  const blob=new Blob([JSON.stringify(readProject('sh'),null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ffmpeg-project.json';a.click();
+}
+function loadProject(input){
+  const f=input.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{ try{
+      const p=JSON.parse(rd.result);
+      segments=p.segments||[];
+      const st=p.settings||{};
+      if(st.width) document.getElementById('res').value=st.width+'x'+st.height;
+      document.getElementById('fps').value=st.fps||30;
+      document.getElementById('preset').value=st.preset||'medium';
+      document.getElementById('crf').value=st.crf!=null?st.crf:20;
+      document.getElementById('audioMode').value=st.audioMode||'none';
+      document.getElementById('audioFile').value=st.audioFile||'';
+      document.getElementById('vol').value=st.volume!=null?st.volume:80;
+      document.getElementById('volVal').textContent=(st.volume!=null?st.volume:80)+'%';
+      document.getElementById('outFile').value=st.output||'output.mp4';
+      onAudioMode(); renderSegs(); autosave();
+    }catch(e){alert('Could not parse project file.');} };
+  rd.readAsText(f); input.value='';
+}
+
+function clearAll(){
+  if(!confirm('Clear all segments and settings?'))return;
+  segments=[]; renderSegs(); autosave();
+  document.getElementById('summary').textContent='';
+  document.getElementById('errors').innerHTML='';
+  document.getElementById('cmd').style.display='none'; lastCmd='';
+}
+
+function autosave(){
+  try{ localStorage.setItem('ffasm', JSON.stringify(readProject('sh'))); }catch(e){}
+}
+function restore(){
+  try{
+    const raw=localStorage.getItem('ffasm'); if(!raw)return;
+    const p=JSON.parse(raw);
+    segments=p.segments||[];
+    const st=p.settings||{};
+    if(st.width) document.getElementById('res').value=st.width+'x'+st.height;
+    if(st.fps) document.getElementById('fps').value=st.fps;
+    if(st.preset) document.getElementById('preset').value=st.preset;
+    if(st.crf!=null) document.getElementById('crf').value=st.crf;
+    if(st.audioMode) document.getElementById('audioMode').value=st.audioMode;
+    if(st.audioFile) document.getElementById('audioFile').value=st.audioFile;
+    if(st.volume!=null){document.getElementById('vol').value=st.volume;document.getElementById('volVal').textContent=st.volume+'%';}
+    if(st.output) document.getElementById('outFile').value=st.output;
+  }catch(e){}
+}
+
+if(typeof document!=='undefined'){ onAudioMode(); restore(); renderSegs(); }
+</script>
+</body>
+</html>

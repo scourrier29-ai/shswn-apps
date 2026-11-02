@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Project Tracker — Independent</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b0d11;--panel:#1b1d22;--panel2:#23262d;--ink:#fff8df;--muted:#a89f81;--accent:#f9bc31;--border:#2e323b;--green:#3dd68c;--red:#ff6b6b;--blue:#6db3f2}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,sans-serif;min-height:100vh;padding:16px;max-width:1100px;margin:0 auto}
+h1{font-size:22px;margin-bottom:4px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+h2{font-size:16px;margin:20px 0 10px;color:var(--accent)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-width:110px}
+.stat .n{font-size:20px;font-weight:800;color:var(--accent)}
+.stat .l{font-size:11px;color:var(--muted)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.toolbar input,.toolbar select{background:var(--panel2);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:8px;font-size:13px}
+.toolbar input[type=text]{flex:1;min-width:160px}
+.btn{background:var(--accent);color:#0b0d11;border:0;border-radius:10px;padding:12px 20px;font-size:15px;font-weight:700;cursor:pointer;margin-right:8px;margin-bottom:8px}
+.btn.ghost{background:var(--panel);color:var(--ink);border:1px solid var(--border)}
+.btn.small{padding:8px 14px;font-size:13px}
+.btn.danger{background:#2a1414;color:#ffc9c9;border:1px solid var(--red)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:var(--accent)}
+.card.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.card h3{font-size:16px;margin-bottom:4px}
+.card .artist{font-size:13px;color:var(--muted);margin-bottom:8px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.badge{font-size:11px;background:var(--panel2);border:1px solid var(--border);padding:3px 9px;border-radius:20px;color:var(--ink)}
+.badge.status-idea{background:#2a2a14;border-color:#8a7a2a;color:#ffe27a}
+.badge.status-demo{background:#1a2a2a;border-color:#2a8a7a;color:#7affdf}
+.badge.status-arranged{background:#14252a;border-color:#2a6a8a;color:#7ad4ff}
+.badge.status-mixed{background:#1a142a;border-color:#5a3a8a;color:#c79aff}
+.badge.status-mastered{background:#2a1a14;border-color:#8a4a2a;color:#ffab7a}
+.badge.status-released{background:#142a14;border-color:#2a8a3a;color:#8aff8a}
+.badge.overdue{background:#2a1414;border-color:var(--red);color:#ffc9c9}
+.prog{height:8px;background:var(--panel2);border-radius:6px;overflow:hidden;margin:8px 0 4px}
+.prog>div{height:100%;background:var(--accent);border-radius:6px;transition:width .2s}
+.prog-lbl{font-size:11px;color:var(--muted)}
+.detail{background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:18px;margin-top:16px}
+.detail.hidden{display:none}
+.frow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.frow label{font-size:12px;color:var(--muted);min-width:70px}
+.frow input,.frow select,.frow textarea{background:var(--panel2);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:8px;font-size:13px}
+.frow input[type=text]{flex:1;min-width:160px}
+.frow input[type=number]{width:90px}
+.frow textarea{flex:1;min-width:220px;min-height:56px;font-family:inherit}
+.pipe{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 12px}
+.pipe button{background:var(--panel2);border:1px solid var(--border);color:var(--muted);border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer}
+.pipe button.done{background:#142a14;border-color:var(--green);color:#8aff8a}
+.pipe button.now{background:var(--accent);border-color:var(--accent);color:#0b0d11;font-weight:700}
+.tasks,.stems{margin:8px 0}
+.task{display:flex;gap:8px;align-items:center;padding:7px 8px;border-bottom:1px solid var(--border)}
+.task input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent)}
+.task.done .t{text-decoration:line-through;color:var(--muted)}
+.task .t{flex:1;font-size:13px}
+.stem{display:flex;gap:8px;align-items:center;padding:7px 8px;border-bottom:1px solid var(--border);font-size:13px}
+.stem .n{flex:1}
+.stem .k{font-size:11px;color:var(--muted);background:var(--panel2);padding:3px 9px;border-radius:20px}
+.x{background:none;border:0;color:var(--red);font-size:16px;cursor:pointer;padding:4px 8px}
+.addrow{display:flex;gap:8px;margin-top:8px}
+.addrow input{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:8px;font-size:13px}
+.addrow select{background:var(--panel2);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:8px;font-size:13px}
+.empty{color:var(--muted);text-align:center;padding:36px;font-size:14px;border:1px dashed var(--border);border-radius:12px}
+.err{background:#2a1414;border:1px solid var(--red);border-radius:8px;padding:8px 12px;font-size:13px;color:#ffc9c9;margin-bottom:8px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--accent);color:var(--ink);padding:10px 20px;border-radius:10px;font-size:14px;display:none;z-index:50}
+.d-actions{margin-top:14px;border-top:1px solid var(--border);padding-top:12px}
+.note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.5}
+</style>
+</head>
+<body>
+<h1>🎵 Music Project Tracker</h1>
+<p class="sub">Track your music projects from idea to release — statuses, tasks, stems, deadlines. Saves locally in your browser.</p>
+
+<div class="stats" id="stats"></div>
+
+<div class="toolbar">
+  <input type="text" id="q" placeholder="Search title or artist…" oninput="refresh()">
+  <select id="fStatus" onchange="refresh()"></select>
+  <select id="fGenre" onchange="refresh()"></select>
+  <select id="sortBy" onchange="refresh()">
+    <option value="updated">Recently updated</option>
+    <option value="title">Title A–Z</option>
+    <option value="progress">Progress</option>
+    <option value="deadline">Deadline</option>
+  </select>
+  <button class="btn small" onclick="openDetail(null)">+ New Project</button>
+  <button class="btn small ghost" onclick="exportAll()">Export All</button>
+  <button class="btn small ghost" onclick="document.getElementById('importFile').click()">Import</button>
+  <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAll(event)">
+</div>
+
+<div id="errors"></div>
+<div class="grid" id="grid"></div>
+
+<div class="detail hidden" id="detail"></div>
+<div id="toast"></div>
+
+<script>
+/* ================= Pure logic (node-testable) ================= */
+var STATUSES=['idea','demo','arranged','mixed','mastered','released'];
+var GENRES=['Hip-Hop','R&B','Pop','EDM','Trap','Afrobeats','Drill','Soul','Rock','Ambient','Other'];
+var NOTES=['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B'];
+var STEM_KINDS=['vocal','beat','bass','drums','keys','fx','other'];
+
+function uid(){return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+
+function newProject(d){
+  d=d||{};
+  var p={
+    id:d.id||uid(),
+    title:String(d.title||'').trim(),
+    artist:String(d.artist||'').trim(),
+    genre:d.genre||'Other',
+    bpm:clampBpm(parseBpm(d.bpm)),
+    key:d.key||'',
+    status:STATUSES.indexOf(d.status)>=0?d.status:'idea',
+    deadline:d.deadline||'',
+    notes:String(d.notes||''),
+    tasks:(Array.isArray(d.tasks)?d.tasks:[]).map(function(t){
+      return {id:t.id||uid(),text:String(t.text||'').trim(),done:!!t.done};
+    }).filter(function(t){return t.text}),
+    stems:(Array.isArray(d.stems)?d.stems:[]).map(function(s){
+      return {id:s.id||uid(),name:String(s.name||'').trim(),kind:STEM_KINDS.indexOf(s.kind)>=0?s.kind:'other'};
+    }).filter(function(s){return s.name}),
+    createdAt:d.createdAt||Date.now(),
+    updatedAt:d.updatedAt||Date.now()
+  };
+  return p;
+}
+
+function validateProject(p){
+  var errs=[];
+  if(!p.title)errs.push('Title is required.');
+  if(p.bpm!==null&&(typeof p.bpm!=='number'||isNaN(p.bpm)||p.bpm<30||p.bpm>300))
+    errs.push('BPM must be a number between 30 and 300 (or blank).');
+  if(p.genre&&GENRES.indexOf(p.genre)<0)errs.push('Unknown genre: '+p.genre);
+  if(p.key&&!validKey(p.key))errs.push('Unknown key: '+p.key);
+  if(STATUSES.indexOf(p.status)<0)errs.push('Unknown status: '+p.status);
+  if(p.deadline&&!/^\d{4}-\d{2}-\d{2}$/.test(p.deadline))errs.push('Deadline must be YYYY-MM-DD.');
+  return errs;
+}
+
+function parseBpm(v){
+  if(v===null||v===undefined||v==='')return null;
+  var n=Number(v);
+  return isNaN(n)?null:n;
+}
+function clampBpm(n){
+  if(n===null||isNaN(n))return null;
+  return Math.max(30,Math.min(300,Math.round(n)));
+}
+function validKey(k){
+  var m=/^([A-G][#b]?)\s*(major|minor)?$/i.exec(String(k).trim());
+  if(!m)return false;
+  var root=m[1][0].toUpperCase()+m[1].slice(1);
+  return NOTES.indexOf(root)>=0;
+}
+function statusIndex(s){return STATUSES.indexOf(s)}
+function statusLabel(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function setStatus(p,s){
+  if(STATUSES.indexOf(s)<0)throw new Error('bad status '+s);
+  p.status=s;p.updatedAt=Date.now();return p;
+}
+function advanceStatus(p){
+  var i=statusIndex(p.status);
+  if(i<STATUSES.length-1)setStatus(p,STATUSES[i+1]);
+  return p;
+}
+function addTask(p,text){
+  text=String(text||'').trim();
+  if(!text)throw new Error('task text required');
+  p.tasks.push({id:uid(),text:text,done:false});
+  p.updatedAt=Date.now();return p;
+}
+function toggleTask(p,id){
+  var t=p.tasks.filter(function(x){return x.id===id})[0];
+  if(!t)throw new Error('task not found '+id);
+  t.done=!t.done;p.updatedAt=Date.now();return t.done;
+}
+function removeTask(p,id){
+  var n=p.tasks.length;
+  p.tasks=p.tasks.filter(function(x){return x.id!==id});
+  if(p.tasks.length===n)throw new Error('task not found '+id);
+  p.updatedAt=Date.now();return p;
+}
+function addStem(p,name,kind){
+  name=String(name||'').trim();
+  if(!name)throw new Error('stem name required');
+  if(STEM_KINDS.indexOf(kind)<0)kind='other';
+  p.stems.push({id:uid(),name:name,kind:kind});
+  p.updatedAt=Date.now();return p;
+}
+function removeStem(p,id){
+  var n=p.stems.length;
+  p.stems=p.stems.filter(function(x){return x.id!==id});
+  if(p.stems.length===n)throw new Error('stem not found '+id);
+  p.updatedAt=Date.now();return p;
+}
+function projectProgress(p){
+  if(!p.tasks.length)return 0;
+  var done=p.tasks.filter(function(t){return t.done}).length;
+  return Math.round(done/p.tasks.length*100);
+}
+function isOverdue(p,nowMs){
+  if(!p.deadline||p.status==='released')return false;
+  var today=new Date(nowMs||Date.now());
+  var y=today.getFullYear(),m=('0'+(today.getMonth()+1)).slice(-2),d=('0'+today.getDate()).slice(-2);
+  return p.deadline<y+'-'+m+'-'+d;
+}
+function filterProjects(list,f){
+  f=f||{};
+  var q=String(f.q||'').trim().toLowerCase();
+  return list.filter(function(p){
+    if(f.status&&f.status!=='all'&&p.status!==f.status)return false;
+    if(f.genre&&f.genre!=='all'&&p.genre!==f.genre)return false;
+    if(q&&(p.title+' '+p.artist).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+}
+function sortProjects(list,key){
+  var arr=list.slice();
+  if(key==='title')arr.sort(function(a,b){return a.title.localeCompare(b.title)});
+  else if(key==='progress')arr.sort(function(a,b){return projectProgress(b)-projectProgress(a)});
+  else if(key==='deadline')arr.sort(function(a,b){
+    if(!a.deadline&&!b.deadline)return 0;
+    if(!a.deadline)return 1;if(!b.deadline)return -1;
+    return a.deadline<b.deadline?-1:1;
+  });
+  else arr.sort(function(a,b){return b.updatedAt-a.updatedAt});
+  return arr;
+}
+function computeStats(list){
+  var byStatus={};STATUSES.forEach(function(s){byStatus[s]=0});
+  var progSum=0,progN=0;
+  list.forEach(function(p){
+    byStatus[p.status]=(byStatus[p.status]||0)+1;
+    if(p.tasks.length){progSum+=projectProgress(p);progN++}
+  });
+  return {total:list.length,byStatus:byStatus,
+    avgProgress:progN?Math.round(progSum/progN):0,
+    overdue:list.filter(function(p){return isOverdue(p)}).length};
+}
+function projectSummary(p){
+  var L=[];
+  L.push('MUSIC PROJECT — '+p.title.toUpperCase());
+  L.push('Artist: '+(p.artist||'—'));
+  L.push('Genre: '+p.genre+' | BPM: '+(p.bpm===null?'—':p.bpm)+' | Key: '+(p.key||'—'));
+  L.push('Status: '+statusLabel(p.status)+' ('+(statusIndex(p.status)+1)+'/'+STATUSES.length+')'+(p.deadline?' | Deadline: '+p.deadline:''));
+  L.push('Progress: '+projectProgress(p)+'% ('+p.tasks.filter(function(t){return t.done}).length+'/'+p.tasks.length+' tasks)');
+  if(p.tasks.length){L.push('');L.push('TASKS:');p.tasks.forEach(function(t){L.push((t.done?'[x] ':'[ ] ')+t.text)})}
+  if(p.stems.length){L.push('');L.push('STEMS:');p.stems.forEach(function(s){L.push('- '+s.name+' ('+s.kind+')')})}
+  if(p.notes){L.push('');L.push('NOTES:');L.push(p.notes)}
+  return L.join('\n');
+}
+function serializeProjects(list){return JSON.stringify(list,null,2)}
+function deserializeProjects(json){
+  var arr=JSON.parse(json);
+  if(!Array.isArray(arr))throw new Error('expected a JSON array of projects');
+  return arr.map(function(raw){
+    var p=newProject(raw);
+    var errs=validateProject(p);
+    if(errs.length)throw new Error('invalid project "'+(raw.title||'?')+'": '+errs.join(' '));
+    return p;
+  });
+}
+
+/* ================= Browser UI ================= */
+if(typeof document!=='undefined'){
+var LS='mpt_projects_v1';
+var projects=[];
+var activeId=null;
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function save(){
+  try{localStorage.setItem(LS,serializeProjects(projects))}catch(e){}
+}
+function load(){
+  try{
+    var raw=localStorage.getItem(LS);
+    if(raw)projects=deserializeProjects(raw);
+  }catch(e){projects=[]}
+}
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  clearTimeout(t._h);t._h=setTimeout(function(){t.style.display='none'},2200);
+}
+function showErrors(errs){
+  document.getElementById('errors').innerHTML=errs.length?
+    errs.map(function(e){return '<div class="err">'+esc(e)+'</div>'}).join(''):'';
+}
+
+function initFilters(){
+  var fs=document.getElementById('fStatus');
+  fs.innerHTML='<option value="all">All statuses</option>'+STATUSES.map(function(s){
+    return '<option value="'+s+'">'+statusLabel(s)+'</option>'}).join('');
+  var fg=document.getElementById('fGenre');
+  fg.innerHTML='<option value="all">All genres</option>'+GENRES.map(function(g){
+    return '<option>'+g+'</option>'}).join('');
+}
+
+function refresh(){renderStats();renderGrid();}
+
+function renderStats(){
+  var st=computeStats(projects);
+  document.getElementById('stats').innerHTML=
+    statBox(st.total,'Projects')+
+    statBox(st.byStatus.released,'Released')+
+    statBox(st.total-st.byStatus.released,'In progress')+
+    statBox(st.avgProgress+'%','Avg progress')+
+    statBox(st.overdue,'Overdue');
+  function statBox(n,l){return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>'}
+}
+
+function currentFilter(){
+  return {q:document.getElementById('q').value,
+    status:document.getElementById('fStatus').value,
+    genre:document.getElementById('fGenre').value};
+}
+
+function renderGrid(){
+  var list=sortProjects(filterProjects(projects,currentFilter()),document.getElementById('sortBy').value);
+  var g=document.getElementById('grid');
+  if(!list.length){g.innerHTML='<div class="empty">No projects yet. Click “+ New Project” to start your first one.</div>';return}
+  g.innerHTML=list.map(function(p){
+    var prog=projectProgress(p);
+    var badges='<span class="badge status-'+p.status+'">'+statusLabel(p.status)+'</span>'+
+      '<span class="badge">'+esc(p.genre)+'</span>'+
+      (p.bpm!==null?'<span class="badge">'+p.bpm+' BPM</span>':'')+
+      (p.key?'<span class="badge">'+esc(p.key)+'</span>':'')+
+      (isOverdue(p)?'<span class="badge overdue">overdue</span>':'');
+    return '<div class="card'+(p.id===activeId?' active':'')+'" onclick="openDetail(\''+p.id+'\')">'+
+      '<h3>'+esc(p.title)+'</h3><div class="artist">'+esc(p.artist||'—')+'</div>'+
+      '<div class="badges">'+badges+'</div>'+
+      '<div class="prog"><div style="width:'+prog+'%"></div></div>'+
+      '<div class="prog-lbl">'+prog+'% · '+p.tasks.filter(function(t){return t.done}).length+'/'+p.tasks.length+' tasks · '+
+      p.stems.length+' stems</div></div>';
+  }).join('');
+}
+
+function openDetail(id){
+  activeId=id;
+  var d=document.getElementById('detail');
+  var p=id?projects.filter(function(x){return x.id===id})[0]:null;
+  if(!p)p=newProject({});
+  d.classList.remove('hidden');
+  var pipe=STATUSES.map(function(s,i){
+    var cls=i<statusIndex(p.status)?'done':(i===statusIndex(p.status)?'now':'');
+    return '<button class="'+cls+'" onclick="setDetailStatus(\''+s+'\')">'+statusLabel(s)+'</button>';
+  }).join('');
+  var taskRows=p.tasks.map(function(t){
+    return '<div class="task'+(t.done?' done':'')+'">'+
+      '<input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleDetailTask(\''+t.id+'\')">'+
+      '<span class="t">'+esc(t.text)+'</span>'+
+      '<button class="x" onclick="removeDetailTask(\''+t.id+'\')">×</button></div>';
+  }).join('');
+  var stemRows=p.stems.map(function(s){
+    return '<div class="stem"><span class="n">'+esc(s.name)+'</span><span class="k">'+esc(s.kind)+'</span>'+
+      '<button class="x" onclick="removeDetailStem(\''+s.id+'\')">×</button></div>';
+  }).join('');
+  d.innerHTML='<h2>'+(id?'Edit Project':'New Project')+'</h2><div id="dErr"></div>'+
+    '<div class="frow"><label>Title*</label><input type="text" id="dTitle" value="'+esc(p.title)+'"></div>'+
+    '<div class="frow"><label>Artist</label><input type="text" id="dArtist" value="'+esc(p.artist)+'"></div>'+
+    '<div class="frow"><label>Genre</label><select id="dGenre">'+GENRES.map(function(g){
+      return '<option '+(g===p.genre?'selected':'')+'>'+g+'</option>'}).join('')+'</select>'+
+    '<label style="min-width:40px">BPM</label><input type="number" id="dBpm" min="30" max="300" value="'+(p.bpm===null?'':p.bpm)+'" placeholder="—">'+
+    '<label style="min-width:36px">Key</label><input type="text" id="dKey" value="'+esc(p.key)+'" placeholder="e.g. A minor" style="width:110px"></div>'+
+    '<div class="frow"><label>Status</label></div><div class="pipe">'+pipe+'</div>'+
+    '<div class="frow"><label>Deadline</label><input type="date" id="dDeadline" value="'+esc(p.deadline)+'"></div>'+
+    '<div class="frow"><label>Notes</label><textarea id="dNotes">'+esc(p.notes)+'</textarea></div>'+
+    '<h2>Tasks ('+p.tasks.filter(function(t){return t.done}).length+'/'+p.tasks.length+' done)</h2>'+
+    '<div class="tasks">'+(taskRows||'<div class="empty">No tasks yet.</div>')+'</div>'+
+    '<div class="addrow"><input type="text" id="dNewTask" placeholder="New task… (Enter to add)" onkeydown="if(event.key===\'Enter\')addDetailTask()"><button class="btn small" onclick="addDetailTask()">Add</button></div>'+
+    '<h2>Stems ('+p.stems.length+')</h2>'+
+    '<div class="stems">'+(stemRows||'<div class="empty">No stems logged.</div>')+'</div>'+
+    '<div class="addrow"><input type="text" id="dNewStem" placeholder="Stem name… (Enter to add)" onkeydown="if(event.key===\'Enter\')addDetailStem()">'+
+    '<select id="dStemKind">'+STEM_KINDS.map(function(k){return '<option>'+k+'</option>'}).join('')+'</select>'+
+    '<button class="btn small" onclick="addDetailStem()">Add</button></div>'+
+    '<div class="d-actions">'+
+    '<button class="btn" onclick="saveDetail()">'+(id?'Save Changes':'Create Project')+'</button>'+
+    (id?'<button class="btn ghost" onclick="exportOne()">Export JSON</button>'+
+        '<button class="btn ghost" onclick="exportSummary()">Export Summary</button>'+
+        '<button class="btn ghost" onclick="duplicateOne()">Duplicate</button>'+
+        '<button class="btn danger" onclick="deleteOne()">Delete</button>':'')+
+    '<button class="btn ghost" onclick="closeDetail()">Close</button></div>'+
+    '<p class="note">Progress = % of tasks checked off. Statuses move along the pipeline: Idea → Demo → Arranged → Mixed → Mastered → Released. Everything autosaves to this browser.</p>';
+  d._pid=p.id;d._isNew=!id;d._draft=p;
+  d.scrollIntoView({behavior:'smooth'});
+  renderGrid();
+}
+
+function readDetail(){
+  var d=document.getElementById('detail');
+  var p=d._draft;
+  p.title=document.getElementById('dTitle').value.trim();
+  p.artist=document.getElementById('dArtist').value.trim();
+  p.genre=document.getElementById('dGenre').value;
+  p.bpm=clampBpm(parseBpm(document.getElementById('dBpm').value));
+  p.key=document.getElementById('dKey').value.trim();
+  p.deadline=document.getElementById('dDeadline').value;
+  p.notes=document.getElementById('dNotes').value;
+  return p;
+}
+function detailErrors(p){
+  var errs=validateProject(p);
+  var d=document.getElementById('detail');
+  d.querySelector('#dErr').innerHTML=errs.length?
+    errs.map(function(e){return '<div class="err">'+esc(e)+'</div>'}).join(''):'';
+  return errs;
+}
+function saveDetail(){
+  var d=document.getElementById('detail');
+  var p=readDetail();
+  if(detailErrors(p).length)return;
+  p.updatedAt=Date.now();
+  if(d._isNew)projects.push(p);
+  save();activeId=p.id;d.classList.add('hidden');activeId=null;
+  showErrors([]);refresh();toast(d._isNew?'Project created':'Changes saved');
+}
+function setDetailStatus(s){
+  var d=document.getElementById('detail');
+  var p=readDetail();setStatus(p,s);d._draft=p;openDetail(d._isNew?null:p.id);
+}
+function addDetailTask(){
+  var inp=document.getElementById('dNewTask');
+  if(!inp.value.trim())return;
+  var d=document.getElementById('detail');
+  var p=readDetail();addTask(p,inp.value);d._draft=p;openDetail(d._isNew?null:p.id);
+}
+function toggleDetailTask(id){
+  var d=document.getElementById('detail');
+  var p=readDetail();toggleTask(p,id);d._draft=p;openDetail(d._isNew?null:p.id);
+}
+function removeDetailTask(id){
+  var d=document.getElementById('detail');
+  var p=readDetail();removeTask(p,id);d._draft=p;openDetail(d._isNew?null:p.id);
+}
+function addDetailStem(){
+  var inp=document.getElementById('dNewStem');
+  if(!inp.value.trim())return;
+  var d=document.getElementById('detail');
+  var p=readDetail();
+  addStem(p,inp.value,document.getElementById('dStemKind').value);
+  d._draft=p;openDetail(d._isNew?null:p.id);
+}
+function removeDetailStem(id){
+  var d=document.getElementById('detail');
+  var p=readDetail();removeStem(p,id);d._draft=p;openDetail(d._isNew?null:p.id);
+}
+function closeDetail(){
+  document.getElementById('detail').classList.add('hidden');
+  activeId=null;refresh();
+}
+function activeProject(){
+  return projects.filter(function(x){return x.id===activeId})[0];
+}
+function download(name,text,mime){
+  var blob=new Blob([text],{type:mime||'text/plain'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+}
+function exportOne(){
+  var p=activeProject();if(!p)return;
+  download(p.title.replace(/[^\w\-]+/g,'_')+'.json',serializeProjects([p]),'application/json');
+}
+function exportSummary(){
+  var p=activeProject();if(!p)return;
+  download(p.title.replace(/[^\w\-]+/g,'_')+'-summary.txt',projectSummary(p));
+}
+function duplicateOne(){
+  var p=activeProject();if(!p)return;
+  var c=newProject(JSON.parse(serializeProjects([p]))[0]);
+  c.id=uid();c.title=p.title+' (copy)';c.createdAt=Date.now();c.updatedAt=Date.now();
+  c.tasks.forEach(function(t){t.id=uid()});c.stems.forEach(function(s){s.id=uid()});
+  projects.push(c);save();activeId=null;
+  document.getElementById('detail').classList.add('hidden');refresh();toast('Project duplicated');
+}
+function deleteOne(){
+  var p=activeProject();if(!p)return;
+  if(!confirm('Delete "'+p.title+'"? This cannot be undone.'))return;
+  projects=projects.filter(function(x){return x.id!==p.id});
+  save();activeId=null;document.getElementById('detail').classList.add('hidden');refresh();toast('Project deleted');
+}
+function exportAll(){
+  if(!projects.length){toast('Nothing to export');return}
+  download('music-projects.json',serializeProjects(projects),'application/json');
+}
+function importAll(ev){
+  var f=ev.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var arr=deserializeProjects(r.result);
+      var ids={};projects.forEach(function(p){ids[p.id]=1});
+      var added=0;
+      arr.forEach(function(p){if(!ids[p.id]){projects.push(p);added++}});
+      save();refresh();toast('Imported '+added+' project'+(added===1?'':'s'));
+    }catch(e){showErrors([e.message])}
+  };
+  r.readAsText(f);ev.target.value='';
+}
+
+load();initFilters();refresh();
+}
+</script>
+</body>
+</html>

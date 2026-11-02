@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storyboard Tool — Independent</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b0d11;--panel:#1b1d22;--panel2:#23262d;--ink:#fff8df;--muted:#a89f81;--accent:#f9bc31;--border:#2e323b;--green:#3dd68c}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,sans-serif;min-height:100vh;padding:16px;max-width:1000px;margin:0 auto}
+h1{font-size:22px;margin-bottom:4px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+textarea{width:100%;min-height:150px;background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:10px;padding:12px;font-size:14px;font-family:inherit;margin-bottom:12px}
+.btn{background:var(--accent);color:#0b0d11;border:0;border-radius:10px;padding:12px 20px;font-size:15px;font-weight:700;cursor:pointer;margin-right:8px;margin-bottom:8px}
+.btn.ghost{background:var(--panel);color:var(--ink);border:1px solid var(--border)}
+.shot{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.shot-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.shot-num{font-weight:800;color:var(--accent);font-size:16px}
+.shot-type{font-size:12px;background:var(--panel2);padding:4px 10px;border-radius:20px;color:var(--muted)}
+.shot textarea{min-height:60px;margin-bottom:8px;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.row input,.row select{background:var(--panel2);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:8px;font-size:13px}
+.row label{font-size:12px;color:var(--muted);align-self:center}
+#output{margin-top:16px}
+.empty{color:var(--muted);text-align:center;padding:40px;font-size:14px}
+</style>
+</head>
+<body>
+<h1>🎬 Storyboard Tool</h1>
+<p class="sub">Paste your script below. The tool breaks it into scenes and generates a shot list.</p>
+
+<textarea id="scriptInput" placeholder="Paste your script here...
+
+Example:
+INT. COFFEE SHOP - DAY
+Shawn sits at a table, laptop open. He looks up as Laura enters.
+
+LAURA
+Hey! Ready to build something cool?
+
+SHAWN
+Always. What've you got?"></textarea>
+
+<div>
+<button class="btn" onclick="generateStoryboard()">Generate Storyboard</button>
+<button class="btn ghost" onclick="exportJSON()">Export JSON</button>
+<button class="btn ghost" onclick="exportText()">Export Shot List</button>
+<button class="btn ghost" onclick="clearAll()">Clear</button>
+</div>
+
+<div id="output"><div class="empty">Your storyboard will appear here.</div></div>
+
+<script>
+let shots=[];
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function generateStoryboard(){
+  const script=document.getElementById('scriptInput').value.trim();
+  if(!script){alert('Paste a script first.');return;}
+  
+  shots=[];
+  // Split by scene headers (INT./EXT.) or double newlines
+  const blocks=script.split(/\n\s*\n/);
+  let shotNum=1;
+  
+  blocks.forEach(block=>{
+    block=block.trim();
+    if(!block)return;
+    
+    // Detect scene header
+    const isScene=/^(INT\.|EXT\.|INT\/EXT\.)/i.test(block);
+    // Detect dialogue (CHARACTER NAME in caps followed by lines)
+    const lines=block.split('\n');
+    
+    if(isScene){
+      shots.push({
+        num:shotNum++,
+        type:'ESTABLISHING',
+        description:block.split('\n')[0],
+        dialogue:'',
+        notes:'Wide shot to establish location'
+      });
+      // Remaining lines as action
+      const rest=lines.slice(1).join('\n').trim();
+      if(rest){
+        shots.push({num:shotNum++,type:'ACTION',description:rest,dialogue:'',notes:''});
+      }
+    } else if(/^[A-Z][A-Z\s]+$/.test(lines[0].trim()) && lines.length>1){
+      // Dialogue block
+      shots.push({
+        num:shotNum++,
+        type:'DIALOGUE',
+        description:'Character speaks',
+        dialogue:block,
+        notes:'Medium close-up'
+      });
+    } else {
+      // Action/description
+      shots.push({num:shotNum++,type:'ACTION',description:block,dialogue:'',notes:''});
+    }
+  });
+  
+  renderShots();
+}
+
+function renderShots(){
+  const out=document.getElementById('output');
+  if(!shots.length){out.innerHTML='<div class="empty">No shots generated.</div>';return;}
+  
+  out.innerHTML='<h3 style="margin-bottom:12px">'+shots.length+' Shots</h3>';
+  shots.forEach((s,i)=>{
+    const div=document.createElement('div');div.className='shot';
+    div.innerHTML=
+      '<div class="shot-header"><span class="shot-num">Shot '+s.num+'</span>'+
+      '<select onchange="shots['+i+'].type=this.value">'+
+      ['ESTABLISHING','ACTION','DIALOGUE','CLOSE-UP','WIDE','MONTAGE','TRANSITION'].map(t=>
+        '<option '+(s.type===t?'selected':'')+'>'+t+'</option>').join('')+
+      '</select></div>'+
+      '<div class="row"><label style="min-width:90px">Description:</label></div>'+
+      '<textarea onchange="shots['+i+'].description=this.value">'+esc(s.description)+'</textarea>'+
+      (s.dialogue?'<div class="row"><label>Dialogue:</label></div><textarea onchange="shots['+i+'].dialogue=this.value" style="font-style:italic">'+esc(s.dialogue)+'</textarea>':'')+
+      '<div class="row"><label style="min-width:90px">Notes:</label>'+
+      '<input style="flex:1" value="'+esc(s.notes)+'" onchange="shots['+i+'].notes=this.value" placeholder="Camera angle, lighting, etc."></div>';
+    out.appendChild(div);
+  });
+}
+
+function exportJSON(){
+  if(!shots.length){alert('Generate a storyboard first.');return;}
+  const blob=new Blob([JSON.stringify(shots,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='storyboard.json';a.click();
+}
+
+function exportText(){
+  if(!shots.length){alert('Generate a storyboard first.');return;}
+  let text='SHOT LIST\n=========\n\n';
+  shots.forEach(s=>{
+    text+='SHOT '+s.num+' ['+s.type+']\n';
+    text+=s.description+'\n';
+    if(s.dialogue)text+='\n'+s.dialogue+'\n';
+    if(s.notes)text+='Notes: '+s.notes+'\n';
+    text+='\n---\n\n';
+  });
+  const blob=new Blob([text],{type:'text/plain'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='shot-list.txt';a.click();
+}
+
+function clearAll(){
+  if(!confirm('Clear script and storyboard?'))return;
+  document.getElementById('scriptInput').value='';
+  shots=[];
+  document.getElementById('output').innerHTML='<div class="empty">Your storyboard will appear here.</div>';
+}
+</script>
+</body>
+</html>
