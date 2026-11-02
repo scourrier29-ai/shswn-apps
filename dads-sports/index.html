@@ -105,7 +105,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,Roboto,san
       <div class="pill-grid">
         <button class="pillbtn" id="scanner-playbtn" onclick="toggleScannerAudio()"><span class="ptri">▶</span> Play Scanner</button>
       </div>
-      <div class="desc" style="margin-top:8px">Fraser Valley Fire & EMS — live. Tap the badge to close.</div>
+      <div class="desc" style="margin-top:8px">Burnaby Fire Dispatch — live. Closest feed to Mission. Tap the badge to close.</div>
     </div>
   </div>
   <div class="tagline">MISSION, BC</div>
@@ -306,12 +306,12 @@ function pickStation(list){
 
 /* ---------- NFL + NHL TEAMS ---------- */
 var NFL_TEAMS=[
-  {t:'Cardinals',s:'Arizona Sports 98.7',q:'KMVP'},
+  {t:'Cardinals',s:'Arizona Sports 98.7',q:'KMVP',url:'https://bonneville.cdnstream1.com/2699_48.aac'},
   {t:'Falcons',s:'92.9 The Game',q:'WZGC'},
   {t:'Ravens',s:'98 Rock',q:'WIYY'},
   {t:'Bills',s:'WGR 550',q:'WGR 550'},
-  {t:'Panthers',s:'99.7 The Fox',q:'WRFX'},
-  {t:'Bears',s:'ESPN 1000',q:'WMVP'},
+  {t:'Panthers',s:'99.7 The Fox',q:'WRFX',url:'https://stream.revma.ihrhls.com/zc1613'},
+  {t:'Bears',s:'ESPN 1000',q:'WMVP',url:'https://live.amperwave.net/direct/goodkarma-wmvpammp3-ibc1'},
   {t:'Bengals',s:'700 WLW',q:'WLW'},
   {t:'Browns',s:'92.3 The Fan',q:'WKRK'},
   {t:'Cowboys',s:'105.3 The Fan',q:'KRLD'},
@@ -320,42 +320,42 @@ var NFL_TEAMS=[
   {t:'Packers',s:'97.3 The Game',q:'WRNW'},
   {t:'Texans',s:'SportsRadio 610',q:'KILT'},
   {t:'Colts',s:'107.5 The Fan',q:'The Fan Indianapolis'},
-  {t:'Jaguars',s:'1010 XL',q:'WJXL'},
+  {t:'Jaguars',s:'1010 XL',q:'WJXL',url:'https://ice23.securenetsystems.net/WJXL'},
   {t:'Chiefs',s:'106.5 The Wolf',q:'WDAF'},
   {t:'Raiders',s:'Raider Nation 920',q:'KRLV'},
   {t:'Chargers',s:'ALT 98.7',q:'KYSR'},
   {t:'Rams',s:'710 ESPN',q:'KSPN'},
   {t:'Dolphins',s:'560 WQAM',q:'WQAM'},
-  {t:'Vikings',s:'KFAN 100.3',q:'KFAN'},
+  {t:'Vikings',s:'KFAN 100.3',q:'KFAN',url:'https://stream.revma.ihrhls.com/zc1209'},
   {t:'Patriots',s:'98.5 Sports Hub',q:'WBZ-FM'},
   {t:'Saints',s:'WWL 870',q:'WWL'},
   {t:'Giants',s:'WFAN 660',q:'WFAN'},
-  {t:'Jets',s:'Q104.3',q:'WAXQ'},
+  {t:'Jets',s:'Q104.3',q:'WAXQ',url:'https://stream.revma.ihrhls.com/zc1465'},
   {t:'Eagles',s:'94.1 WIP',q:'WIP'},
   {t:'Steelers',s:'102.5 WDVE',q:'WDVE'},
   {t:'49ers',s:'KNBR 680',q:'KNBR'},
-  {t:'Seahawks',s:'710 Seattle Sports',q:'KIRO'},
+  {t:'Seahawks',s:'710 Seattle Sports',q:'KIRO',url:'https://bonneville.cdnstream1.com/2643_48.aac'},
   {t:'Buccaneers',s:'98 Rock 97.9',q:'WXTB'},
   {t:'Titans',s:'104.5 The Zone',q:'WGFX'},
   {t:'Commanders',s:'106.7 The Fan',q:'WJFK'}
 ];
 var NHL_TEAMS=[
   {t:'Ducks',s:'AM 830 KLAA',q:'KLAA'},
-  {t:'Bruins',s:'98.5 Sports Hub',q:'WBZ-FM'},
+  {t:'Bruins',s:'98.5 Sports Hub',q:'WBZ-FM',url:'https://stream.revma.ihrhls.com/zc7729'},
   {t:'Sabres',s:'WGR 550',q:'WGR 550'},
   {t:'Flames',s:'Sportsnet 960',q:'Sportsnet 960'},
-  {t:'Hurricanes',s:'99.9 The Fan',q:'WCMC'},
+  {t:'Hurricanes',s:'99.9 The Fan',q:'WCMC',url:'https://ais-sa8.cdnstream1.com/2750_64.aac'},
   {t:'Blackhawks',s:'720 WGN',q:'WGN'},
   {t:'Avalanche',s:'92.5 Altitude',q:'KKSE'},
-  {t:'Blue Jackets',s:'97.1 The Fan',q:'WBNS'},
+  {t:'Blue Jackets',s:'97.1 The Fan',q:'WBNS',url:'https://radiohio.streamguys1.com/cols/wbnsfm.mp3'},
   {t:'Stars',s:'1310 The Ticket',q:'KTCK'},
   {t:'Red Wings',s:'97.1 The Ticket',q:'WXYT'},
-  {t:'Oilers',s:'630 CHED',q:'CHED'},
+  {t:'Oilers',s:'630 CHED',q:'CHED',url:'https://corus.leanstream.co/CHEDAM-MP3'},
   {t:'Panthers',s:'560 WQAM',q:'WQAM'},
   {t:'Kings',s:'790 KABC',q:'KABC'},
-  {t:'Wild',s:'KFAN 100.3',q:'KFAN'},
+  {t:'Wild',s:'KFAN 100.3',q:'KFAN',url:'https://stream.revma.ihrhls.com/zc1209'},
   {t:'Canadiens',s:'TSN 690',q:'TSN 690'},
-  {t:'Predators',s:'102.5 The Game',q:'WGFX'},
+  {t:'Predators',s:'102.5 The Game',q:'WGFX',url:'https://cromwell-ice.streamguys1.com/WPRTFM'},
   {t:'Devils',s:'WFAN 660',q:'WFAN'},
   {t:'Islanders',s:'88.7 WRHU',q:'WRHU'},
   {t:'Rangers',s:'98.7 ESPN NY',q:'WEPN'},
@@ -504,18 +504,9 @@ function toggleScanner(){
   p.style.display=(p.style.display==='none')?'block':'none';
 }
 function toggleScannerAudio(){
-  var btn=document.getElementById('scanner-playbtn');
-  if(!scannerAudio){
-    scannerAudio=new Audio();
-    // Fraser Valley Fire/EMS via Broadcastify embed stream
-    // Direct stream URL to be set once browser task confirms feed
-    scannerAudio.src='';
-  }
-  if(scannerPlaying){scannerAudio.pause();scannerPlaying=false;btn.innerHTML='<span class="ptri">▶</span> Play Scanner';btn.classList.remove('playing');}
-  else{
-    if(!scannerAudio.src){alert('Scanner feed coming soon — still wiring it up.');return;}
-    scannerAudio.play();scannerPlaying=true;btn.innerHTML='<span class="ptri">⏸</span> Stop';btn.classList.add('playing');
-  }
+  // Burnaby Fire Dispatch — closest live feed to Mission BC (Feed ID 38213)
+  // Opens Broadcastify pop-out player (requires free login once)
+  window.open('https://www.broadcastify.com/listen/feed/popout.php?feedId=38213','_blank');
 }
 
 /* ---------- MISSION BC CLOCK + WEATHER ---------- */
