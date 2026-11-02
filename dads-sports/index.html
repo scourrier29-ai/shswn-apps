@@ -361,15 +361,15 @@ var NHL_TEAMS=[
   {t:'Rangers',s:'98.7 ESPN NY',q:'WEPN'},
   {t:'Senators',s:'TSN 1200',q:'TSN 1200'},
   {t:'Flyers',s:'97.5 Fanatic',q:'WPEN'},
-  {t:'Penguins',s:'105.9 The X',q:'WXDX'},
+  {t:'Penguins',s:'105.9 The X',q:'WXDX',url:'https://stream.revma.ihrhls.com/zc2033'},
   {t:'Sharks',s:'98.5 KFOX',q:'KUFX'},
   {t:'Kraken',s:'93.3 KJR',q:'KJR'},
   {t:'Blues',s:'101 ESPN',q:'WXOS'},
-  {t:'Lightning',s:'970 WFLA',q:'WFLA'},
+  {t:'Lightning',s:'970 WFLA',q:'WFLA',url:'https://stream.revma.ihrhls.com/zc2823'},
   {t:'Maple Leafs',s:'Sportsnet 590',q:'Sportsnet 590'},
-  {t:'Mammoth',s:'KSL Sports',q:'KSL Sports'},
+  {t:'Mammoth',s:'KSL Sports',q:'KSL Sports',url:'https://bonneville.cdnstream1.com/2707_48.aac'},
   {t:'Canucks',s:'Sportsnet 650',q:'Sportsnet 650'},
-  {t:'Golden Knights',s:'Fox Sports 98.9',q:'KKGK'},
+  {t:'Golden Knights',s:'Fox Sports 98.9',q:'KKGK',url:'https://playerservices.streamtheworld.com/api/livestream-redirect/KRLVAMAAC.aac'},
   {t:'Capitals',s:'106.7 The Fan',q:'WJFK'},
   {t:'Jets',s:'680 CJOB',q:'CJOB'}
 ];
@@ -377,6 +377,8 @@ function loadTeamGrid(elId,teams){
   var el=document.getElementById(elId);
   el.innerHTML='<div class="loading">Finding team stations…</div>';
   Promise.all(teams.map(function(tm){
+    // Verified direct stream (HTTPS only — HTTP is mixed-content-blocked on GitHub Pages)
+    if(tm.url&&/^https:\/\//i.test(tm.url))return Promise.resolve({t:tm.t,s:tm.s,url:tm.url});
     return rbSearch(tm.q).then(function(list){
       var st=pickStation(list);
       return {t:tm.t,s:tm.s,url:st?st.url_resolved:null};
