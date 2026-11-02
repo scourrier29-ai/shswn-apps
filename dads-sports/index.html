@@ -289,14 +289,16 @@ document.querySelectorAll('.tabbtn').forEach(function(b){
 });
 
 /* ---------- AUDIO HELPERS ---------- */
-function makePill(label,url,sub){
+function makePill(label,url,sub,isWeb){
   var b=document.createElement('button');
   b.className='pillbtn'+(url?'':' nostream');
-  var tri=document.createElement('span');tri.className='ptri';tri.textContent=url?'▶':'·';
+  var tri=document.createElement('span');tri.className='ptri';tri.textContent=isWeb?'↗':(url?'▶':'·');
   b.appendChild(tri);
   var lbl=document.createElement('span');lbl.textContent=label;
   b.appendChild(lbl);
-  if(url){
+  if(url&&isWeb){
+    b.addEventListener('click',function(){window.open(url,'_blank');});
+  }else if(url){
     b.addEventListener('click',function(){
       document.querySelectorAll('.pillbtn.playing').forEach(function(p){p.classList.remove('playing');});
       b.classList.add('playing');
@@ -338,87 +340,89 @@ function pickStation(list){
 
 /* ---------- NFL + NHL TEAMS ---------- */
 var NFL_TEAMS=[
-  {t:'Cardinals',s:'Arizona Sports 98.7',q:'KMVP',url:'https://bonneville.cdnstream1.com/2699_48.aac'},
-  {t:'Falcons',s:'92.9 The Game',q:'WZGC'},
-  {t:'Ravens',s:'98 Rock',q:'WIYY'},
-  {t:'Bills',s:'WGR 550',q:'WGR 550'},
+  {t:'Cardinals',s:'Arizona Sports 98.7 FM',q:'KMVP',url:'https://bonneville.cdnstream1.com/2699_48.aac'},
+  {t:'Falcons',s:'92.9 The Game',q:'WZGC',web:'https://www.audacy.com/929thegame/listen'},
+  {t:'Ravens',s:'98 Rock',q:'WIYY',web:'https://tunein.com/radio/98-ROCK-979-s29726/'},
+  {t:'Bills',s:'97 Rock 96.9 FM',q:'WGR 550',web:'https://www.97rock.com/'},
   {t:'Panthers',s:'99.7 The Fox',q:'WRFX',url:'https://stream.revma.ihrhls.com/zc1613'},
   {t:'Bears',s:'ESPN 1000',q:'WMVP',url:'https://live.amperwave.net/direct/goodkarma-wmvpammp3-ibc1'},
-  {t:'Bengals',s:'700 WLW',q:'WLW'},
-  {t:'Browns',s:'92.3 The Fan',q:'WKRK'},
-  {t:'Cowboys',s:'105.3 The Fan',q:'KRLD'},
-  {t:'Broncos',s:'850 KOA',q:'KOA'},
+  {t:'Bengals',s:'700 WLW',q:'WLW',web:'https://700wlw.iheart.com/'},
+  {t:'Browns',s:'92.3 The Fan',q:'WKRK',web:'https://www.audacy.com/923thefan'},
+  {t:'Cowboys',s:'105.3 The Fan',q:'KRLD',web:'https://www.audacy.com/1053thefan/listen'},
+  {t:'Broncos',s:'850 KOA',q:'KOA',web:'https://koacolorado.iheart.com/'},
   {t:'Lions',s:'97.1 The Ticket',q:'WXYT'},
-  {t:'Packers',s:'97.3 The Game',q:'WRNW'},
-  {t:'Texans',s:'SportsRadio 610',q:'KILT'},
-  {t:'Colts',s:'107.5 The Fan',q:'The Fan Indianapolis'},
+  {t:'Packers',s:'95.7 BIG FM',q:'WRNW',web:'https://www.iheart.com/live/2689'},
+  {t:'Texans',s:'SportsRadio 610',q:'KILT',web:'https://www.audacy.com/sportsradio610'},
+  {t:'Colts',s:'93.5 / 107.5 The Fan',q:'The Fan Indianapolis',web:'https://1075thefan.com/'},
   {t:'Jaguars',s:'1010 XL',q:'WJXL',url:'https://ice23.securenetsystems.net/WJXL'},
-  {t:'Chiefs',s:'106.5 The Wolf',q:'WDAF'},
-  {t:'Raiders',s:'Raider Nation 920',q:'KRLV'},
-  {t:'Chargers',s:'ALT 98.7',q:'KYSR'},
-  {t:'Rams',s:'710 ESPN',q:'KSPN'},
-  {t:'Dolphins',s:'560 WQAM',q:'WQAM'},
-  {t:'Vikings',s:'KFAN 100.3',q:'KFAN',url:'https://stream.revma.ihrhls.com/zc1209'},
-  {t:'Patriots',s:'98.5 Sports Hub',q:'WBZ-FM'},
-  {t:'Saints',s:'WWL 870',q:'WWL'},
-  {t:'Giants',s:'WFAN 660',q:'WFAN'},
-  {t:'Jets',s:'Q104.3',q:'WAXQ',url:'https://stream.revma.ihrhls.com/zc1465'},
-  {t:'Eagles',s:'94.1 WIP',q:'WIP'},
-  {t:'Steelers',s:'102.5 WDVE',q:'WDVE'},
-  {t:'49ers',s:'KNBR 680',q:'KNBR'},
+  {t:'Chiefs',s:'106.5 The Wolf',q:'WDAF',web:'https://www.audacy.com/1065thewolf'},
+  {t:'Raiders',s:'Raider Nation Radio 920',q:'KRLV',web:'https://www.lvsportsnetwork.com/raider-nation-radio-920-am/'},
+  {t:'Chargers',s:'ALT 98.7 FM',q:'KYSR',web:'https://www.iheart.com/live/201'},
+  {t:'Rams',s:'710 ESPN',q:'KSPN',web:'https://tunein.com/radio/ESPN-LA-710-s32301/'},
+  {t:'Dolphins',s:'560 WQAM',q:'WQAM',web:'https://www.audacy.com/wqam'},
+  {t:'Vikings',s:'KFAN 100.3 FM',q:'KFAN',url:'https://stream.revma.ihrhls.com/zc1209'},
+  {t:'Patriots',s:'98.5 The Sports Hub',q:'WBZ-FM',web:'https://tunein.com/985thesportshub/'},
+  {t:'Saints',s:'WWL 870 AM',q:'WWL'},
+  {t:'Giants',s:'WFAN 660 AM / 101.9 FM',q:'WFAN',web:'https://www.audacy.com/wfan/listen'},
+  {t:'Jets',s:'Q104.3 FM',q:'WAXQ',url:'https://stream.revma.ihrhls.com/zc1465'},
+  {t:'Eagles',s:'94.1 WIP',q:'WIP',web:'https://www.audacy.com/94wip/listen'},
+  {t:'Steelers',s:'102.5 WDVE',q:'WDVE',web:'https://dve.iheart.com/'},
+  {t:'49ers',s:'KNBR 680 AM',q:'KNBR',web:'https://tunein.com/radio/The-Sports-Leader-KNBR-680-s34231/'},
   {t:'Seahawks',s:'710 Seattle Sports',q:'KIRO',url:'https://bonneville.cdnstream1.com/2643_48.aac'},
-  {t:'Buccaneers',s:'98 Rock 97.9',q:'WXTB'},
-  {t:'Titans',s:'104.5 The Zone',q:'WGFX'},
-  {t:'Commanders',s:'106.7 The Fan',q:'WJFK'}
+  {t:'Buccaneers',s:'98 Rock 97.9 FM',q:'WXTB',web:'https://www.iheart.com/live/697'},
+  {t:'Titans',s:'104.5 The Zone',q:'WGFX',web:'https://www.1045thezone.com/'},
+  {t:'Commanders',s:'106.7 The Fan',q:'WJFK',web:'https://www.audacy.com/thefandc/listen'},
 ];
 var NHL_TEAMS=[
-  {t:'Ducks',s:'AM 830 KLAA',q:'KLAA'},
-  {t:'Bruins',s:'98.5 Sports Hub',q:'WBZ-FM',url:'https://stream.revma.ihrhls.com/zc7729'},
-  {t:'Sabres',s:'WGR 550',q:'WGR 550'},
-  {t:'Flames',s:'Sportsnet 960',q:'Sportsnet 960'},
+  {t:'Ducks',s:'AM 830 KLAA',q:'KLAA',web:'https://tunein.com/radio/AM830-KLAA-s34679/'},
+  {t:'Bruins',s:'98.5 The Sports Hub',q:'WBZ-FM',url:'https://stream.revma.ihrhls.com/zc7729'},
+  {t:'Sabres',s:'WGR 550 AM',q:'WGR 550',web:'https://www.audacy.com/wgr550'},
+  {t:'Flames',s:'Sportsnet 960 The Fan',q:'Sportsnet 960'},
   {t:'Hurricanes',s:'99.9 The Fan',q:'WCMC',url:'https://ais-sa8.cdnstream1.com/2750_64.aac'},
-  {t:'Blackhawks',s:'720 WGN',q:'WGN'},
-  {t:'Avalanche',s:'92.5 Altitude',q:'KKSE'},
+  {t:'Blackhawks',s:'720 WGN',q:'WGN',web:'https://tunein.com/radio/WGN-Radio-720-s29085/'},
+  {t:'Avalanche',s:'92.5 Altitude Sports',q:'KKSE',web:'https://www.altitudesportsradio.com/'},
   {t:'Blue Jackets',s:'97.1 The Fan',q:'WBNS',url:'https://radiohio.streamguys1.com/cols/wbnsfm.mp3'},
-  {t:'Stars',s:'1310 The Ticket',q:'KTCK'},
+  {t:'Stars',s:'96.7 / 1310 The Ticket',q:'KTCK',web:'https://tunein.com/radio/The-Ticket-1310-s35596/'},
   {t:'Red Wings',s:'97.1 The Ticket',q:'WXYT'},
   {t:'Oilers',s:'630 CHED',q:'CHED',url:'https://corus.leanstream.co/CHEDAM-MP3'},
-  {t:'Panthers',s:'560 WQAM',q:'WQAM'},
-  {t:'Kings',s:'790 KABC',q:'KABC'},
-  {t:'Wild',s:'KFAN 100.3',q:'KFAN',url:'https://stream.revma.ihrhls.com/zc1209'},
-  {t:'Canadiens',s:'TSN 690',q:'TSN 690'},
+  {t:'Panthers',s:'99.7 The Fox',q:'WQAM',url:'https://stream.revma.ihrhls.com/zc1613'},
+  {t:'Kings',s:'790 KABC',q:'KABC',web:'https://www.iheart.com/live/5335'},
+  {t:'Wild',s:'KFAN 100.3 FM',q:'KFAN',url:'https://stream.revma.ihrhls.com/zc1209'},
+  {t:'Canadiens',s:'TSN 690',q:'TSN 690',web:'https://www.tsn.ca/radio/montreal-690'},
   {t:'Predators',s:'102.5 The Game',q:'WGFX',url:'https://cromwell-ice.streamguys1.com/WPRTFM'},
-  {t:'Devils',s:'WFAN 660',q:'WFAN'},
-  {t:'Islanders',s:'88.7 WRHU',q:'WRHU'},
-  {t:'Rangers',s:'98.7 ESPN NY',q:'WEPN'},
-  {t:'Senators',s:'TSN 1200',q:'TSN 1200'},
-  {t:'Flyers',s:'97.5 Fanatic',q:'WPEN'},
+  {t:'Devils',s:'WFAN 660 AM / 101.9 FM',q:'WFAN',web:'https://www.audacy.com/wfan'},
+  {t:'Islanders',s:'88.7 WRHU',q:'WRHU',web:'https://tunein.com/radio/WRHU-887-s22416/'},
+  {t:'Rangers',s:'98.7 ESPN New York',q:'WEPN',url:'https://stream.abacast.net/direct/goodkarma-wepnamaac-ibc'},
+  {t:'Senators',s:'TSN 1200',q:'TSN 1200',web:'https://www.tsn.ca:443/radio/ottawa-1200/shows'},
+  {t:'Flyers',s:'97.5 The Fanatic',q:'WPEN',web:'https://975thefanatic.com'},
   {t:'Penguins',s:'105.9 The X',q:'WXDX',url:'https://stream.revma.ihrhls.com/zc2033'},
-  {t:'Sharks',s:'98.5 KFOX',q:'KUFX'},
-  {t:'Kraken',s:'93.3 KJR',q:'KJR'},
-  {t:'Blues',s:'101 ESPN',q:'WXOS'},
+  {t:'Sharks',s:'98.5 KFOX',q:'KUFX',web:'https://www.sjsharks.com/listen'},
+  {t:'Kraken',s:'93.3 KJR FM',q:'KJR',web:'https://933kjr.com/listen'},
+  {t:'Blues',s:'101 ESPN',q:'WXOS',web:'https://tunein.com/radio/101-ESPN-1011-s23633/'},
   {t:'Lightning',s:'970 WFLA',q:'WFLA',url:'https://stream.revma.ihrhls.com/zc2823'},
-  {t:'Maple Leafs',s:'Sportsnet 590',q:'Sportsnet 590'},
-  {t:'Mammoth',s:'KSL Sports',q:'KSL Sports',url:'https://bonneville.cdnstream1.com/2707_48.aac'},
-  {t:'Canucks',s:'Sportsnet 650',q:'Sportsnet 650'},
-  {t:'Golden Knights',s:'Fox Sports 98.9',q:'KKGK',url:'https://playerservices.streamtheworld.com/api/livestream-redirect/KRLVAMAAC.aac'},
-  {t:'Capitals',s:'106.7 The Fan',q:'WJFK'},
-  {t:'Jets',s:'680 CJOB',q:'CJOB'}
+  {t:'Maple Leafs',s:'Sportsnet 590 The Fan',q:'Sportsnet 590',web:'https://www.sportsnet.ca/590/'},
+  {t:'Mammoth',s:'KSL Sports Zone',q:'KSL Sports',url:'https://bonneville.cdnstream1.com/2707_48.aac'},
+  {t:'Canucks',s:'Sportsnet 650',q:'Sportsnet 650',web:'https://www.sportsnet.ca/650/'},
+  {t:'Golden Knights',s:'Fox Sports 98.9 FM',q:'KKGK',url:'https://playerservices.streamtheworld.com/api/livestream-redirect/KRLVAMAAC.aac'},
+  {t:'Capitals',s:'106.7 The Fan',q:'WJFK',web:'https://www.audacy.com/thefandc'},
+  {t:'Jets',s:'Q104.3 FM',q:'CJOB',url:'https://stream.revma.ihrhls.com/zc1465'},
 ];
 function loadTeamGrid(elId,teams){
   var el=document.getElementById(elId);
   el.innerHTML='<div class="loading">Finding team stations…</div>';
   Promise.all(teams.map(function(tm){
     // Verified direct stream (HTTPS only — HTTP is mixed-content-blocked on GitHub Pages)
-    if(tm.url&&/^https:\/\//i.test(tm.url))return Promise.resolve({t:tm.t,s:tm.s,url:tm.url});
+    if(tm.url&&/^https:\/\//i.test(tm.url))return Promise.resolve({t:tm.t,s:tm.s,url:tm.url,web:false});
+    // Official web player — opens the station's own listen page in a new tab
+    if(tm.web)return Promise.resolve({t:tm.t,s:tm.s,url:tm.web,web:true});
     return rbSearch(tm.q).then(function(list){
       var st=pickStation(list);
-      return {t:tm.t,s:tm.s,url:st?st.url_resolved:null};
-    }).catch(function(){return {t:tm.t,s:tm.s,url:null};});
+      return {t:tm.t,s:tm.s,url:st?st.url_resolved:null,web:false};
+    }).catch(function(){return {t:tm.t,s:tm.s,url:null,web:false};});
   })).then(function(found){
     el.innerHTML='';
     found.forEach(function(f){
-      el.appendChild(makePill(f.t,f.url,f.s));
+      el.appendChild(makePill(f.t,f.url,f.s,f.web));
     });
   }).catch(function(){errBox(el,function(){loadTeamGrid(elId,teams);});});
 }
