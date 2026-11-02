@@ -891,9 +891,28 @@ function loadVoices(){
   ttsVoices=(filtered.length?filtered:vs).slice().sort(function(a,b){return scoreVoice(b)-scoreVoice(a);}).slice(0,6);
   renderVoicePanels();
 }
+function isFemaleVoice(v){
+  var n=(v.name||'').toLowerCase();
+  return /female|samantha|victoria|karen|zira|susan|fiona|tessa|moira|veena|kathy|cathy|jenny|emma|olivia|aria|female|woman|girl|lady/i.test(n);
+}
 function pickVoice(){
   var uri=null;try{uri=localStorage.getItem(LS_VOICE);}catch(e){}
-  if(uri){for(var i=0;i<ttsVoices.length;i++)if(ttsVoices[i].voiceURI===uri)return ttsVoices[i];}
+  if(uri){
+    for(var i=0;i<ttsVoices.length;i++){
+      if(ttsVoices[i].voiceURI===uri){
+        // Reject saved female voices
+        if(isFemaleVoice(ttsVoices[i])){
+          try{localStorage.removeItem(LS_VOICE);}catch(e){}
+          break;
+        }
+        return ttsVoices[i];
+      }
+    }
+  }
+  // Find first non-female voice
+  for(var j=0;j<ttsVoices.length;j++){
+    if(!isFemaleVoice(ttsVoices[j]))return ttsVoices[j];
+  }
   return ttsVoices[0]||null;
 }
 function shortName(v){
