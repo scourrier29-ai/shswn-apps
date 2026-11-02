@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#020c1b">
+<title>Dad's Sports Radio</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+:root{
+  --gold:#f5b301;--gold-dim:#b8860b;--gold-glow:rgba(245,179,1,.45);
+  --bg:#020c1b;--panel:#061524;--panel2:#0a1e33;
+  --text:#ffffff;--muted:#9db8d2;--cyan:#40daff;--cyan-dim:rgba(64,218,255,.15);
+  --red:#e53935;--green:#4caf50;
+}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,Roboto,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;font-size:18px;line-height:1.45}
+.header{position:fixed;top:0;left:0;right:0;min-height:72px;z-index:50;display:flex;align-items:center;justify-content:center;padding:12px;background:rgba(2,12,27,.97);border-bottom:2px solid rgba(245,179,1,.35)}
+.header h1{font-size:26px;font-weight:800;letter-spacing:.02em;color:var(--gold);text-align:center}
+.main{position:fixed;top:72px;bottom:92px;left:0;right:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.tab-panel{display:none;padding:16px 16px 32px;max-width:700px;margin:0 auto}
+.tab-panel.active{display:block}
+.tabbar{position:fixed;bottom:0;left:0;right:0;height:92px;z-index:50;display:flex;background:rgba(2,12,27,.98);border-top:2px solid rgba(245,179,1,.35);padding-bottom:env(safe-area-inset-bottom)}
+.tabbtn{flex:1;border:none;background:transparent;color:var(--muted);font-size:18px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:76px;touch-action:manipulation}
+.tabbtn .ticon{font-size:34px}
+.tabbtn.active{color:var(--gold)}
+.hero{text-align:center;padding:28px 16px 8px}
+.hero h2{font-size:32px;font-weight:800;color:var(--cyan);margin-bottom:10px}
+.hero p{font-size:20px;color:var(--muted);margin-bottom:24px}
+.bigbtn{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:88px;margin:14px 0;padding:18px 20px;font-size:24px;font-weight:800;color:#06121f;background:linear-gradient(145deg,#ffd75e,#f5b301);border:none;border-radius:20px;cursor:pointer;touch-action:manipulation;box-shadow:0 4px 18px var(--gold-glow)}
+.bigbtn:active{transform:scale(.97)}
+.bigbtn .bicon{font-size:40px}
+.bigbtn.cyan{background:linear-gradient(145deg,#7de9ff,#40daff);box-shadow:0 4px 18px rgba(64,218,255,.4)}
+.card{background:var(--panel);border:2px solid rgba(64,218,255,.25);border-radius:18px;padding:18px;margin:12px 0;display:flex;align-items:center;gap:16px}
+.card .cinfo{flex:1;min-width:0}
+.card .cname{font-size:21px;font-weight:700;margin-bottom:4px}
+.card .csub{font-size:16px;color:var(--muted)}
+.playbtn{flex:0 0 auto;width:76px;height:76px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(145deg,#7de9ff,#40daff);color:#06121f;font-size:32px;display:flex;align-items:center;justify-content:center;touch-action:manipulation;box-shadow:0 4px 14px rgba(64,218,255,.45)}
+.playbtn.playing{background:linear-gradient(145deg,#ff8a80,#e53935);color:#fff}
+.sect{font-size:22px;font-weight:800;color:var(--gold);margin:22px 0 6px}
+.loading{text-align:center;color:var(--muted);font-size:19px;padding:30px}
+.errorbox{background:rgba(229,57,53,.12);border:2px solid var(--red);border-radius:14px;padding:18px;margin:12px 0;font-size:18px;text-align:center}
+.retrybtn{margin-top:12px;min-height:56px;padding:12px 28px;font-size:19px;font-weight:700;border-radius:14px;border:none;background:var(--cyan);color:#06121f;cursor:pointer}
+.playerbar{position:fixed;left:12px;right:12px;bottom:100px;z-index:60;background:var(--panel2);border:2px solid var(--cyan);border-radius:16px;padding:12px 16px;display:none;align-items:center;gap:14px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+.playerbar.show{display:flex}
+.playerbar .pname{flex:1;font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pstop{width:60px;height:60px;border-radius:50%;border:none;background:var(--red);color:#fff;font-size:24px;cursor:pointer;touch-action:manipulation;flex:0 0 auto}
+.ep{display:block;width:100%;text-align:left;background:var(--panel);border:2px solid rgba(64,218,255,.25);border-radius:16px;padding:16px;margin:10px 0;cursor:pointer;touch-action:manipulation;color:var(--text)}
+.ep:active{transform:scale(.98)}
+.ep .etitle{font-size:19px;font-weight:700;margin-bottom:4px}
+.ep .edate{font-size:15px;color:var(--muted)}
+.backbtn{display:inline-flex;align-items:center;gap:8px;min-height:56px;padding:10px 20px;margin-bottom:8px;font-size:19px;font-weight:700;color:var(--cyan);background:var(--cyan-dim);border:2px solid var(--cyan);border-radius:14px;cursor:pointer;touch-action:manipulation}
+.searchrow{display:flex;gap:10px;margin:8px 0 4px}
+.searchrow input{flex:1;min-height:60px;font-size:19px;padding:10px 16px;border-radius:14px;border:2px solid rgba(64,218,255,.4);background:var(--panel2);color:var(--text)}
+.searchrow button{flex:0 0 auto;min-height:60px;padding:10px 22px;font-size:19px;font-weight:700;border-radius:14px;border:none;background:var(--gold);color:#06121f;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="header"><h1>🏈 Dad's Sports Radio</h1></div>
+
+<div class="main">
+  <!-- HOME -->
+  <div class="tab-panel active" id="tab-home">
+    <div class="hero">
+      <h2>What do you want<br>to listen to?</h2>
+      <p>Tap one of the big buttons below.</p>
+    </div>
+    <button class="bigbtn cyan" data-goto="radio"><span class="bicon">📻</span> Sports Radio</button>
+    <button class="bigbtn cyan" data-goto="vancouver"><span class="bicon">🌊</span> Vancouver Radio</button>
+    <button class="bigbtn" data-goto="podcasts"><span class="bicon">🎙️</span> Podcasts</button>
+  </div>
+
+  <!-- RADIO -->
+  <div class="tab-panel" id="tab-radio">
+    <div class="sect">🇨🇦 Canadian Sports</div>
+    <div id="ca-stations"><div class="loading">Loading stations…</div></div>
+    <div class="sect">🌍 More Sports Talk</div>
+    <div id="us-stations"><div class="loading">Loading stations…</div></div>
+  </div>
+
+  <!-- VANCOUVER -->
+  <div class="tab-panel" id="tab-vancouver">
+    <div class="sect">🌊 Vancouver Stations</div>
+    <div id="van-stations"><div class="loading">Loading stations…</div></div>
+  </div>
+
+  <!-- PODCASTS -->
+  <div class="tab-panel" id="tab-podcasts">
+    <div class="sect">🏍️ Bikers & Outlaws</div>
+    <div id="pod-biker"><div class="loading">Loading…</div></div>
+    <div class="sect">🤠 Wild West & Westerns</div>
+    <div id="pod-western"><div class="loading">Loading…</div></div>
+    <div class="sect">🔍 Search All Podcasts</div>
+    <div class="searchrow">
+      <input id="pod-q" type="search" placeholder="Search podcasts…" value="">
+      <button id="pod-go">Search</button>
+    </div>
+    <div id="pod-list"><div class="loading">Loading podcasts…</div></div>
+    <div id="ep-list" style="display:none">
+      <button class="backbtn" id="ep-back">← Back to podcasts</button>
+      <div class="sect" id="ep-title"></div>
+      <div id="eps"></div>
+    </div>
+  </div>
+</div>
+
+<!-- now playing bar -->
+<div class="playerbar" id="playerbar">
+  <div class="pname" id="pname">Playing…</div>
+  <button class="pstop" id="pstop" aria-label="Stop">⏹</button>
+</div>
+<audio id="audio" preload="none"></audio>
+
+<nav class="tabbar">
+  <button class="tabbtn active" data-tab="home"><span class="ticon">🏠</span>Home</button>
+  <button class="tabbtn" data-tab="radio"><span class="ticon">📻</span>Sports</button>
+  <button class="tabbtn" data-tab="vancouver"><span class="ticon">🌊</span>Vancouver</button>
+  <button class="tabbtn" data-tab="podcasts"><span class="ticon">🎙️</span>Podcasts</button>
+</nav>
+
+<script>
+(function(){
+"use strict";
+var audio=document.getElementById('audio');
+var playerbar=document.getElementById('playerbar');
+var pname=document.getElementById('pname');
+var currentPlayBtn=null;
+
+function showTab(name){
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-tab')===name);});
+  document.querySelector('.main').scrollTop=0;
+}
+document.querySelectorAll('.tabbtn').forEach(function(b){
+  b.addEventListener('click',function(){showTab(b.getAttribute('data-tab'));});
+});
+document.querySelectorAll('[data-goto]').forEach(function(b){
+  b.addEventListener('click',function(){showTab(b.getAttribute('data-goto'));});
+});
+
+function setPlaying(btn,name){
+  if(currentPlayBtn&&currentPlayBtn!==btn){currentPlayBtn.classList.remove('playing');currentPlayBtn.textContent='▶';}
+  currentPlayBtn=btn;
+  if(btn){btn.classList.add('playing');btn.textContent='⏸';}
+  pname.textContent=name||'';
+  playerbar.classList.toggle('show',!!btn);
+}
+function stopAll(){
+  audio.pause();audio.removeAttribute('src');audio.load();
+  setPlaying(null,'');
+}
+document.getElementById('pstop').addEventListener('click',stopAll);
+audio.addEventListener('ended',stopAll);
+audio.addEventListener('error',function(){if(audio.getAttribute('src')){alert('Sorry, that stream would not play. Try another one.');stopAll();}});
+
+function card(name,sub,url){
+  var d=document.createElement('div');d.className='card';
+  var info=document.createElement('div');info.className='cinfo';
+  var n=document.createElement('div');n.className='cname';n.textContent=name;
+  var s=document.createElement('div');s.className='csub';s.textContent=sub||'';
+  info.appendChild(n);info.appendChild(s);
+  var b=document.createElement('button');b.className='playbtn';b.textContent='▶';b.setAttribute('aria-label','Play '+name);
+  b.addEventListener('click',function(){
+    if(currentPlayBtn===b&&!audio.paused){audio.pause();b.classList.remove('playing');b.textContent='▶';playerbar.classList.remove('show');return;}
+    if(currentPlayBtn===b&&audio.paused){audio.play();b.classList.add('playing');b.textContent='⏸';playerbar.classList.add('show');return;}
+    stopAll();audio.src=url;audio.play().catch(function(){});
+    setPlaying(b,'📻 '+name);
+  });
+  d.appendChild(info);d.appendChild(b);return d;
+}
+function errBox(el,retry){
+  el.innerHTML='';
+  var d=document.createElement('div');d.className='errorbox';
+  d.textContent='Could not load. Check your internet connection.';
+  var r=document.createElement('button');r.className='retrybtn';r.textContent='Try Again';
+  r.addEventListener('click',retry);d.appendChild(document.createElement('br'));d.appendChild(r);
+  el.appendChild(d);
+}
+
+/* ---------- SPORTS RADIO ---------- */
+var CA_SEEDS=[
+  {name:'TSN Radio 1050 Toronto',sub:'Toronto sports talk',q:'TSN 1050'},
+  {name:'TSN Radio 690 Montreal',sub:'Montreal sports talk',q:'TSN 690'},
+  {name:'TSN Radio 1200 Ottawa',sub:'Ottawa sports talk',q:'TSN 1200'},
+  {name:'Sportsnet 590 The FAN',sub:'Toronto sports talk',q:'Sportsnet 590'},
+  {name:'Sportsnet 960 The FAN',sub:'Calgary sports talk',q:'Sportsnet 960'},
+  {name:'TSN Radio 1040 Vancouver',sub:'Vancouver sports talk',q:'TSN 1040'}
+];
+function rbSearch(query){
+  return fetch('https://de1.api.radio-browser.info/json/stations/search?name='+encodeURIComponent(query)+'&limit=3&hidebroken=true&order=votes&reverse=true')
+    .then(function(r){if(!r.ok)throw 0;return r.json();});
+}
+function pickStation(list){
+  if(!list||!list.length)return null;
+  for(var i=0;i<list.length;i++){if(list[i].url_resolved&&/^https?:\/\//i.test(list[i].url_resolved))return list[i];}
+  return null;
+}
+function loadRadio(){
+  var caEl=document.getElementById('ca-stations');
+  var usEl=document.getElementById('us-stations');
+  caEl.innerHTML='<div class="loading">Loading stations…</div>';
+  usEl.innerHTML='<div class="loading">Loading stations…</div>';
+  // Canadian seeds: best stream per name
+  Promise.all(CA_SEEDS.map(function(s){
+    return rbSearch(s.q).then(function(list){
+      var st=pickStation(list);
+      return st?{name:s.name,sub:s.sub,url:st.url_resolved}:null;
+    }).catch(function(){return null;});
+  })).then(function(found){
+    caEl.innerHTML='';
+    var any=false;
+    found.forEach(function(f){if(f){caEl.appendChild(card(f.name,f.sub,f.url));any=true;}});
+    if(!any)caEl.innerHTML='<div class="errorbox">No Canadian stations found right now.</div>';
+  }).catch(function(){errBox(caEl,loadRadio);});
+  // General sports tag
+  fetch('https://de1.api.radio-browser.info/json/stations/bytag/sports?limit=40&hidebroken=true&order=votes&reverse=true')
+    .then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(list){
+      usEl.innerHTML='';
+      var shown=0;
+      list.forEach(function(st){
+        if(shown>=12)return;
+        if(!st.url_resolved||!/^https?:\/\//i.test(st.url_resolved))return;
+        var name=st.name||'Sports station';
+        if(/TSN 1050|TSN 690|TSN 1200|Sportsnet 590|Sportsnet 960|TSN 1040/i.test(name))return;
+        usEl.appendChild(card(name,(st.country||'')+(st.language?', '+st.language:''),st.url_resolved));
+        shown++;
+      });
+      if(!shown)usEl.innerHTML='<div class="errorbox">No stations found right now.</div>';
+    })
+    .catch(function(){errBox(usEl,loadRadio);});
+}
+
+/* ---------- PODCASTS ---------- */
+var podList=document.getElementById('pod-list');
+var epList=document.getElementById('ep-list');
+var epsEl=document.getElementById('eps');
+function loadPodcasts(q){
+  podList.style.display='block';epList.style.display='none';
+  podList.innerHTML='<div class="loading">Loading podcasts…</div>';
+  fetch('https://itunes.apple.com/search?media=podcast&term='+encodeURIComponent(q||'sports')+'&limit=20&country=CA')
+    .then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(j){
+      podList.innerHTML='';
+      if(!j.results||!j.results.length){podList.innerHTML='<div class="errorbox">No podcasts found. Try another search.</div>';return;}
+      j.results.forEach(function(p){
+        var d=document.createElement('div');d.className='card';
+        var info=document.createElement('div');info.className='cinfo';
+        var n=document.createElement('div');n.className='cname';n.textContent=p.collectionName||'Podcast';
+        var s=document.createElement('div');s.className='csub';s.textContent=p.artistName||'';
+        info.appendChild(n);info.appendChild(s);
+        var b=document.createElement('button');b.className='playbtn';b.textContent='📃';b.setAttribute('aria-label','Episodes');
+        b.addEventListener('click',function(){loadEpisodes(p.collectionId,p.collectionName);});
+        d.appendChild(info);d.appendChild(b);podList.appendChild(d);
+      });
+    })
+    .catch(function(){errBox(podList,function(){loadPodcasts(q);});});
+}
+function loadEpisodes(id,name){
+  podList.style.display='none';epList.style.display='block';
+  document.getElementById('ep-title').textContent=name||'Episodes';
+  epsEl.innerHTML='<div class="loading">Loading episodes…</div>';
+  fetch('https://itunes.apple.com/lookup?id='+id+'&entity=podcastEpisode&limit=25&country=CA')
+    .then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(j){
+      epsEl.innerHTML='';
+      var eps=(j.results||[]).filter(function(e){return e.wrapperType==='podcastEpisode'&&e.episodeUrl;});
+      if(!eps.length){epsEl.innerHTML='<div class="errorbox">No playable episodes found.</div>';return;}
+      eps.forEach(function(e){
+        var b=document.createElement('button');b.className='ep';
+        var t=document.createElement('div');t.className='etitle';t.textContent='▶ '+(e.trackName||'Episode');
+        var dt=document.createElement('div');dt.className='edate';
+        try{dt.textContent=new Date(e.releaseDate).toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'});}catch(x){dt.textContent='';}
+        b.appendChild(t);b.appendChild(dt);
+        b.addEventListener('click',function(){
+          stopAll();audio.src=e.episodeUrl;audio.play().catch(function(){});
+          setPlaying(null,'');pname.textContent='🎙️ '+(e.trackName||'Episode');playerbar.classList.add('show');
+        });
+        epsEl.appendChild(b);
+      });
+    })
+    .catch(function(){errBox(epsEl,function(){loadEpisodes(id,name);});});
+}
+document.getElementById('ep-back').addEventListener('click',function(){epList.style.display='none';podList.style.display='block';});
+document.getElementById('pod-go').addEventListener('click',function(){loadPodcasts(document.getElementById('pod-q').value);});
+document.getElementById('pod-q').addEventListener('keydown',function(e){if(e.key==='Enter')loadPodcasts(e.target.value);});
+
+/* ---------- VANCOUVER RADIO ---------- */
+function loadVancouver(){
+  var el=document.getElementById('van-stations');
+  el.innerHTML='<div class="loading">Loading stations…</div>';
+  var queries=['TSN 1040 Vancouver','Sportsnet 650 Vancouver','CBC Vancouver','CKNW 980 Vancouver','CFUN Vancouver','CHQM Vancouver'];
+  Promise.all(queries.map(function(q){
+    return rbSearch(q).then(function(list){
+      var st=pickStation(list);
+      return st?{name:st.name,sub:(st.country||'Vancouver'),url:st.url_resolved}:null;
+    }).catch(function(){return null;});
+  })).then(function(found){
+    el.innerHTML='';
+    var any=false;
+    found.forEach(function(f){if(f){el.appendChild(card(f.name,f.sub,f.url));any=true;}});
+    // Also pull by Vancouver tag
+    return fetch('https://de1.api.radio-browser.info/json/stations/search?name=Vancouver&limit=20&hidebroken=true&order=votes&reverse=true')
+      .then(function(r){return r.json();})
+      .then(function(list){
+        var shown=0;
+        list.forEach(function(st){
+          if(shown>=8)return;
+          if(!st.url_resolved||!/^https?:\/\//i.test(st.url_resolved))return;
+          el.appendChild(card(st.name||'Vancouver station',(st.tags||'').split(',').slice(0,2).join(', '),st.url_resolved));
+          shown++;any=true;
+        });
+        if(!any)el.innerHTML='<div class="errorbox">No Vancouver stations found right now.</div>';
+      });
+  }).catch(function(){errBox(el,loadVancouver);});
+}
+
+/* ---------- CURATED PODCASTS ---------- */
+function loadCuratedPodcasts(elId,query){
+  var el=document.getElementById(elId);
+  el.innerHTML='<div class="loading">Loading…</div>';
+  fetch('https://itunes.apple.com/search?media=podcast&term='+encodeURIComponent(query)+'&limit=8&country=CA')
+    .then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(j){
+      el.innerHTML='';
+      if(!j.results||!j.results.length){el.innerHTML='<div class="errorbox">None found.</div>';return;}
+      j.results.forEach(function(p){
+        var d=document.createElement('div');d.className='card';
+        var info=document.createElement('div');info.className='cinfo';
+        var n=document.createElement('div');n.className='cname';n.textContent=p.collectionName||'Podcast';
+        var s=document.createElement('div');s.className='csub';s.textContent=p.artistName||'';
+        info.appendChild(n);info.appendChild(s);
+        var b=document.createElement('button');b.className='playbtn';b.textContent='📃';b.setAttribute('aria-label','Episodes');
+        b.addEventListener('click',function(){loadEpisodes(p.collectionId,p.collectionName);});
+        d.appendChild(info);d.appendChild(b);el.appendChild(d);
+      });
+    })
+    .catch(function(){el.innerHTML='<div class="errorbox">Could not load.</div>';});
+}
+
+/* go */
+loadRadio();
+loadVancouver();
+loadCuratedPodcasts('pod-biker',"Hell's Angels motorcycle club");
+loadCuratedPodcasts('pod-western','wild west history western');
+loadPodcasts('');
+})();
+</script>
+</body>
+</html>
