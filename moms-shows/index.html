@@ -145,7 +145,7 @@ updateArrows();
 <nav class="bottomnav" id="bottomnav"></nav>
 
 <!-- 🐈‍⬛ Grumpy cat mascot -->
-<div id="cat" style="position:fixed;z-index:9999;width:96px;height:96px;cursor:pointer;user-select:none;transition:transform .1s;pointer-events:auto;font-size:84px;line-height:96px;text-align:center;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))">🐈‍⬛</div><div id="catname" style="position:fixed;z-index:9999;pointer-events:none;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 4px #000;text-align:center;width:96px">Sasha</div><div id="catzzz" style="position:fixed;z-index:9999;pointer-events:none;font-size:28px;display:none;animation:zfloat 2s ease-in-out infinite">💤</div><style>@keyframes zfloat{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-12px);opacity:.4}}</style>
+<div id="cat" style="position:fixed;z-index:9999;width:96px;height:96px;cursor:pointer;user-select:none;transition:transform .1s;pointer-events:auto;font-size:84px;line-height:96px;text-align:center;">🐈‍⬛</div><div id="catname" style="position:fixed;z-index:9999;pointer-events:none;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 4px #000;text-align:center;width:96px">Sasha</div><div id="catzzz" style="position:fixed;z-index:9999;pointer-events:none;font-size:28px;display:none;animation:zfloat 2s ease-in-out infinite">💤</div><style>@keyframes zfloat{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-12px);opacity:.4}}</style>
 <script>
 (function(){
 const cat=document.getElementById("cat");
@@ -165,8 +165,11 @@ function setState(s,dur){
  if(s==="sleep"){cat.textContent="😴";cat.style.fontSize="80px";showZZZ(true);}
  else{showZZZ(false);if(s==="walk"){cat.textContent="\uD83D\uDC08\u200D⬛";cat.style.fontSize="84px";}}
 }
+let lastTick=0;
 function tick(){
  const now=Date.now();
+ if(now-lastTick<33){requestAnimationFrame(tick);return;}
+ lastTick=now;
  if(state==="walk"){
   x=clampX(x+dx);y=clampY(y+dy);
   if(x<=0||x>=innerWidth-100)dx*=-1;
