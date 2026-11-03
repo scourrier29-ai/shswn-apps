@@ -2,218 +2,146 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Mom's Short Dramas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ReelDrama — Mom's Short Dramas</title>
 <style>
-:root{
- --gold:#D4A24C;--gold-dim:#8D6E2A;--gold-glow:rgba(212,162,76,.4);
- --bg:#1A120B;--panel:#2C1E12;--panel2:#3E2A18;
- --text:#F5EFE0;--muted:#C4A882;--red:#A0402A;
-}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh}
-body::before{content:"";position:fixed;inset:0;z-index:-1;
- background:radial-gradient(1200px 600px at 50% -10%,rgba(212,162,76,.10),transparent 60%),
-            radial-gradient(900px 500px at 90% 110%,rgba(212,162,76,.06),transparent 60%);}
-.header{position:fixed;top:0;left:0;right:0;height:64px;z-index:50;display:flex;align-items:center;justify-content:center;padding:0 12px;background:rgba(26,18,11,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,162,76,.3)}
-.header h1{font-size:19px;font-weight:800;color:var(--gold);letter-spacing:.04em}
-.header .sub{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.08em;margin-top:2px}
-.hwrap{display:flex;flex-direction:column;align-items:center}
-main{padding:80px 0 100px}
-.tab-panel{display:none;padding:16px 16px 28px;max-width:640px;margin:0 auto;position:relative}
-.tab-panel.active{display:block;animation:fadein .28s ease}
-@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.hero{background:rgba(44,30,18,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(212,162,76,.35);border-radius:16px;padding:22px 18px;margin-bottom:18px;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.35)}
-.hero .emoji{font-size:40px;display:block;margin-bottom:8px}
-.hero h2{font-size:20px;font-weight:800;color:var(--gold);margin-bottom:8px;letter-spacing:.02em}
-.hero p{font-size:14px;color:var(--muted);line-height:1.55}
-.sec-title{font-size:13px;font-weight:800;color:var(--gold);letter-spacing:.14em;margin:22px 2px 12px;text-transform:uppercase}
-.card{display:block;text-decoration:none;color:inherit;background:rgba(44,30,18,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(212,162,76,.35);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .12s ease,border-color .12s ease}
-.card:active{transform:scale(.985);border-color:var(--gold)}
-.card .row{display:flex;align-items:center;gap:14px}
-.card .ico{flex:0 0 52px;width:52px;height:52px;border-radius:14px;background:rgba(212,162,76,.14);border:1px solid rgba(212,162,76,.4);display:flex;align-items:center;justify-content:center;font-size:26px}
-.card .body{flex:1;min-width:0}
-.card h3{font-size:16px;font-weight:800;line-height:1.3;margin-bottom:4px}
-.card .meta{font-size:12px;color:var(--gold);font-weight:700;letter-spacing:.04em;margin-bottom:4px}
-.card p{font-size:13px;color:var(--muted);line-height:1.5}
-.card .chev{flex:0 0 auto;color:var(--gold);font-size:20px;font-weight:800}
-.note{background:rgba(44,30,18,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(212,162,76,.22);border-radius:12px;padding:14px 16px;margin-top:18px;font-size:13px;color:var(--muted);line-height:1.65}
-.note b{color:var(--text)}
-.tabbar{position:fixed;bottom:0;left:0;right:0;height:76px;z-index:50;display:flex;background:rgba(26,18,11,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(212,162,76,.3);padding-bottom:env(safe-area-inset-bottom);overflow-x:auto;scrollbar-width:none}
-.tabbar::-webkit-scrollbar{display:none}
-.tabbtn{flex:1 1 0;min-width:64px;border:none;background:transparent;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;letter-spacing:.02em}
-.tabbtn .ti{font-size:22px;line-height:1}
-.tabbtn.active{color:var(--gold)}
+:root{--red:#e50914;--bg:#0a0a0a;--bg2:#141414;--card:#1a1a1a;--text:#fff;--muted:#8c8c8c}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+/* HEADER */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent);transition:background .3s}
+.topbar.solid{background:rgba(10,10,10,.97)}
+.logo{font-size:24px;font-weight:900;color:var(--red);letter-spacing:-.5px}
+.logo span{color:#fff;font-weight:300}
+/* HERO */
+.hero{position:relative;height:52vh;min-height:380px;display:flex;align-items:flex-end;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#2b0a0a 0%,#1a0a1a 40%,#0a0a0a 100%)}
+.hero-bg::after{content:'';position:absolute;inset:0;background:
+ radial-gradient(ellipse 60% 50% at 70% 20%,rgba(229,9,20,.25),transparent),
+ radial-gradient(ellipse 50% 40% at 20% 80%,rgba(120,20,80,.2),transparent)}
+.hero-content{position:relative;z-index:2;padding:24px 20px;width:100%;background:linear-gradient(to top,rgba(10,10,10,1) 0%,rgba(10,10,10,.7) 60%,transparent 100%);padding-top:80px}
+.hero-kicker{font-size:12px;font-weight:700;letter-spacing:3px;color:var(--red);margin-bottom:8px}
+.hero-title{font-size:34px;font-weight:900;line-height:1.1;margin-bottom:10px;max-width:90%}
+.hero-desc{font-size:14px;color:#ccc;line-height:1.5;margin-bottom:18px;max-width:85%;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hero-btns{display:flex;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:6px;font-size:16px;font-weight:700;border:none;cursor:pointer}
+.btn-play{background:#fff;color:#000}
+.btn-play:active{background:#ddd}
+.btn-more{background:rgba(109,109,110,.7);color:#fff}
+.btn-more:active{background:rgba(109,109,110,.4)}
+/* ROWS */
+.row{margin:18px 0;padding-left:20px}
+.row-title{font-size:18px;font-weight:700;margin-bottom:12px;padding-right:20px}
+.carousel{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-right:20px;padding-bottom:8px;scrollbar-width:none}
+.carousel::-webkit-scrollbar{display:none}
+.poster{flex:0 0 auto;width:130px;scroll-snap-align:start;border-radius:8px;overflow:hidden;background:var(--card);cursor:pointer;transition:transform .2s;position:relative}
+.poster:active{transform:scale(.96)}
+.poster-art{width:130px;height:195px;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;overflow:hidden}
+.poster-art::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6),transparent 50%)}
+.poster-label{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:8px;font-size:12px;font-weight:700;line-height:1.3}
+.poster-wide{flex:0 0 auto;width:240px;scroll-snap-align:start;border-radius:8px;overflow:hidden;background:var(--card);cursor:pointer;position:relative}
+.poster-wide:active{transform:scale(.97)}
+.poster-wide .poster-art{width:240px;height:135px;font-size:36px}
+/* Genre art gradients */
+.g-romance{background:linear-gradient(135deg,#5c1030,#a02050)}
+.g-thriller{background:linear-gradient(135deg,#0a0a1a,#2a1a3a)}
+.g-revenge{background:linear-gradient(135deg,#3a0a0a,#7a1a1a)}
+.g-billionaire{background:linear-gradient(135deg,#1a2a1a,#3a5a2a)}
+.g-comedy{background:linear-gradient(135deg,#3a2a0a,#8a5a1a)}
+.g-drama{background:linear-gradient(135deg,#1a1a2a,#3a3a5a)}
+.g-app{background:linear-gradient(135deg,#0a2a3a,#1a5a7a)}
+/* DETAIL MODAL */
+.modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);display:none;align-items:flex-end;justify-content:center}
+.modal.show{display:flex}
+.sheet{background:var(--bg2);border-radius:16px 16px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;padding:24px;animation:slideup .3s}
+@keyframes slideup{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+.sheet h2{font-size:22px;margin-bottom:6px}
+.sheet .meta{font-size:13px;color:var(--red);font-weight:700;margin-bottom:12px}
+.sheet p{font-size:14px;color:#ccc;line-height:1.6;margin-bottom:20px}
+.sheet .btn{width:100%;justify-content:center;margin-bottom:10px}
+.close-x{position:absolute;top:16px;right:20px;font-size:28px;color:#fff;background:rgba(0,0,0,.5);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
+/* BOTTOM NAV */
+.bottomnav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;background:rgba(10,10,10,.97);border-top:1px solid #222;padding:10px 4px calc(10px + env(safe-area-inset-bottom))}
+.bottomnav button{flex:1;background:none;border:none;color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px}
+.bottomnav button.active{color:#fff}
+.bottomnav .ico{font-size:22px}
+.spacer{height:90px}
 </style>
 </head>
 <body>
 
-<div class="header"><div class="hwrap"><h1>🎬 MOM'S SHORT DRAMAS</h1><div class="sub">TAP ANYTHING — IT PLAYS</div></div></div>
+<div class="topbar" id="topbar"><div class="logo">REEL<span>DRAMA</span></div></div>
 
-<main>
-<!-- HOME -->
-<div class="tab-panel active" id="p-home">
- <div class="hero">
-  <span class="emoji">🍿</span>
-  <h2>Your Shows, One Tap Away</h2>
-  <p>Every short drama you love — the apps and thousands of free episodes on YouTube — all in one place. Just tap and watch.</p>
- </div>
-
- <div class="sec-title">📱 The Apps</div>
- <a class="card" href="https://play.google.com/store/apps/details?id=com.freereels.app" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">🎞️</div><div class="body">
-   <h3>FreeReels</h3><div class="meta">250M+ DOWNLOADS · FREE</div>
-   <p>Your main app — thousands of short dramas, always free to start.</p>
-  </div><div class="chev">›</div></div>
- </a>
- <a class="card" href="https://play.google.com/store/apps/details?id=com.storymatrix.drama" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">📺</div><div class="body">
-   <h3>DramaBox</h3><div class="meta">30,000+ DRAMAS · FREE TO START</div>
-   <p>Romance, revenge, thriller — the biggest short-drama library.</p>
-  </div><div class="chev">›</div></div>
- </a>
- <a class="card" href="https://play.google.com/store/apps/details?id=com.newreading.reelshort" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">🎥</div><div class="body">
-   <h3>ReelShort</h3><div class="meta">108 SERIES FULLY FREE</div>
-   <p>Over a hundred complete series with zero payment, ever.</p>
-  </div><div class="chev">›</div></div>
- </a>
-
- <div class="sec-title">📺 Free on YouTube — No App Needed</div>
- <a class="card" href="https://www.youtube.com/@dramaboxapp" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">▶️</div><div class="body">
-   <h3>DramaBox on YouTube</h3><div class="meta">16M SUBSCRIBERS · 1,300+ FULL DRAMAS</div>
-   <p>Full episodes posted by DramaBox itself. Completely free, just YouTube ads.</p>
-  </div><div class="chev">›</div></div>
- </a>
- <a class="card" href="https://www.youtube.com/@reelshortapp" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">▶️</div><div class="body">
-   <h3>ReelShort on YouTube</h3><div class="meta">500+ FULL DRAMAS · FREE</div>
-   <p>Full series in episode batches, posted by ReelShort. Free forever.</p>
-  </div><div class="chev">›</div></div>
- </a>
-
- <div class="note"><b>Tip:</b> The apps have the most shows but ask for payment after a few free episodes. The <b>YouTube channels are 100% free</b> — full dramas, no coins, no subscriptions.</div>
+<!-- HERO -->
+<div class="hero">
+<div class="hero-bg"></div>
+<div class="hero-content">
+<div class="hero-kicker">FEATURED COLLECTION</div>
+<div class="hero-title">Thousands of Short Dramas.<br>One Tap Away.</div>
+<div class="hero-desc">The shows you love from FreeReels, DramaBox and ReelShort — romance, revenge, billionaires, thrillers. Full episodes free on their official channels.</div>
+<div class="hero-btns">
+<button class="btn btn-play" onclick="openLink('https://www.youtube.com/@dramaboxapp','DramaBox')">▶ Play</button>
+<button class="btn btn-more" onclick="openLink('https://www.youtube.com/@reelshortapp','ReelShort')">ⓘ More</button>
 </div>
+</div>
+</div>
+
+<!-- APPS ROW -->
+<div class="row"><div class="row-title">📱 Get the Apps</div>
+<div class="carousel">
+<div class="poster-wide" onclick="openLink('https://play.google.com/store/apps/details?id=com.freereels.app','FreeReels')"><div class="poster-art g-app">📱</div><div class="poster-label">FreeReels<br><span style="color:#888;font-weight:400">250M+ downloads</span></div></div>
+<div class="poster-wide" onclick="openLink('https://play.google.com/store/apps/details?id=com.storymatrix.drama','DramaBox App')"><div class="poster-art g-app">🎭</div><div class="poster-label">DramaBox<br><span style="color:#888;font-weight:400">16M on YouTube too</span></div></div>
+<div class="poster-wide" onclick="openLink('https://play.google.com/store/apps/details?id=com.newreading.reelshort','ReelShort App')"><div class="poster-art g-app">🎬</div><div class="poster-label">ReelShort<br><span style="color:#888;font-weight:400">108 series free</span></div></div>
+</div></div>
 
 <!-- ROMANCE -->
-<div class="tab-panel" id="p-romance">
- <div class="sec-title">💕 Romance</div>
- <a class="card" href="https://www.youtube.com/results?search_query=dramabox+romance+full+movie" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">💕</div><div class="body">
-   <h3>Romance Full Movies</h3><div class="meta">YOUTUBE · FREE</div>
-   <p>Billionaire love stories, secret marriages, second chances — complete dramas.</p>
-  </div><div class="chev">›</div></div>
- </a>
- <a class="card" href="https://www.youtube.com/results?search_query=reelshort+romance+full+episodes" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">💘</div><div class="body">
-   <h3>ReelShort Romance</h3><div class="meta">YOUTUBE · FREE</div>
-   <p>Full romance series from ReelShort's official channel.</p>
-  </div><div class="chev">›</div></div>
- </a>
- <a class="card" href="https://www.youtube.com/@dramaboxapp" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">▶️</div><div class="body">
-   <h3>Browse DramaBox Channel</h3><div class="meta">@DRAMABOXAPP · FREE</div>
-   <p>Search "romance" inside the channel for hundreds more.</p>
-  </div><div class="chev">›</div></div>
- </a>
-</div>
+<div class="row"><div class="row-title">💕 Romance</div>
+<div class="carousel">
+<div class="poster" onclick="openLink('https://www.youtube.com/@dramaboxapp','DramaBox Romance')"><div class="poster-art g-romance">💕</div><div class="poster-label">DramaBox Romance</div></div>
+<div class="poster" onclick="openLink('https://www.youtube.com/@reelshortapp','ReelShort Romance')"><div class="poster-art g-romance">💒</div><div class="poster-label">ReelShort Romance</div></div>
+<div class="poster" onclick="openLink('https://www.youtube.com/results?search_query=short+drama+romance+full+movie','Romance Search')"><div class="poster-art g-romance">🔍</div><div class="poster-label">All Romance</div></div>
+</div></div>
 
 <!-- THRILLER -->
-<div class="tab-panel" id="p-thriller">
- <div class="sec-title">🔍 Thriller &amp; Mystery</div>
- <a class="card" href="https://www.youtube.com/results?search_query=dramabox+thriller+full+movie" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">🔍</div><div class="body">
-   <h3>Thriller Full Movies</h3><div class="meta">YOUTUBE · FREE</div>
-   <p>Mystery, suspense, plot twists — complete thriller dramas.</p>
-  </div><div class="chev">›</div></div>
- </a>
- <a class="card" href="https://www.youtube.com/results?search_query=shortmax+thriller+full+drama" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">🎬</div><div class="body">
-   <h3>ShortMax Thrillers</h3><div class="meta">YOUTUBE · FREE</div>
-   <p>ShortMax posts complete dramas marked [FULL] — free to watch.</p>
-  </div><div class="chev">›</div></div>
- </a>
-</div>
+<div class="row"><div class="row-title">🔍 Thriller & Mystery</div>
+<div class="carousel">
+<div class="poster" onclick="openLink('https://www.youtube.com/@dramaboxapp','DramaBox Thriller')"><div class="poster-art g-thriller">🔍</div><div class="poster-label">DramaBox Thrillers</div></div>
+<div class="poster" onclick="openLink('https://www.youtube.com/results?search_query=short+drama+thriller+full+episode','Thriller Search')"><div class="poster-art g-thriller">🌙</div><div class="poster-label">All Thrillers</div></div>
+</div></div>
 
 <!-- REVENGE -->
-<div class="tab-panel" id="p-revenge">
- <div class="sec-title">⚔️ Revenge</div>
- <a class="card" href="https://www.youtube.com/results?search_query=dramabox+revenge+full+movie" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">⚔️</div><div class="body">
-   <h3>Revenge Full Movies</h3><div class="meta">YOUTUBE · FREE</div>
-   <p>Betrayal, payback, justice served — the revenge dramas you love.</p>
-  </div><div class="chev">›</div></div>
- </a>
- <a class="card" href="https://www.youtube.com/results?search_query=reelshort+revenge+full+episodes" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">🔥</div><div class="body">
-   <h3>ReelShort Revenge</h3><div class="meta">YOUTUBE · FREE</div>
-   <p>Wronged heroines getting even — full series, free.</p>
-  </div><div class="chev">›</div></div>
- </a>
-</div>
+<div class="row"><div class="row-title">⚔️ Revenge</div>
+<div class="carousel">
+<div class="poster" onclick="openLink('https://www.youtube.com/results?search_query=dramabox+revenge+full+episode','Revenge Search')"><div class="poster-art g-revenge">⚔️</div><div class="poster-label">Revenge Dramas</div></div>
+<div class="poster" onclick="openLink('https://www.youtube.com/@reelshortapp','ReelShort Revenge')"><div class="poster-art g-revenge">🔥</div><div class="poster-label">ReelShort Revenge</div></div>
+</div></div>
 
 <!-- BILLIONAIRE -->
-<div class="tab-panel" id="p-billionaire">
- <div class="sec-title">💎 Billionaire</div>
- <a class="card" href="https://www.youtube.com/results?search_query=reelshort+billionaire+full+movie" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">💎</div><div class="body">
-   <h3>Billionaire Full Movies</h3><div class="meta">YOUTUBE · FREE</div>
-   <p>Secret billionaires, CEO romances, hidden identities.</p>
-  </div><div class="chev">›</div></div>
- </a>
- <a class="card" href="https://www.youtube.com/results?search_query=dramabox+billionaire+full+episodes" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">👔</div><div class="body">
-   <h3>DramaBox Billionaires</h3><div class="meta">YOUTUBE · FREE</div>
-   <p>The billionaire collection — full series, no payment.</p>
-  </div><div class="chev">›</div></div>
- </a>
-</div>
+<div class="row"><div class="row-title">💎 Billionaire</div>
+<div class="carousel">
+<div class="poster" onclick="openLink('https://www.youtube.com/results?search_query=reelshort+billionaire+full+episode','Billionaire Search')"><div class="poster-art g-billionaire">💎</div><div class="poster-label">Billionaire Dramas</div></div>
+<div class="poster" onclick="openLink('https://www.youtube.com/@dramaboxapp','DramaBox Billionaire')"><div class="poster-art g-billionaire">👔</div><div class="poster-label">DramaBox CEOs</div></div>
+</div></div>
 
 <!-- COMEDY -->
-<div class="tab-panel" id="p-comedy">
- <div class="sec-title">😂 Comedy</div>
- <a class="card" href="https://www.youtube.com/results?search_query=short+drama+comedy+full+movie" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">😂</div><div class="body">
-   <h3>Comedy Full Movies</h3><div class="meta">YOUTUBE · FREE</div>
-   <p>Funny short dramas — light, feel-good, complete stories.</p>
-  </div><div class="chev">›</div></div>
- </a>
- <a class="card" href="https://www.youtube.com/results?search_query=goodshort+comedy+full+drama" target="_blank" rel="noopener">
-  <div class="row"><div class="ico">🎭</div><div class="body">
-   <h3>GoodShort Comedy</h3><div class="meta">YOUTUBE · FREE</div>
-   <p>Comedy dramas from GoodShort's official channel.</p>
-  </div><div class="chev">›</div></div>
- </a>
-</div>
-</main>
+<div class="row"><div class="row-title">😂 Comedy</div>
+<div class="carousel">
+<div class="poster" onclick="openLink('https://www.youtube.com/results?search_query=short+drama+comedy+full+episode','Comedy Search')"><div class="poster-art g-comedy">😂</div><div class="poster-label">Comedy Dramas</div></div>
+</div></div>
 
-<div class="tabbar" id="tabbar"></div>
+<div class="spacer"></div>
+
+<nav class="bottomnav">
+<button class="active" onclick="scrollTop_()"> <span class="ico">🏠</span>Home</button>
+<button onclick="openLink('https://www.youtube.com/@dramaboxapp','DramaBox')"> <span class="ico">🔍</span>Browse</button>
+<button onclick="openLink('https://play.google.com/store/apps/details?id=com.freereels.app','FreeReels')"> <span class="ico">📱</span>Apps</button>
+</nav>
 
 <script>
-const tabs=[
- {id:"home",icon:"🏠",label:"Home"},
- {id:"romance",icon:"💕",label:"Romance"},
- {id:"thriller",icon:"🔍",label:"Thriller"},
- {id:"revenge",icon:"⚔️",label:"Revenge"},
- {id:"billionaire",icon:"💎",label:"Billionaire"},
- {id:"comedy",icon:"😂",label:"Comedy"}
-];
-const bar=document.getElementById("tabbar");
-tabs.forEach((t,i)=>{
- const b=document.createElement("button");
- b.className="tabbtn"+(i===0?" active":"");
- b.innerHTML='<span class="ti">'+t.icon+'</span>'+t.label;
- b.onclick=()=>go(t.id);
- bar.appendChild(b);
-});
-function go(id){
- document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
- document.getElementById("p-"+id).classList.add("active");
- [...bar.children].forEach((el,i)=>el.classList.toggle("active",tabs[i].id===id));
- window.scrollTo(0,0);
-}
+function openLink(url,title){window.open(url,'_blank')}
+function scrollTop_(){window.scrollTo({top:0,behavior:'smooth'})}
+window.addEventListener('scroll',()=>{document.getElementById('topbar').classList.toggle('solid',window.scrollY>40)});
 </script>
 </body>
 </html>
