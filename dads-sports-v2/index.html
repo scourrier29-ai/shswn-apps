@@ -399,6 +399,40 @@ h1.app-title{font-size:20px;font-weight:900;letter-spacing:.1em;margin:4px 2px 0
   <div class="sec"><h2>⭐ RANDY'S STORY</h2><div class="rule"></div><span class="tag">TALL TALE</span></div>
   <div class="hero" style="margin-bottom:14px"><img id="randy-story-img" alt="Randy" style="height:280px;object-fit:cover"></div>
   <div id="randy-story"></div>
+  <div class="sec"><h2>🍌 NANO BANANA</h2><div class="rule"></div><span class="tag">AI PHOTO STUDIO</span></div>
+  <div style="padding:0 16px 16px;max-width:600px;margin:0 auto">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Upload a photo, describe what you want, hit Create. Same AI that made your gallery photos.</p>
+    <div id="dsNbNoKey" style="display:none;background:#3a1a1a;border:1px solid #e5484d;border-radius:8px;padding:10px;font-size:13px;margin-bottom:12px;color:#ffb4b4">
+      ⚠️ Need your free Gemini API key. <a href="https://aistudio.google.com" target="_blank" rel="noopener" style="color:#D4A24C">Get one at aistudio.google.com</a>, then paste it below.
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <input id="dsGeminiKey" type="password" placeholder="Gemini API key" autocomplete="off" style="flex:1;min-width:180px;background:#1a1512;border:1px solid #5a4a2a;color:#f5e6c8;border-radius:8px;padding:10px;font-size:14px">
+      <button id="dsGeminiSave" style="background:#D4A24C;color:#1a1206;border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer">Save</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button id="dsNbModeGen" style="flex:1;background:#D4A24C;color:#1a1206;border:1px solid #D4A24C;border-radius:8px;padding:10px;font-weight:700;cursor:pointer">✨ Generate</button>
+      <button id="dsNbModeEdit" style="flex:1;background:transparent;color:#D4A24C;border:1px solid #D4A24C;border-radius:8px;padding:10px;font-weight:700;cursor:pointer">🖼️ Edit photo</button>
+    </div>
+    <div id="dsNbUploadRow" style="display:none;margin-bottom:12px">
+      <label style="display:inline-block;background:transparent;color:#D4A24C;border:1px solid #D4A24C;border-radius:8px;padding:10px 16px;cursor:pointer;font-weight:700">📷 Pick photo<input type="file" id="dsNbImage" accept="image/*" hidden></label>
+      <span id="dsNbImageName" style="font-size:13px;color:var(--muted);margin-left:8px"></span>
+    </div>
+    <div id="dsNbPreviewWrap" style="display:none;margin-bottom:12px;text-align:center">
+      <img id="dsNbPreview" alt="Upload preview" style="max-width:100%;max-height:200px;border-radius:10px;border:1px solid #5a4a2a">
+    </div>
+    <textarea id="dsNbPrompt" rows="3" placeholder="Describe what you want…" style="width:100%;background:#1a1512;border:1px solid #5a4a2a;color:#f5e6c8;border-radius:8px;padding:10px;font-size:14px;margin-bottom:12px;box-sizing:border-box"></textarea>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+      <button id="dsNbGenerate" style="background:#D4A24C;color:#1a1206;border:0;border-radius:8px;padding:12px 20px;font-weight:700;cursor:pointer;font-size:15px">🍌 Create</button>
+      <span id="dsNbStatus" style="font-size:13px;color:var(--muted)"></span>
+    </div>
+    <div id="dsNbResult" style="display:none;text-align:center">
+      <img id="dsNbResultImg" alt="Generated image" style="max-width:100%;border-radius:12px;border:1px solid #5a4a2a;margin-bottom:10px">
+      <div>
+        <a id="dsNbDownload" download="nano-banana.png" style="display:inline-block;background:#D4A24C;color:#1a1206;border-radius:8px;padding:10px 16px;font-weight:700;text-decoration:none;margin-right:8px">⬇ Download</a>
+        <button id="dsNbAgain" style="background:transparent;color:#D4A24C;border:1px solid #D4A24C;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer">🔄 New</button>
+      </div>
+    </div>
+  </div>
   <div class="divider"></div>
   <div class="empty">Built with ♥ for Randy Courrier · Mission, BC<br>Dad's Sports 2.0</div>
 </section>
@@ -1170,6 +1204,76 @@ function initRadio(){
     });
   });
 }
+
+/* ================= NANO BANANA (Gemini 2.5 Flash Image) ================= */
+(function(){
+var nbMode='generate',nbImageData=null,nbImageMime=null;
+function $(id){return document.getElementById(id);}
+function nbGetKey(){try{return localStorage.getItem('ds_geminikey')||'';}catch(e){return '';}}
+function nbCheckKey(){var has=!!nbGetKey();$('dsNbNoKey').style.display=has?'none':'block';return has;}
+$('dsGeminiKey').value=nbGetKey();
+$('dsGeminiSave').addEventListener('click',function(){
+  try{localStorage.setItem('ds_geminikey',$('dsGeminiKey').value.trim());}catch(e){}
+  nbCheckKey();
+});
+function nbSetMode(m){
+  nbMode=m;
+  $('dsNbModeGen').style.background=m==='generate'?'#D4A24C':'transparent';
+  $('dsNbModeGen').style.color=m==='generate'?'#1a1206':'#D4A24C';
+  $('dsNbModeEdit').style.background=m==='edit'?'#D4A24C':'transparent';
+  $('dsNbModeEdit').style.color=m==='edit'?'#1a1206':'#D4A24C';
+  $('dsNbUploadRow').style.display=(m==='edit')?'block':'none';
+  if(m==='generate'){$('dsNbPreviewWrap').style.display='none';nbImageData=null;}
+}
+$('dsNbModeGen').addEventListener('click',function(){nbSetMode('generate');});
+$('dsNbModeEdit').addEventListener('click',function(){nbSetMode('edit');});
+$('dsNbImage').addEventListener('change',function(){
+  var f=$('dsNbImage').files[0];if(!f)return;
+  $('dsNbImageName').textContent=f.name;
+  var r=new FileReader();
+  r.onload=function(){
+    nbImageMime=f.type||'image/jpeg';
+    nbImageData=r.result.split(',')[1];
+    $('dsNbPreview').src=r.result;
+    $('dsNbPreviewWrap').style.display='block';
+  };
+  r.readAsDataURL(f);
+});
+$('dsNbAgain').addEventListener('click',function(){
+  $('dsNbResult').style.display='none';$('dsNbStatus').textContent='';
+});
+$('dsNbGenerate').addEventListener('click',function(){
+  if(!nbCheckKey())return;
+  var prompt=$('dsNbPrompt').value.trim();
+  if(!prompt){$('dsNbStatus').textContent='Type what you want first.';return;}
+  if(nbMode==='edit'&&!nbImageData){$('dsNbStatus').textContent='Pick a photo to edit.';return;}
+  $('dsNbGenerate').disabled=true;
+  $('dsNbStatus').textContent='Creating... (10-30s)';
+  $('dsNbResult').style.display='none';
+  var parts=[{text:prompt}];
+  if(nbMode==='edit'&&nbImageData)parts.push({inlineData:{mimeType:nbImageMime,data:nbImageData}});
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key='+encodeURIComponent(nbGetKey()),{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{parts:parts}]})
+  }).then(function(r){
+    if(!r.ok)throw new Error(r.status===400?'Bad API key.':'API error '+r.status);
+    return r.json();
+  }).then(function(d){
+    var ps=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[];
+    var p=null;
+    for(var i=0;i<ps.length;i++){if(ps[i].inlineData&&ps[i].inlineData.data){p=ps[i];break;}}
+    if(!p)throw new Error('No image in response.');
+    var url='data:'+(p.inlineData.mimeType||'image/png')+';base64,'+p.inlineData.data;
+    $('dsNbResultImg').src=url;$('dsNbDownload').href=url;
+    $('dsNbResult').style.display='block';$('dsNbStatus').textContent='Done!';
+  }).catch(function(e){
+    $('dsNbStatus').textContent='Error: '+e.message;
+  }).finally(function(){
+    $('dsNbGenerate').disabled=false;
+  });
+});
+nbCheckKey();
+})();
 
 /* ================= INIT ================= */
 initPhotos();loadWeather();renderFavs();
