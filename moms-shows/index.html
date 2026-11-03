@@ -85,6 +85,46 @@ a{color:inherit;text-decoration:none}
 
 <nav class="bottomnav" id="bottomnav"></nav>
 
+<!-- 🐈‍⬛ Grumpy cat mascot -->
+<div id="cat" style="position:fixed;z-index:500;width:64px;height:64px;cursor:pointer;user-select:none;transition:transform .1s;pointer-events:auto;font-size:52px;line-height:64px;text-align:center;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))">🐈‍⬛</div>
+<script>
+(function(){
+const cat=document.getElementById("cat");
+let x=Math.random()*(innerWidth-80),y=innerHeight*0.6,dx=1.2,dy=0.8,taps=0,angry=false,lastTap=0;
+const meows=["meow!","mew!","mrrp!","mew mew!","prrrp!"];
+const angryMeows=["HISSS!","GRRR!","MEOW!!","*swats*"];
+function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.rate=1.4;u.pitch=angry?0.6:1.6;speechSynthesis.speak(u);}catch(e){}}
+function clampX(v){return Math.max(0,Math.min(innerWidth-70,v));}
+function clampY(v){return Math.max(110,Math.min(innerHeight-90,v));}
+function move(){
+ if(angry)return;
+ x=clampX(x+dx);y=clampY(y+dy);
+ if(x<=0||x>=innerWidth-70)dx*=-1;
+ if(y<=110||y>=innerHeight-90)dy*=-1;
+ if(Math.random()<0.01){dx=(Math.random()-0.5)*3;dy=(Math.random()-0.5)*2;}
+ cat.style.transform=`translate(${x}px,${y}px) scaleX(${dx>=0?1:-1})`;
+ requestAnimationFrame(move);
+}
+cat.style.position="fixed";cat.style.left="0";cat.style.top="0";
+cat.style.transform=`translate(${x}px,${y}px)`;
+move();
+cat.addEventListener("click",()=>{
+ const now=Date.now();
+ taps=(now-lastTap<1500)?taps+1:1;lastTap=now;
+ if(taps>=4&&!angry){
+  angry=true;cat.textContent="🙀";cat.style.fontSize="60px";
+  speak(angryMeows[Math.floor(Math.random()*angryMeows.length)]);
+  // swat animation: lunge toward tap then shake
+  cat.animate([{transform:`translate(${x}px,${y}px) scale(1)`},{transform:`translate(${x}px,${y-40}px) scale(1.4) rotate(-15deg)`},{transform:`translate(${x}px,${y}px) scale(1) rotate(10deg)`},{transform:`translate(${x}px,${y}px) scale(1)`}],{duration:600});
+  setTimeout(()=>{angry=false;taps=0;cat.textContent="🐈‍⬛";cat.style.fontSize="52px";dx=(Math.random()-0.5)*3;dy=(Math.random()-0.5)*2;move();},2500);
+ }else if(!angry){
+  cat.animate([{transform:`translate(${x}px,${y}px) scale(1)`},{transform:`translate(${x}px,${y-18}px) scale(1.15)`},{transform:`translate(${x}px,${y}px) scale(1)`}],{duration:300});
+  speak(meows[Math.floor(Math.random()*meows.length)]);
+ }
+});
+})();
+</script>
+
 <script>
 const TABS=[{id:"shows",label:"🎬 Shows",icon:"🎬"},{id:"apps",label:"📱 Apps & Sites",icon:"📱"}];
 // verified live video IDs (checked 2026-11-03 via search)
