@@ -514,21 +514,26 @@ TABS.forEach((t,i)=>{
 });
 let curTab=0;
 function isShowsTab(){return typeof curTab!=="undefined"?TABS[curTab].id==="shows":true;}
+function isCritterDiv(d){
+ const t=d.textContent;
+ return t==="\uD83D\uDC26"||t==="\uD83D\uDC15"||t==="\uD83D\uDC36"||t==="\uD83E\uDD7A"||t==="\uD83D\uDE31"||t==="\uD83D\uDCA4"||t==="\uD83E\uDEB6"||t==="\uD83E\uDD0D"||t==="\uD83E\uDE3A"||t==="\uD83D\uDC3A"||t==="\uD83D\ude3b"||t==="\uD83D\ude38"||t==="\uD83D\ude3e"||t==="\uD83D\ude34"||t==="\uD83D\uDC31\u200d\uD83D\uDCA8"||t==="SASHA";
+}
 function updateCritterVisibility(){
  const show=isShowsTab()&&!isVideoOpen();
- const disp=show?"":"none";
  try{
-  if(!crittersHidden){
-   cat.style.display=disp;
-   document.getElementById("catname").style.display=disp;
-   const zzz=document.getElementById("catzzz");if(zzz)zzz.style.display=show?(cat.textContent==="\uD83D\ude34"?"block":"none"):"none";
-   // Also hide/show ALL birds, buddy, feathers - everything
+  if(!show){
+   // NUCLEAR: remove ALL critter divs from DOM when not on Shows tab
    document.querySelectorAll("div").forEach(d=>{
-    const t=d.textContent;
-    if(t==="\uD83D\uDC26"||t==="\uD83D\uDC15"||t==="\uD83D\uDC36"||t==="\uD83E\uDD7A"||t==="\uD83D\uDE31"||t==="\uD83D\uDCA4"||t==="\uD83E\uDEB6"||t==="\uD83E\uDD0D"||t==="\uD83E\uDE3A"||t==="\uD83D\uDC3A"){
-     d.style.display=disp;
-    }
+    if(isCritterDiv(d))d.remove();
    });
+   // Also hide the permanent cat elements
+   try{cat.style.display="none";document.getElementById("catname").style.display="none";
+   const zzz=document.getElementById("catzzz");if(zzz)zzz.style.display="none";}catch(e){}
+  }else{
+   // On Shows tab: restore cat visibility (birds/buddy respawn naturally)
+   if(!crittersHidden){
+    try{cat.style.display="";document.getElementById("catname").style.display="";}catch(e){}
+   }
   }
  }catch(e){}
 }
