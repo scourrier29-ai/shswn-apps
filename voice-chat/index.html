@@ -360,6 +360,7 @@
         <div class="field">
           <label for="voiceSel">Voice</label>
           <select id="voiceSel"><option value="">Default voice</option></select>
+          <p class="hint" id="voiceHint"></p>
         </div>
         <div class="row2">
           <div class="field">
@@ -459,6 +460,7 @@
         adult: false,
         systemPrompt: "",
         voiceURI: "",
+        voiceName: "",
         rate: 1,
         pitch: 1,
         speakReplies: true,
@@ -492,6 +494,8 @@
       /* ---------------- state ---------------- */
       var SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
       var synth = window.speechSynthesis || null;
+      var voiceList = [];        // last voice list handed over by the browser
+      var voicesSettled = false; // true once voices arrived or we gave up waiting
       var callActive = false;
       var muted = false;
       var aiBusy = false;        // waiting on the AI or speaking
@@ -722,9 +726,13 @@
       }
       function pickVoice() {
         if (!synth) return null;
-        var voices = synth.getVoices();
+        var voices = voiceList.length ? voiceList : synth.getVoices();
         if (settings.voiceURI) {
           for (var i = 0; i < voices.length; i++) if (voices[i].voiceURI === settings.voiceURI) return voices[i];
+        }
+        /* Some Android builds change voiceURIs between sessions — fall back to the name. */
+        if (settings.voiceName) {
+          for (var j = 0; j < voices.length; j++) if (voices[j].name === settings.voiceName) return voices[j];
         }
         return null;
       }
@@ -1022,7 +1030,7 @@
 
       /* ---------------- settings UI ---------------- */
       var sheet = $("settingsSheet"), backdrop = $("sheetBackdrop");
-      function openSheet() { sheet.classList.add("open"); backdrop.classList.add("open"); }
+      function openSheet() { sheet.classList.add("open"); backdrop.classList.add("open"); loadVoices(); warmUpVoices(); }
       function closeSheet() { sheet.classList.remove("open"); backdrop.classList.remove("open"); }
       $("settingsBtn").addEventListener("click", openSheet);
       backdrop.addEventListener("click", closeSheet);
@@ -1098,22 +1106,127 @@
         closeSheet();
       });
 
-      /* voices list (loads async in most browsers) */
-      function loadVoices() {
-        if (!synth) return;
+      /* ---------------- voices ----------------
+         getVoices() is asynchronous in most browsers: it commonly
+         returns an empty list on the first call and only fills in when
+         the voiceschanged event fires. On Android Chrome it can stay
+         empty until the speech engine has been used once. So: listen
+         for voiceschanged (both registration styles), poll briefly as
+         a backstop, re-check every time Settings opens or the dropdown
+         is tapped, and never wipe the user's current selection when
+         the list refreshes. */
+      var voicePollTimer = null;
+      var voicePollTries = 0;
+      var voicesWarmed = false;
+
+      function renderVoiceOptions() {
         var sel = $("voiceSel");
-        var current = settings.voiceURI;
-        sel.innerHTML = '<option value="">Default voice</option>';
-        var voices = synth.getVoices();
-        voices.forEach(function (v) {
+        var hint = $("voiceHint");
+        var want = sel.value || settings.voiceURI || "";
+        sel.innerHTML = "";
+        var def = document.createElement("option");
+        def.value = "";
+        def.textContent = "Default voice";
+        sel.appendChild(def);
+        if (!synth) {
+          var noSynth = document.createElement("option");
+          noSynth.value = ""; noSynth.disabled = true;
+          noSynth.textContent = "Speech isn't supported in this browser";
+          sel.appendChild(noSynth);
+          sel.value = "";
+          if (hint) hint.textContent = "This browser has no speech synthesis, so replies stay text-only here.";
+          return;
+        }
+        if (!voiceList.length) {
+          var empty = document.createElement("option");
+          empty.value = ""; empty.disabled = true;
+          empty.textContent = voicesSettled ? "No voices available on this device" : "Loading voices…";
+          sel.appendChild(empty);
+          sel.value = "";
+          if (hint) hint.textContent = voicesSettled
+            ? "No text-to-speech voices were found on this device, so replies can't be spoken aloud here. If your phone has a speech engine (like Google Text-to-Speech), make sure it's enabled in your device settings, then reopen this page."
+            : "Loading the voices installed on this device…";
+          return;
+        }
+        var seen = {};
+        voiceList.forEach(function (v) {
+          var key = v.voiceURI + "|" + v.lang;
+          if (seen[key]) return;
+          seen[key] = true;
           var o = document.createElement("option");
           o.value = v.voiceURI;
-          o.textContent = v.name + " (" + v.lang + ")";
+          o.textContent = v.name + " (" + v.lang + ")" + (v.default ? " — device default" : "");
           sel.appendChild(o);
         });
-        sel.value = current;
+        sel.value = want;
+        if (sel.selectedIndex < 0) sel.selectedIndex = 0;
+        if (hint) hint.textContent = voiceList.length + (voiceList.length === 1 ? " voice" : " voices") + " available on this device. Your pick applies as soon as you choose it — tap Test voice below to hear it.";
       }
-      if (synth) { loadVoices(); synth.onvoiceschanged = loadVoices; }
+
+      function stopVoicePoll() {
+        if (voicePollTimer) { clearInterval(voicePollTimer); voicePollTimer = null; }
+      }
+      function startVoicePoll() {
+        if (voicePollTimer || !synth) return;
+        voicePollTries = 0;
+        voicePollTimer = setInterval(function () {
+          voicePollTries++;
+          var voices = [];
+          try { voices = synth.getVoices() || []; } catch (e) {}
+          if (voices.length) {
+            voiceList = voices; voicesSettled = true;
+            stopVoicePoll(); renderVoiceOptions();
+          } else if (voicePollTries >= 24) { /* ~6 seconds of trying, then settle on the fallback */
+            voicesSettled = true;
+            stopVoicePoll(); renderVoiceOptions();
+          }
+        }, 250);
+      }
+      function loadVoices() {
+        if (!synth) { voicesSettled = true; renderVoiceOptions(); return; }
+        var voices = [];
+        try { voices = synth.getVoices() || []; } catch (e) {}
+        if (voices.length) {
+          voiceList = voices; voicesSettled = true;
+          stopVoicePoll(); renderVoiceOptions();
+        } else {
+          renderVoiceOptions();
+          startVoicePoll();
+        }
+      }
+      /* Android Chrome often won't hand over its voice list until the
+         speech engine has been used once. A zero-volume utterance of a
+         period makes no audible sound but wakes the engine up; the
+         voiceschanged event then delivers the real list. */
+      function warmUpVoices() {
+        if (!synth || voicesWarmed || voiceList.length) return;
+        voicesWarmed = true;
+        try {
+          var u = new SpeechSynthesisUtterance(".");
+          u.volume = 0;
+          synth.speak(u);
+          loadVoices();
+        } catch (e) {}
+      }
+      /* Selecting a voice applies (and saves) immediately — no need to
+         hit Save settings for the pick to take effect. */
+      $("voiceSel").addEventListener("change", function () {
+        settings.voiceURI = this.value;
+        settings.voiceName = "";
+        for (var i = 0; i < voiceList.length; i++) {
+          if (voiceList[i].voiceURI === this.value) { settings.voiceName = voiceList[i].name; break; }
+        }
+        saveSettings();
+      });
+      $("voiceSel").addEventListener("focus", function () { loadVoices(); warmUpVoices(); });
+      if (synth) {
+        if (typeof synth.addEventListener === "function") synth.addEventListener("voiceschanged", loadVoices);
+        synth.onvoiceschanged = loadVoices;
+        loadVoices();
+      } else {
+        voicesSettled = true;
+        renderVoiceOptions();
+      }
 
       loadSettingsUI();
       if (!synth) {
