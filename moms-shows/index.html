@@ -175,7 +175,7 @@ function pickDest(){
 }
 function tick(){
  const now=Date.now();
- if(!isShowsTab()&&!isVideoOpen()){requestAnimationFrame(tick);return;}
+ try{if(typeof isShowsTab==="function"&&!isShowsTab()&&!isVideoOpen()){requestAnimationFrame(tick);return;}}catch(e){}
  if(state==="walk"){
   // BIRD AWARENESS: if birds are flying, stop and watch them
   if(birdWatch&&now<birdWatch.until){
@@ -224,7 +224,7 @@ setState("walk",8000);place();tick();
 cat.style.display="";document.getElementById("catname").style.display="";crittersHidden=false;
 // --- BIRD ---
 function spawnBird(){
- if(!isShowsTab()){setTimeout(spawnBird,10000);return;}
+ try{if(typeof isShowsTab==="function"&&!isShowsTab()){setTimeout(spawnBird,10000);return;}}catch(e){}
  // FLOCK: 3-5 birds fly by together
  const flockSize=3+Math.floor(Math.random()*3);
  const dir=Math.random()<0.5?1:-1;
@@ -328,7 +328,7 @@ setTimeout(spawnBird,10000+Math.random()*10000);
  window.addEventListener("resize",placeBuddy);
  // Buddy behavior loop
  function buddyTick(){
-  if(crittersHidden||isVideoOpen()||!isShowsTab()){requestAnimationFrame(buddyTick);return;}
+  try{if(crittersHidden||isVideoOpen()||(typeof isShowsTab==="function"&&!isShowsTab())){requestAnimationFrame(buddyTick);return;}}catch(e){if(crittersHidden||isVideoOpen()){requestAnimationFrame(buddyTick);return;}}
   if(bState==="walk"){
    bX+=bSpeed*bDir;
    if(bX>innerWidth-100){bDir=-1;}
