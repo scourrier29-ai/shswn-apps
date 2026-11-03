@@ -437,8 +437,8 @@
         },
         openrouter: {
           label: "OpenRouter",
-          defaultModel: "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-          modelHint: "Free uncensored — 50 chats/day. If it's down, try: nousresearch/hermes-3-llama-3.1-405b:free",
+          defaultModel: "nousresearch/hermes-3-llama-3.1-405b:free",
+          modelHint: "Free uncensored — 50 chats/day.",
           keyHint: 'Get a key at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a> — sign up, then "Create Key". Pick a model with :free in its name to pay nothing.'
         },
         none: {
@@ -470,8 +470,10 @@
         var saved = JSON.parse(localStorage.getItem(LS_KEY) || "null");
         if (saved) { for (var k in settings) { if (saved[k] !== undefined) settings[k] = saved[k]; } }
       } catch (e) {}
-      /* Default OpenRouter to the free uncensored model, and migrate the old default. */
-      if (settings.provider === "openrouter" && (!settings.model || settings.model === "meta-llama/llama-3.3-70b-instruct:free")) {
+      /* Default OpenRouter to the free uncensored model, and migrate old defaults. */
+      if (settings.model && settings.model.indexOf("dolphin") > -1) {
+        settings.model = PROVIDER_INFO.openrouter.defaultModel;
+      } else if (settings.provider === "openrouter" && (!settings.model || settings.model === "meta-llama/llama-3.3-70b-instruct:free")) {
         settings.model = PROVIDER_INFO.openrouter.defaultModel;
       }
       function saveSettings() {
