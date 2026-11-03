@@ -301,6 +301,15 @@ function solMoveScore(m,info,drawCount){
   if(info&&info.flipped)s+=5;
   return s;
 }
+function solDealCards(cards,seed){
+  var i;for(i=0;i<cards.length;i++)cards[i].isFaceUp=false;
+  var rng=(seed==null||seed===undefined)?Math.random:mulberry32(seed>>>0);
+  var shuffled=solShuffle(cards.slice(),rng);
+  var piles={stock:[],waste:[],foundations:[[],[],[],[]],tableau:[[],[],[],[],[],[],[]]};
+  for(i=0;i<7;i++)for(var j=0;j<=i;j++){var c=shuffled.pop();if(j===i)c.isFaceUp=true;piles.tableau[i].push(c);}
+  piles.stock=shuffled;
+  return piles;
+}
 function solIsWin(p){return p.foundations[0].length===13&&p.foundations[1].length===13&&p.foundations[2].length===13&&p.foundations[3].length===13;}
 function solAutoReady(p){
   if(p.stock.length||p.waste.length)return false;
@@ -325,8 +334,8 @@ function solRestore(p,s,byId){
   for(var id in s.up)if(byId[id])byId[id].isFaceUp=!!s.up[id];
 }
 /* Solver-verified winnable deal seeds (Draw 1). Filled by the Node test harness. */
-var WINNABLE_SEEDS=[];
-if(typeof module!=='undefined'&&module.exports){module.exports={mulberry32:mulberry32,solNewCard:solNewCard,solBuildDeck:solBuildDeck,solShuffle:solShuffle,solDeal:solDeal,solCanFoundation:solCanFoundation,solCanTableau:solCanTableau,solEnumerateMoves:solEnumerateMoves,solApplyMove:solApplyMove,solMoveScore:solMoveScore,solIsWin:solIsWin,solAutoReady:solAutoReady,solSnapshot:solSnapshot,solRestore:solRestore,SOL_SUIT_NAMES:SOL_SUIT_NAMES,SOL_SUIT_COLORS:SOL_SUIT_COLORS,SOL_RANKS:SOL_RANKS};}
+var WINNABLE_SEEDS=[1007,1008,1010,1012,1015,1022,1023,1039,1040,1047,1049,1051,1058,1062,1064,1071,1077,1081,1085,1086,1087,1096,1101,1103];
+if(typeof module!=='undefined'&&module.exports){module.exports={mulberry32:mulberry32,solNewCard:solNewCard,solBuildDeck:solBuildDeck,solShuffle:solShuffle,solDeal:solDeal,solCanFoundation:solCanFoundation,solCanTableau:solCanTableau,solEnumerateMoves:solEnumerateMoves,solApplyMove:solApplyMove,solMoveScore:solMoveScore,solIsWin:solIsWin,solAutoReady:solAutoReady,solSnapshot:solSnapshot,solRestore:solRestore,solDealCards:solDealCards,WINNABLE_SEEDS:WINNABLE_SEEDS,SOL_SUIT_NAMES:SOL_SUIT_NAMES,SOL_SUIT_COLORS:SOL_SUIT_COLORS,SOL_RANKS:SOL_RANKS};}
 /*__LOGIC_END__*/
 
 /* ================= UI LAYER ================= */
@@ -416,7 +425,7 @@ function newGame(){
   clearSelection();
   var seed=null;
   if(settings.winnable&&WINNABLE_SEEDS.length)seed=WINNABLE_SEEDS[Math.floor(Math.random()*WINNABLE_SEEDS.length)];
-  piles=solDeal(seed);
+  piles=solDealCards(deck,seed);
   var dk=settings.draw===1?'d1':'d3';
   stats[dk].games++;stats[dk].streak=0;saveStats();renderStats();
   gameActive=true;calculateLayout();renderAll();updateUndoBtn();
