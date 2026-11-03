@@ -142,7 +142,7 @@ function render(){
     d.style.left=((t.x-MINX)*UW + t.z*ZX)+'px';
     d.style.top=(t.y*UH - t.z*ZY)+'px';
     d.textContent=t.face;
-    d.addEventListener('click',()=>onTap(t));
+    d.addEventListener('pointerdown',e=>{e.preventDefault();onTap(t);});
     t.el=d; board.appendChild(d);
   }
   fitBoard();
