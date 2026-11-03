@@ -16,6 +16,29 @@ function goTab(name){
 document.querySelectorAll('.ttab').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.tab)));
 document.querySelectorAll('.oct').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.tab)));
 
+/* ---------- swipe navigation (left/right switches tabs) ---------- */
+const SWIPE_TABS = ['home','stream','news','podcast','radio','tools','arcade','settings'];
+let swX0 = 0, swY0 = 0;
+const swipeArea = document.getElementById('app') || document.body;
+swipeArea.addEventListener('touchstart', e=>{
+  const t = e.changedTouches[0];
+  swX0 = t.clientX; swY0 = t.clientY;
+}, {passive:true});
+swipeArea.addEventListener('touchend', e=>{
+  const t = e.changedTouches[0];
+  const dx = t.clientX - swX0, dy = t.clientY - swY0;
+  const adx = Math.abs(dx), ady = Math.abs(dy);
+  if (adx < 80) return;            /* 80px minimum swipe distance */
+  if (adx < ady * 1.5) return;     /* must be mostly horizontal — keeps vertical scroll working */
+  const curBtn = document.querySelector('.ttab.active');
+  let i = SWIPE_TABS.indexOf(curBtn ? curBtn.dataset.tab : 'home');
+  if (i < 0) i = 0;
+  i = dx < 0
+    ? (i + 1) % SWIPE_TABS.length            /* swipe left → next tab (wraps) */
+    : (i - 1 + SWIPE_TABS.length) % SWIPE_TABS.length;  /* swipe right → prev tab (wraps) */
+  goTab(SWIPE_TABS[i]);
+}, {passive:true});
+
 /* ---------- Ottawa time ---------- */
 const TORONTO = 'America/Toronto';
 function tickOttawa(){
