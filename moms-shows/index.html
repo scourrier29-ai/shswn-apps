@@ -90,36 +90,73 @@ a{color:inherit;text-decoration:none}
 <script>
 (function(){
 const cat=document.getElementById("cat");
-let x=Math.random()*(innerWidth-80),y=innerHeight*0.6,dx=1.2,dy=0.8,taps=0,angry=false,lastTap=0;
+let x=Math.random()*(innerWidth-80),y=innerHeight*0.6,dx=1.2,dy=0.8;
+let state="walk"; // walk | sleep | purr | waking | angry
+let stateUntil=0,taps=0,lastTap=0,wakeTimer=null;
 const meows=["meow!","mew!","mrrp!","mew mew!","prrrp!"];
-const angryMeows=["HISSS!","GRRR!","MEOW!!","*swats*"];
-function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.rate=1.4;u.pitch=angry?0.6:1.6;speechSynthesis.speak(u);}catch(e){}}
+const angryMeows=["HISSS!","GRRR!","MEOW!!"];
+function speak(t,rate,pitch){try{const u=new SpeechSynthesisUtterance(t);u.rate=rate||1.4;u.pitch=pitch||1.6;speechSynthesis.speak(u);}catch(e){}}
 function clampX(v){return Math.max(0,Math.min(innerWidth-70,v));}
 function clampY(v){return Math.max(110,Math.min(innerHeight-90,v));}
-function move(){
- if(angry)return;
- x=clampX(x+dx);y=clampY(y+dy);
- if(x<=0||x>=innerWidth-70)dx*=-1;
- if(y<=110||y>=innerHeight-90)dy*=-1;
- if(Math.random()<0.01){dx=(Math.random()-0.5)*3;dy=(Math.random()-0.5)*2;}
- cat.style.transform=`translate(${x}px,${y}px) scaleX(${dx>=0?1:-1})`;
- requestAnimationFrame(move);
+function place(){cat.style.transform=`translate(${x}px,${y}px) scaleX(${dx>=0?1:-1})`;}
+function setState(s,dur){
+ state=s;stateUntil=Date.now()+dur;
+ if(s==="sleep"){cat.textContent="💤";cat.style.fontSize="40px";}
+ else if(s==="purr"){cat.textContent="😻";cat.style.fontSize="52px";speak("purrrrrrr",0.5,0.7);}
+ else if(s==="walk"){cat.textContent="🐈‍⬛";cat.style.fontSize="52px";}
+}
+function tick(){
+ const now=Date.now();
+ if(state==="walk"){
+  x=clampX(x+dx);y=clampY(y+dy);
+  if(x<=0||x>=innerWidth-70)dx*=-1;
+  if(y<=110||y>=innerHeight-90)dy*=-1;
+  if(Math.random()<0.008){dx=(Math.random()-0.5)*3;dy=(Math.random()-0.5)*2;}
+  place();
+  if(now>stateUntil){
+   const r=Math.random();
+   if(r<0.45)setState("sleep",8000+Math.random()*12000); // naps 8-20s
+   else if(r<0.65)setState("purr",4000+Math.random()*3000); // purrs 4-7s
+   else stateUntil=now+6000+Math.random()*10000;
+  }
+ }else if(state==="sleep"){
+  // Zzz bob
+  cat.style.transform=`translate(${x}px,${y+Math.sin(now/600)*3}px)`;
+  if(now>stateUntil)setState("walk",6000+Math.random()*10000);
+ }else if(state==="purr"){
+  cat.style.transform=`translate(${x}px,${y}px) scale(${1+Math.sin(now/150)*0.04})`;
+  if(now>stateUntil)setState("walk",6000+Math.random()*10000);
+ }
+ requestAnimationFrame(tick);
 }
 cat.style.position="fixed";cat.style.left="0";cat.style.top="0";
-cat.style.transform=`translate(${x}px,${y}px)`;
-move();
+setState("walk",8000+Math.random()*8000);place();tick();
 cat.addEventListener("click",()=>{
  const now=Date.now();
  taps=(now-lastTap<1500)?taps+1:1;lastTap=now;
- if(taps>=4&&!angry){
-  angry=true;cat.textContent="🙀";cat.style.fontSize="60px";
-  speak(angryMeows[Math.floor(Math.random()*angryMeows.length)]);
-  // swat animation: lunge toward tap then shake
-  cat.animate([{transform:`translate(${x}px,${y}px) scale(1)`},{transform:`translate(${x}px,${y-40}px) scale(1.4) rotate(-15deg)`},{transform:`translate(${x}px,${y}px) scale(1) rotate(10deg)`},{transform:`translate(${x}px,${y}px) scale(1)`}],{duration:600});
-  setTimeout(()=>{angry=false;taps=0;cat.textContent="🐈‍⬛";cat.style.fontSize="52px";dx=(Math.random()-0.5)*3;dy=(Math.random()-0.5)*2;move();},2500);
- }else if(!angry){
-  cat.animate([{transform:`translate(${x}px,${y}px) scale(1)`},{transform:`translate(${x}px,${y-18}px) scale(1.15)`},{transform:`translate(${x}px,${y}px) scale(1)`}],{duration:300});
-  speak(meows[Math.floor(Math.random()*meows.length)]);
+ if(state==="angry")return;
+ if(state==="sleep"||state==="purr"){
+  // grumpy wake-up: takes a beat, then ANGRY
+  state="waking";cat.textContent="😾";cat.style.fontSize="56px";
+  clearTimeout(wakeTimer);
+  wakeTimer=setTimeout(()=>{
+   state="angry";cat.textContent="🙀";cat.style.fontSize="60px";
+   speak(angryMeows[Math.floor(Math.random()*angryMeows.length)],1.1,0.5);
+   cat.animate([{transform:`translate(${x}px,${y}px) scale(1)`},{transform:`translate(${x}px,${y-50}px) scale(1.5) rotate(-18deg)`},{transform:`translate(${x}px,${y}px) scale(1) rotate(12deg)`},{transform:`translate(${x}px,${y}px) scale(1)`}],{duration:700});
+   setTimeout(()=>{setState("walk",6000+Math.random()*8000);dx=(Math.random()-0.5)*3;dy=(Math.random()-0.5)*2;taps=0;},2600);
+  },900); // "eventually" — the slow grumpy wake-up
+  return;
+ }
+ if(state==="walk"){
+  if(taps>=4){
+   state="angry";cat.textContent="🙀";cat.style.fontSize="60px";
+   speak(angryMeows[Math.floor(Math.random()*angryMeows.length)],1.1,0.5);
+   cat.animate([{transform:`translate(${x}px,${y}px) scale(1)`},{transform:`translate(${x}px,${y-50}px) scale(1.5) rotate(-18deg)`},{transform:`translate(${x}px,${y}px) scale(1)`}],{duration:600});
+   setTimeout(()=>{setState("walk",6000+Math.random()*8000);taps=0;},2500);
+  }else{
+   cat.animate([{transform:`translate(${x}px,${y}px) scale(1)`},{transform:`translate(${x}px,${y-18}px) scale(1.15)`},{transform:`translate(${x}px,${y}px) scale(1)`}],{duration:300});
+   speak(meows[Math.floor(Math.random()*meows.length)]);
+  }
  }
 });
 })();
