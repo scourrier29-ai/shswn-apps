@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>🔍 Spot the Difference</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+:root{--red:#e50914;--bg:#0a0a0a;--card:#1c1c1c;--text:#fff;--muted:#bbb}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;min-height:100vh;padding:16px 16px calc(24px + env(safe-area-inset-bottom));}
+.wrap{max-width:1100px;margin:0 auto}
+h1{font-size:clamp(26px,5vw,40px);font-weight:900;text-align:center;margin:8px 0 4px}
+h1 .r{color:var(--red)}
+.sub{text-align:center;color:var(--muted);font-size:clamp(15px,3vw,19px);margin-bottom:12px}
+.puzzlename{text-align:center;font-size:clamp(20px,4vw,28px);font-weight:800;margin:6px 0}
+.counter{text-align:center;font-size:clamp(22px,4.5vw,32px);font-weight:900;margin:10px 0 4px}
+.counter .n{color:var(--red);font-size:1.3em}
+.dots{display:flex;justify-content:center;gap:10px;margin:10px 0 16px}
+.dot{width:18px;height:18px;border-radius:50%;background:#333;border:2px solid #555}
+.dot.found{background:var(--red);border-color:var(--red)}
+.panels{display:flex;gap:16px;justify-content:center}
+@media(max-width:760px){.panels{flex-direction:column;align-items:center}}
+.panel{position:relative;flex:1 1 0;max-width:520px;width:100%;aspect-ratio:4/3;border-radius:16px;overflow:hidden;border:3px solid #2c2c2c;cursor:pointer;touch-action:manipulation}
+.panel .tag{position:absolute;top:8px;left:12px;z-index:5;background:rgba(0,0,0,.65);color:#fff;font-weight:800;font-size:16px;padding:6px 14px;border-radius:20px}
+.scene{position:absolute;inset:0}
+.item{position:absolute;transform:translate(-50%,-50%);font-size:clamp(38px,7vw,54px);line-height:1;pointer-events:none}
+.circle{position:absolute;transform:translate(-50%,-50%);width:76px;height:76px;border:5px solid var(--red);border-radius:50%;pointer-events:none;z-index:4;animation:pop .35s ease-out;box-shadow:0 0 12px rgba(229,9,20,.8)}
+@keyframes pop{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.ripple{position:absolute;transform:translate(-50%,-50%);width:34px;height:34px;border:3px solid rgba(255,255,255,.55);border-radius:50%;pointer-events:none;z-index:4;animation:rip .5s ease-out forwards}
+@keyframes rip{0%{opacity:1;transform:translate(-50%,-50%) scale(.4)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
+.hintring{position:absolute;transform:translate(-50%,-50%);width:84px;height:84px;border:5px dashed #ffd23f;border-radius:50%;pointer-events:none;z-index:4;animation:hintpulse 1s ease-in-out 3}
+@keyframes hintpulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1}50%{transform:translate(-50%,-50%) scale(1.25);opacity:.6}}
+.controls{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:14px;font-weight:800;color:#fff;background:#2a2a2a;min-height:64px;padding:14px 28px;font-size:20px;touch-action:manipulation}
+button:active{transform:scale(.96)}
+button.primary{background:var(--red)}
+button:disabled{opacity:.4}
+.nav{display:flex;justify-content:center;gap:10px;margin-top:14px}
+.nav button{min-height:56px;font-size:17px;padding:10px 20px}
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:24px}
+.overlay.show{display:flex}
+.overlay h2{font-size:clamp(34px,8vw,58px);font-weight:900;margin-bottom:10px}
+.overlay p{font-size:clamp(18px,4vw,24px);color:var(--muted);margin-bottom:24px}
+.overlay .big{font-size:clamp(60px,15vw,110px);margin-bottom:8px;animation:bounce 1s ease infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.overlay button{font-size:24px;min-height:72px;padding:16px 44px;margin:6px}
+.confetti{position:absolute;top:-20px;width:12px;height:18px;z-index:51;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><span class="r">🔍</span> Spot the Difference</h1>
+  <div class="sub">Tap the 5 things that are different!</div>
+  <div class="puzzlename" id="puzzlename"></div>
+  <div class="counter">You found <span class="n" id="foundcount">0</span> of 5</div>
+  <div class="dots" id="dots"></div>
+  <div class="panels">
+    <div class="panel" id="panelL"><div class="tag">Picture 1</div><div class="scene" id="sceneL"></div></div>
+    <div class="panel" id="panelR"><div class="tag">Picture 2</div><div class="scene" id="sceneR"></div></div>
+  </div>
+  <div class="controls">
+    <button id="hintbtn" class="primary">💡 Hint (<span id="hintsleft">3</span> left)</button>
+  </div>
+  <div class="nav">
+    <button id="prevbtn">‹ Back</button>
+    <button id="nextbtn">Next ›</button>
+    <button id="replaybtn">🔁 Play Again</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="big" id="ovemoji">🎉</div>
+  <h2 id="ovtitle">You found them all!</h2>
+  <p id="ovsub">Amazing! Ready for the next one?</p>
+  <button class="primary" id="ovnext">Next Puzzle ›</button>
+  <button id="ovreplay">🔁 Play Again</button>
+</div>
+
+<script>
+"use strict";
+// ---------- tiny sounds (WebAudio, no files needed) ----------
+function beep(freq,dur,type,vol){
+  try{
+    const ctx=beep.ctx||(beep.ctx=new (window.AudioContext||window.webkitAudioContext)());
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=type||"sine";o.frequency.value=freq;
+    g.gain.setValueAtTime(vol||0.18,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+    o.connect(g);g.connect(ctx.destination);
+    o.start();o.stop(ctx.currentTime+dur);
+  }catch(e){}
+}
+const sndGood=()=>{beep(660,.12,"sine");setTimeout(()=>beep(880,.18,"sine"),110);};
+const sndBad=()=>beep(200,.12,"triangle",0.1);
+const sndWin=()=>{[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.22,"sine"),i*140));};
+
+// ---------- puzzles ----------
+// items: emoji at x%, y% on the left picture
+// diffs: missing (gone on right), change (different emoji on right), move (new x,y on right)
+const PUZZLES=[
+{
+  name:"🛋️ The Living Room",
+  bg:"linear-gradient(to bottom,#3a2c22 0%,#3a2c22 62%,#5a3d2b 62%,#5a3d2b 100%)",
+  items:[
+    {e:"🛋️",x:20,y:60},{e:"🪟",x:74,y:22},{e:"🪴",x:88,y:64},{e:"🐈",x:46,y:74},
+    {e:"🖼️",x:32,y:16},{e:"☕",x:58,y:68},{e:"🕰️",x:9,y:14},{e:"📚",x:64,y:72},
+    {e:"🕯️",x:80,y:46},{e:"🧸",x:11,y:78}
+  ],
+  diffs:[
+    {type:"missing",i:3},
+    {type:"change",i:4,to:"🌅"},
+    {type:"move",i:5,x:30,y:74},
+    {type:"missing",i:6},
+    {type:"change",i:9,to:"🎁"}
+  ]
+},
+{
+  name:"🌷 The Garden",
+  bg:"linear-gradient(to bottom,#7ec8f7 0%,#aee3f5 55%,#5da24a 55%,#4a8a3c 100%)",
+  items:[
+    {e:"🌻",x:15,y:32},{e:"🌷",x:35,y:58},{e:"🦋",x:60,y:26},{e:"🐝",x:76,y:50},
+    {e:"🌳",x:87,y:36},{e:"⛲",x:45,y:72},{e:"🍄",x:24,y:78},{e:"🐦",x:55,y:12},
+    {e:"🌈",x:10,y:12},{e:"🪻",x:70,y:78}
+  ],
+  diffs:[
+    {type:"missing",i:2},
+    {type:"change",i:3,to:"🐞"},
+    {type:"move",i:6,x:56,y:80},
+    {type:"missing",i:8},
+    {type:"change",i:9,to:"🌹"}
+  ]
+},
+{
+  name:"🍳 The Kitchen",
+  bg:"linear-gradient(to bottom,#d9e2ec 0%,#d9e2ec 58%,#b08968 58%,#b08968 100%)",
+  items:[
+    {e:"🍳",x:20,y:42},{e:"☕",x:40,y:30},{e:"🍎",x:60,y:46},{e:"🧁",x:76,y:62},
+    {e:"🥛",x:30,y:68},{e:"🔪",x:54,y:72},{e:"🧂",x:70,y:26},{e:"🍌",x:14,y:72},
+    {e:"🫖",x:82,y:42},{e:"🥚",x:44,y:56}
+  ],
+  diffs:[
+    {type:"missing",i:2},
+    {type:"change",i:3,to:"🍩"},
+    {type:"move",i:7,x:50,y:76},
+    {type:"missing",i:8},
+    {type:"change",i:9,to:"🧀"}
+  ]
+}
+];
+
+let pi=0, found=[], hints=3;
+
+function rightItems(p){
+  const r=p.items.map(o=>({...o}));
+  p.diffs.forEach(d=>{
+    if(d.type==="missing") r[d.i]=null;
+    else if(d.type==="change") r[d.i].e=d.to;
+    else if(d.type==="move"){r[d.i].x=d.x;r[d.i].y=d.y;}
+  });
+  return r;
+}
+// diff screen positions: left pos always; right pos (for move diffs both ends count)
+function diffZones(p){
+  return p.diffs.map(d=>{
+    const L={x:p.items[d.i].x,y:p.items[d.i].y};
+    let R={...L};
+    if(d.type==="move") R={x:d.x,y:d.y};
+    return {L,R};
+  });
+}
+
+function render(){
+  const p=PUZZLES[pi], R=rightItems(p);
+  document.getElementById("puzzlename").textContent=p.name;
+  const sL=document.getElementById("sceneL"), sR=document.getElementById("sceneR");
+  sL.style.background=p.bg; sR.style.background=p.bg;
+  sL.innerHTML=""; sR.innerHTML="";
+  p.items.forEach(o=>{
+    const s=document.createElement("span");s.className="item";s.textContent=o.e;
+    s.style.left=o.x+"%";s.style.top=o.y+"%";sL.appendChild(s);
+  });
+  R.forEach(o=>{
+    if(!o)return;
+    const s=document.createElement("span");s.className="item";s.textContent=o.e;
+    s.style.left=o.x+"%";s.style.top=o.y+"%";sR.appendChild(s);
+  });
+  // redraw found circles
+  found.forEach(idx=>drawCircle(idx));
+  updateCounter();
+  document.getElementById("hintsleft").textContent=hints;
+  document.getElementById("prevbtn").disabled=(pi===0);
+  document.getElementById("nextbtn").disabled=(pi===PUZZLES.length-1);
+}
+
+function updateCounter(){
+  document.getElementById("foundcount").textContent=found.length;
+  const dots=document.getElementById("dots");dots.innerHTML="";
+  for(let i=0;i<5;i++){
+    const d=document.createElement("div");d.className="dot"+(i<found.length?" found":"");
+    dots.appendChild(d);
+  }
+}
+
+function drawCircle(idx){
+  const zones=diffZones(PUZZLES[pi]);
+  [["sceneL",zones[idx].L],["sceneR",zones[idx].R]].forEach(([sid,pos])=>{
+    const c=document.createElement("div");c.className="circle";
+    c.style.left=pos.x+"%";c.style.top=pos.y+"%";
+    document.getElementById(sid).appendChild(c);
+  });
+}
+
+function panelTap(e,panelSide){
+  const panel=e.currentTarget;
+  const rect=panel.getBoundingClientRect();
+  const px=(e.clientX-rect.left)/rect.width*100;
+  const py=(e.clientY-rect.top)/rect.height*100;
+  const zones=diffZones(PUZZLES[pi]);
+  const TOL=10; // generous for older fingers
+  for(let i=0;i<zones.length;i++){
+    if(found.includes(i))continue;
+    const z=zones[i];
+    const hitL=Math.abs(px-z.L.x)<TOL&&Math.abs(py-z.L.y)<TOL;
+    const hitR=Math.abs(px-z.R.x)<TOL&&Math.abs(py-z.R.y)<TOL;
+    if((panelSide==="L"&&(hitL||hitR))||(panelSide==="R"&&(hitR||hitL))){
+      found.push(i);drawCircle(i);updateCounter();sndGood();
+      if(found.length===5)setTimeout(celebrate,600);
+      return;
+    }
+  }
+  // miss: gentle ripple so the tap feels acknowledged
+  const r=document.createElement("div");r.className="ripple";
+  r.style.left=px+"%";r.style.top=py+"%";
+  panel.querySelector(".scene").appendChild(r);
+  setTimeout(()=>r.remove(),550);sndBad();
+}
+
+document.getElementById("panelL").addEventListener("pointerdown",e=>panelTap(e,"L"));
+document.getElementById("panelR").addEventListener("pointerdown",e=>panelTap(e,"R"));
+
+document.getElementById("hintbtn").addEventListener("click",()=>{
+  if(hints<=0||found.length===5)return;
+  hints--;document.getElementById("hintsleft").textContent=hints;
+  const remaining=PUZZLES[pi].diffs.map((_,i)=>i).filter(i=>!found.includes(i));
+  const idx=remaining[Math.floor(Math.random()*remaining.length)];
+  const pos=diffZones(PUZZLES[pi])[idx].L;
+  const h=document.createElement("div");h.className="hintring";
+  h.style.left=pos.x+"%";h.style.top=pos.y+"%";
+  document.getElementById("sceneL").appendChild(h);
+  setTimeout(()=>h.remove(),3100);sndGood();
+});
+
+function celebrate(){
+  sndWin();
+  const last=(pi===PUZZLES.length-1);
+  document.getElementById("ovemoji").textContent=last?"🏆":"🎉";
+  document.getElementById("ovtitle").textContent=last?"You finished all 3 puzzles!":"You found them all!";
+  document.getElementById("ovsub").textContent=last?"You're a superstar! 🌟":"Amazing! Ready for the next one?";
+  document.getElementById("ovnext").style.display=last?"none":"";
+  document.getElementById("overlay").classList.add("show");
+  confetti();
+}
+function confetti(){
+  const ov=document.getElementById("overlay");
+  const colors=["#e50914","#ffd23f","#4fc3f7","#81c784","#ba68c8","#ffffff"];
+  for(let i=0;i<50;i++){
+    const c=document.createElement("div");c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDuration=(2+Math.random()*2.5)+"s";
+    c.style.animationDelay=(Math.random()*0.8)+"s";
+    ov.appendChild(c);setTimeout(()=>c.remove(),5500);
+  }
+}
+function closeOverlay(){document.getElementById("overlay").classList.remove("show");}
+function loadPuzzle(n){
+  pi=Math.max(0,Math.min(PUZZLES.length-1,n));
+  found=[];hints=3;closeOverlay();render();
+}
+document.getElementById("ovnext").addEventListener("click",()=>loadPuzzle(pi+1));
+document.getElementById("ovreplay").addEventListener("click",()=>loadPuzzle(pi));
+document.getElementById("nextbtn").addEventListener("click",()=>loadPuzzle(pi+1));
+document.getElementById("prevbtn").addEventListener("click",()=>loadPuzzle(pi-1));
+document.getElementById("replaybtn").addEventListener("click",()=>loadPuzzle(pi));
+
+loadPuzzle(0);
+</script>
+</body>
+</html>

@@ -90,6 +90,38 @@ a{color:inherit;text-decoration:none}
 <div class="appcard" onclick="go('https://www.facebook.com/search/videos/?q=dramabox%20full%20episode')"><div class="ai">🎭</div><div class="ab"><div class="an">DramaBox on Facebook</div><div class="ad">Full DramaBox episodes posted free</div></div><div class="go">›</div></div>
 </div>
 
+<!-- PUZZLES PAGE -->
+<div class="page" id="page-puzzles">
+<div class="hero"><h2>🧩 Spot the Difference</h2><p>Find all 5 differences in each picture. Tap what looks different!</p></div>
+<iframe src="games/spot-diff.html" style="width:100%;height:calc(100vh - 280px);border:none;border-radius:12px;margin:0 0 16px" title="Spot the Difference"></iframe>
+</div>
+
+<!-- SOLITAIRE PAGE -->
+<div class="page" id="page-solitaire">
+<div class="hero"><h2>🃏 Solitaire</h2><p>Classic Klondike. Tap a card, then tap where it should go.</p></div>
+<iframe src="games/solitaire.html" style="width:100%;height:calc(100vh - 280px);border:none;border-radius:12px;margin:0 0 16px" title="Solitaire"></iframe>
+</div>
+
+<!-- MAHJONG PAGE -->
+<div class="page" id="page-mahjong">
+<div class="hero"><h2>🀄 Mahjong</h2><p>Match pairs of free tiles to clear the board.</p></div>
+<iframe src="games/mahjong.html" style="width:100%;height:calc(100vh - 280px);border:none;border-radius:12px;margin:0 0 16px" title="Mahjong"></iframe>
+</div>
+
+<!-- CLASSICS PAGE -->
+<div class="page" id="page-classics">
+<div class="hero"><h2>👾 Classic Adventures</h2><p>The legendary Sierra adventure games — King's Quest and Leisure Suit Larry.</p></div>
+<div class="section">KING'S QUEST</div>
+<div class="appcard" onclick="go('https://www.gog.com/game/kings_quest_1_2_3')"><div class="ai">👑</div><div class="ab"><div class="an">King's Quest 1+2+3</div><div class="ad">The original trilogy — GOG, DRM-free</div></div><div class="go">›</div></div>
+<div class="appcard" onclick="go('https://www.gog.com/game/kings_quest_4_5_6')"><div class="ai">🗡️</div><div class="ab"><div class="an">King's Quest 4+5+6</div><div class="ad">The later classics — GOG, DRM-free</div></div><div class="go">›</div></div>
+<div class="section">LEISURE SUIT LARRY</div>
+<div class="appcard" onclick="go('https://www.gog.com/game/leisure_suit_larry_1_2_3')"><div class="ai">🕺</div><div class="ab"><div class="an">Leisure Suit Larry 1+2+3</div><div class="ad">The original trilogy — GOG, DRM-free</div></div><div class="go">›</div></div>
+<div class="appcard" onclick="go('https://store.steampowered.com/app/7650/Leisure_Suit_Larry_Greatest_Hits_and_Misses/')"><div class="ai">🎮</div><div class="ab"><div class="an">Larry: Greatest Hits</div><div class="ad">Full collection on Steam</div></div><div class="go">›</div></div>
+<div class="section">PLAY FREE IN BROWSER</div>
+<div class="appcard" onclick="go('https://archive.org/details/msdos_Kings_Quest_I_Quest_for_the_Crown_1990')"><div class="ai">🌐</div><div class="ab"><div class="an">King's Quest I — Free in Browser</div><div class="ad">Play the original right in your browser via Internet Archive</div></div><div class="go">›</div></div>
+<div class="appcard" onclick="go('https://archive.org/details/msdos_Leisure_Suit_Larry_1_-_In_the_Land_of_the_Lounge_Lizards_1987')"><div class="ai">🌐</div><div class="ab"><div class="an">Leisure Suit Larry 1 — Free in Browser</div><div class="ad">Play the original right in your browser via Internet Archive</div></div><div class="go">›</div></div>
+</div>
+
 <div id="player"><div id="backbar"><button onclick="closePlayer()">‹ Back</button><span id="ptitle"></span></div><iframe id="frame" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
 
 <nav class="bottomnav" id="bottomnav"></nav>
@@ -269,7 +301,7 @@ cat.addEventListener("click",()=>{
 </script>
 
 <script>
-const TABS=[{id:"shows",label:"🎬 Shows",icon:"🎬"},{id:"apps",label:"📱 Apps & Sites",icon:"📱"}];
+const TABS=[{id:"shows",label:"🎬 Shows",icon:"🎬"},{id:"apps",label:"📱 Apps & Sites",icon:"📱"},{id:"puzzles",label:"🧩 Puzzles",icon:"🧩"},{id:"solitaire",label:"🃏 Solitaire",icon:"🃏"},{id:"mahjong",label:"🀄 Mahjong",icon:"🀄"},{id:"classics",label:"👾 Classics",icon:"👾"}];
 // verified live video IDs (checked 2026-11-03 via search)
 const EP=[
  // trending
@@ -322,13 +354,30 @@ TABS.forEach((t,i)=>{
  const d=document.createElement("div");d.className="tab"+(i===0?" active":"");d.textContent=t.label;d.onclick=()=>goTab(t.id);tabsEl.appendChild(d);
  const b=document.createElement("button");b.innerHTML=`<span class="ico">${t.icon}</span>${t.label.split(" ")[1]}`;if(i===0)b.classList.add("active");b.onclick=()=>goTab(t.id);navEl.appendChild(b);
 });
+let curTab=0;
 function goTab(id){
+ const idx=TABS.findIndex(t=>t.id===id);if(idx>=0)curTab=idx;
  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
  document.getElementById("page-"+id).classList.add("active");
  [...tabsEl.children].forEach((el,i)=>el.classList.toggle("active",TABS[i].id===id));
  [...navEl.children].forEach((el,i)=>el.classList.toggle("active",TABS[i].id===id));
  scrollTo(0,0);
 }
+// swipe left/right to change tabs
+(function(){
+ let sx=0,sy=0,swiping=false;
+ document.addEventListener("touchstart",e=>{
+  if(e.target.closest("#player.show")||e.target.closest("iframe"))return;
+  sx=e.touches[0].clientX;sy=e.touches[0].clientY;swiping=true;
+ },{passive:true});
+ document.addEventListener("touchend",e=>{
+  if(!swiping)return;swiping=false;
+  const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)<80||Math.abs(dx)<Math.abs(dy)*1.5)return; // need clear horizontal swipe
+  if(dx<0&&curTab<TABS.length-1)goTab(TABS[curTab+1].id); // swipe left = next
+  else if(dx>0&&curTab>0)goTab(TABS[curTab-1].id); // swipe right = prev
+ },{passive:true});
+})();
 function play(e){
  document.getElementById("ptitle").textContent=e.t;
  document.getElementById("frame").src=`https://www.youtube.com/embed/${e.id}?autoplay=1&rel=0`;

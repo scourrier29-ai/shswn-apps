@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🀄 Mahjong</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:#0a0a0a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;min-height:100vh;overscroll-behavior:none}
+body{display:flex;flex-direction:column;align-items:center;padding:12px 8px 24px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+header{width:100%;max-width:720px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 4px 12px;flex-wrap:wrap}
+.logo{font-size:22px;font-weight:900;color:#e50914;letter-spacing:.5px}
+#counter{font-size:15px;font-weight:700;color:#ccc;background:#1c1c1c;border:1px solid #333;border-radius:10px;padding:8px 14px;white-space:nowrap}
+#counter b{color:#e50914}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:#e50914;color:#fff;border:none;border-radius:10px;padding:12px 16px;font-size:15px;font-weight:700;cursor:pointer;min-height:48px}
+.btn:active{transform:scale(.96)}
+.btn.ghost{background:#1c1c1c;border:1px solid #444;color:#fff}
+#wrap{width:100%;max-width:720px;overflow:hidden;position:relative}
+#board{position:relative;transform-origin:top left}
+.tile{position:absolute;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  background:linear-gradient(145deg,#fffdf4 0%,#f3ecd9 60%,#e7dcc0 100%);
+  border:2px solid #9a8a63;border-radius:9px;
+  box-shadow:2px 3px 0 #6e6247, 3px 5px 6px rgba(0,0,0,.55);
+  font-size:44px;line-height:1;transition:transform .12s, box-shadow .12s, opacity .2s}
+.tile.blocked{opacity:.62;cursor:default}
+.tile.free:hover{transform:translateY(-2px)}
+.tile.selected{outline:4px solid #e50914;outline-offset:-2px;box-shadow:0 0 14px #e50914, 2px 3px 0 #6e6247;transform:translateY(-4px)}
+.tile.hint{outline:4px solid #ffd54a;outline-offset:-2px;box-shadow:0 0 16px #ffd54a;animation:pulse .5s ease-in-out 3}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.tile.removing{animation:pop .25s forwards}
+@keyframes pop{to{transform:scale(.2);opacity:0}}
+#msg{min-height:26px;font-size:15px;color:#ffb3b3;font-weight:600;margin:8px 0;text-align:center}
+#win{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:50;flex-direction:column;gap:18px;text-align:center;padding:20px}
+#win.show{display:flex}
+#win h1{font-size:42px;color:#e50914}
+#win p{font-size:18px;color:#ddd}
+#win .btn{font-size:18px;padding:14px 30px}
+footer{margin-top:10px;font-size:12px;color:#666;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🀄 MAHJONG</div>
+  <div id="counter">Tiles left: <b id="left">88</b></div>
+  <div class="controls">
+    <button class="btn ghost" id="hintBtn">💡 Hint</button>
+    <button class="btn ghost" id="shuffleBtn">🔀 Shuffle</button>
+    <button class="btn" id="newBtn">↻ New Game</button>
+  </div>
+</header>
+<div id="wrap"><div id="board"></div></div>
+<div id="msg"></div>
+<div id="win">
+  <h1>🎉 You Win! 🎉</h1>
+  <p>Board cleared — amazing!</p>
+  <button class="btn" id="againBtn">Play Again</button>
+</div>
+<footer>Tap two matching free tiles to remove them.<br>Dimmed tiles are blocked — clear the tiles on top or beside them first.</footer>
+
+<script>
+(function(){
+"use strict";
+// ---- Layout (units: tile = 2x2) ----
+const UW=36, UH=45;            // half-tile px (tile = 72x90)
+const ZX=8, ZY=8;              // 3D shift per layer
+const MINX=-1;
+function buildLayout(){
+  const L=[];
+  for(let y=0;y<=10;y+=2) for(let x=0;x<=14;x+=2) L.push({x,y,z:0});
+  L.push({x:-1,y:4,z:0},{x:-1,y:6,z:0},{x:15,y:4,z:0},{x:15,y:6,z:0});
+  for(let y=2;y<=8;y+=2) for(let x=2;x<=12;x+=2) L.push({x,y,z:1});
+  for(const y of [4,6]) for(const x of [4,6,8,10]) L.push({x,y,z:2});
+  for(const y of [4,6]) for(const x of [6,8]) L.push({x,y,z:3});
+  return L; // 88 slots
+}
+// ---- Faces: 22 types x 4 ----
+function buildFaces(){
+  const F=[];
+  for(let i=0;i<9;i++) F.push(String.fromCodePoint(0x1F007+i)); // characters
+  for(let i=0;i<9;i++) F.push(String.fromCodePoint(0x1F019+i)); // bamboo
+  for(let i=0;i<4;i++) F.push(String.fromCodePoint(0x1F010+i)); // dots
+  return F; // 22
+}
+const board=document.getElementById('board'), wrap=document.getElementById('wrap');
+const leftEl=document.getElementById('left'), msgEl=document.getElementById('msg');
+let tiles=[], selected=null, removed=0, hintTimer=null;
+
+function shuffleArr(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function isFree(t){
+  if(t.removed) return false;
+  for(const o of tiles){
+    if(o.removed||o===t) continue;
+    if(o.z===t.z+1 && Math.abs(o.x-t.x)<2 && Math.abs(o.y-t.y)<2) return false;
+  }
+  let bl=false, br=false;
+  for(const o of tiles){
+    if(o.removed||o===t||o.z!==t.z) continue;
+    if(Math.abs(o.y-t.y)<2){
+      const d=o.x-t.x;
+      if(d<0&&d>-2) bl=true;
+      if(d>0&&d<2) br=true;
+    }
+  }
+  return !(bl&&br);
+}
+function freeTiles(){return tiles.filter(t=>!t.removed&&isFree(t));}
+function findPair(){
+  const f=freeTiles();
+  for(let i=0;i<f.length;i++) for(let j=i+1;j<f.length;j++)
+    if(f[i].face===f[j].face) return [f[i],f[j]];
+  return null;
+}
+function deal(){
+  board.innerHTML=''; selected=null; removed=0; hideWin();
+  const layout=buildLayout();
+  const faces=buildFaces();
+  let deck=[]; faces.forEach(f=>{for(let k=0;k<4;k++) deck.push(f);});
+  // assign until at least one free pair exists
+  let tries=0;
+  do{ shuffleArr(deck); tries++; }while(tries<50 && !pairExists(layout,deck));
+  tiles=layout.map((p,i)=>({x:p.x,y:p.y,z:p.z,face:deck[i],removed:false,el:null}));
+  render();
+  updateCounter(); setMsg('');
+}
+function pairExists(layout,deck){
+  // quick check with temp objects
+  const tmp=layout.map((p,i)=>({x:p.x,y:p.y,z:p.z,face:deck[i],removed:false}));
+  const save=tiles; tiles=tmp;
+  const ok=findPair()!==null;
+  tiles=save; return ok;
+}
+function render(){
+  board.innerHTML='';
+  const order=[...tiles].sort((a,b)=>a.z-b.z||a.y-b.y||a.x-b.x);
+  for(const t of order){
+    if(t.removed) continue;
+    const d=document.createElement('div');
+    d.className='tile'+(isFree(t)?' free':' blocked');
+    d.style.width=(UW*2)+'px'; d.style.height=(UH*2)+'px';
+    d.style.left=((t.x-MINX)*UW + t.z*ZX)+'px';
+    d.style.top=(t.y*UH - t.z*ZY)+'px';
+    d.textContent=t.face;
+    d.addEventListener('click',()=>onTap(t));
+    t.el=d; board.appendChild(d);
+  }
+  fitBoard();
+}
+function fitBoard(){
+  const bw=(18*UW)+3*ZX+10, bh=(12*UH)+3*ZY+10;
+  board.style.width=bw+'px'; board.style.height=bh+'px';
+  const s=Math.min(1, wrap.clientWidth/bw);
+  board.style.transform='scale('+s+')';
+  wrap.style.height=(bh*s)+'px';
+}
+function refreshStates(){
+  for(const t of tiles){
+    if(t.removed||!t.el) continue;
+    t.el.classList.toggle('free',isFree(t));
+    t.el.classList.toggle('blocked',!isFree(t));
+    t.el.classList.toggle('selected',t===selected);
+  }
+}
+function onTap(t){
+  if(t.removed||!isFree(t)) return;
+  clearHint();
+  if(selected===t){ selected=null; refreshStates(); return; }
+  if(!selected){ selected=t; refreshStates(); return; }
+  if(selected.face===t.face){
+    const a=selected; selected=null;
+    a.el.classList.add('removing'); t.el.classList.add('removing');
+    setTimeout(()=>{
+      a.removed=true; t.removed=true; removed+=2;
+      a.el.remove(); t.el.remove();
+      updateCounter(); refreshStates(); checkEnd();
+    },240);
+  }else{
+    selected=t; refreshStates();
+  }
+}
+function updateCounter(){ leftEl.textContent=(tiles.length-removed); }
+function setMsg(s){ msgEl.textContent=s; }
+function checkEnd(){
+  if(removed>=tiles.length){ showWin(); return; }
+  if(!findPair()) setMsg('No moves left — tap 🔀 Shuffle to mix the tiles!');
+  else setMsg('');
+}
+function clearHint(){
+  if(hintTimer){clearTimeout(hintTimer);hintTimer=null;}
+  document.querySelectorAll('.tile.hint').forEach(e=>e.classList.remove('hint'));
+}
+function hint(){
+  clearHint();
+  const p=findPair();
+  if(!p){ setMsg('No moves left — tap 🔀 Shuffle!'); return; }
+  p[0].el.classList.add('hint'); p[1].el.classList.add('hint');
+  p[0].el.scrollIntoView({block:'nearest',behavior:'smooth'});
+  hintTimer=setTimeout(clearHint,1800);
+}
+function shuffleTiles(){
+  clearHint(); selected=null;
+  const rem=tiles.filter(t=>!t.removed);
+  const faces=rem.map(t=>t.face);
+  let tries=0;
+  do{
+    shuffleArr(faces);
+    rem.forEach((t,i)=>t.face=faces[i]);
+    tries++;
+  }while(tries<60 && !findPair());
+  render(); setMsg('Tiles shuffled!');
+  setTimeout(()=>{if(msgEl.textContent==='Tiles shuffled!')setMsg('');},2000);
+}
+function showWin(){ document.getElementById('win').classList.add('show'); }
+function hideWin(){ document.getElementById('win').classList.remove('show'); }
+
+document.getElementById('hintBtn').addEventListener('click',hint);
+document.getElementById('shuffleBtn').addEventListener('click',shuffleTiles);
+document.getElementById('newBtn').addEventListener('click',deal);
+document.getElementById('againBtn').addEventListener('click',deal);
+window.addEventListener('resize',fitBoard);
+deal();
+})();
+</script>
+</body>
+</html>
