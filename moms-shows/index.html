@@ -522,6 +522,13 @@ function updateCritterVisibility(){
    cat.style.display=disp;
    document.getElementById("catname").style.display=disp;
    const zzz=document.getElementById("catzzz");if(zzz)zzz.style.display=show?(cat.textContent==="\uD83D\ude34"?"block":"none"):"none";
+   // Also hide/show ALL birds, buddy, feathers - everything
+   document.querySelectorAll("div").forEach(d=>{
+    const t=d.textContent;
+    if(t==="\uD83D\uDC26"||t==="\uD83D\uDC15"||t==="\uD83D\uDC36"||t==="\uD83E\uDD7A"||t==="\uD83D\uDE31"||t==="\uD83D\uDCA4"||t==="\uD83E\uDEB6"||t==="\uD83E\uDD0D"||t==="\uD83E\uDE3A"||t==="\uD83D\uDC3A"){
+     d.style.display=disp;
+    }
+   });
   }
  }catch(e){}
 }
