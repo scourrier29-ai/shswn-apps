@@ -1,4 +1,4 @@
-/* Creator Hub — Shawn's approved design. Dark, gold, graffiti. Mobile-first. */
+/* Creator Hub â Shawn's approved design. Dark, gold, graffiti. Mobile-first. */
 :root{
   --gold:#f5b301;
   --gold-dim:rgba(245,179,1,.35);
@@ -214,3 +214,9 @@ select{flex:0 1 auto}
   .hero-title{font-size:76px}
   .graf-word{font-size:170px}
 }
+
+/* News sources editor (v1.8, Laura) */
+.row{display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap}
+.btn.ghost{background:transparent;border-color:var(--line,#3a3a44);color:var(--text,#fff);padding:6px 10px;font-size:13px}
+#newsSources input[type=text]{flex:1;min-width:180px}
+#newsSources .row span{text-transform:capitalize}

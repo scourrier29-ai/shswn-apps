@@ -175,6 +175,59 @@ $('briefBtn').addEventListener('click', ()=>{
   $('briefBtn').innerHTML='&#9632; Stop briefing'; $('briefStatus').textContent='Playing briefing on this phone…';
 });
 
+
+/* ---------- news sources (v1.8, Laura) — user-editable permitted RSS feeds ---------- */
+const NEWS_CATS=['tech','entertainment','music','gaming'];
+const DEFAULT_NEWS_FEEDS={
+  tech:'https://feeds.arstechnica.com/arstechnica/index',
+  entertainment:'https://feeds.ew.com/ew/entertainment',
+  music:'https://www.rollingstone.com/feed/',
+  gaming:'https://www.polygon.com/rss/index.xml',
+};
+// User overrides persist to localStorage; each category must be an http(s) RSS URL.
+function getNewsFeeds(){
+  let saved={};
+  try{saved=JSON.parse(localStorage.getItem('ch_newsFeeds')||'{}');}catch(e){saved={};}
+  const f=Object.assign({},DEFAULT_NEWS_FEEDS);
+  NEWS_CATS.forEach(c=>{if(typeof saved[c]==='string'&&/^https?:\/\//.test(saved[c]))f[c]=saved[c];});
+  return f;
+}
+function saveNewsFeeds(f){try{localStorage.setItem('ch_newsFeeds',JSON.stringify(f));}catch(e){}}
+function toggleSources(){
+  const d=document.getElementById('newsSources');
+  d.style.display=(d.style.display==='none')?'block':'none';
+  if(d.style.display!=='none')renderSources();
+}
+function renderSources(){
+  const d=document.getElementById('newsSources');d.innerHTML='';
+  const f=getNewsFeeds();
+  const t=document.createElement('p');
+  t.style.cssText='color:var(--muted);font-size:13px;margin:4px 0 8px';
+  t.textContent='Permitted sources — one RSS feed per category. Your changes save on this device.';
+  d.appendChild(t);
+  NEWS_CATS.forEach(cat=>{
+    const row=document.createElement('div');row.className='row';
+    const lab=document.createElement('span');
+    lab.style.cssText='min-width:110px;font-weight:700;font-size:13px;text-transform:capitalize';
+    lab.textContent=cat;
+    const inp=document.createElement('input');
+    inp.type='text';inp.value=f[cat];inp.placeholder='https://…/feed.xml';
+    inp.style.cssText='flex:1;max-width:none';
+    const save=document.createElement('button');save.className='btn ghost';save.textContent='Save';
+    save.onclick=()=>{
+      const v=(inp.value||'').trim();
+      if(!/^https?:\/\//i.test(v)){alert('URL must start with http:// or https://');return;}
+      const cur=getNewsFeeds();cur[cat]=v;saveNewsFeeds(cur);renderSources();
+    };
+    const reset=document.createElement('button');reset.className='btn ghost';reset.textContent='Reset';
+    reset.onclick=()=>{
+      const cur=getNewsFeeds();cur[cat]=DEFAULT_NEWS_FEEDS[cat];saveNewsFeeds(cur);renderSources();
+    };
+    row.appendChild(lab);row.appendChild(inp);row.appendChild(save);row.appendChild(reset);
+    d.appendChild(row);
+  });
+}
+
 /* ---------- podcast (iTunes, keyless) ---------- */
 const podAudio = $('podAudio');
 async function podSearch(q){

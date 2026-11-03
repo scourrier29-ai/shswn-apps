@@ -85,10 +85,10 @@
   <div class="card">
     <h2 class="card-h">STREAMING</h2>
     <div class="stream-row">
-      <a class="stream-tile" href="https://www.primevideo.com" target="_blank" rel="noopener"><span class="st-ico">📦</span><span>Prime Video</span></a>
+      <a class="stream-tile" href="https://www.primevideo.com" target="_blank" rel="noopener"><span class="st-ico">ð¦</span><span>Prime Video</span></a>
       <a class="stream-tile" href="https://www.netflix.com" target="_blank" rel="noopener"><span class="st-ico">N</span><span>Netflix</span></a>
-      <a class="stream-tile" href="https://www.disneyplus.com" target="_blank" rel="noopener"><span class="st-ico">✨</span><span>Disney+</span></a>
-      <a class="stream-tile" href="https://flixflare.to" target="_blank" rel="noopener"><span class="st-ico">🎬</span><span>FlixFlare</span></a>
+      <a class="stream-tile" href="https://www.disneyplus.com" target="_blank" rel="noopener"><span class="st-ico">â¨</span><span>Disney+</span></a>
+      <a class="stream-tile" href="https://flixflare.to" target="_blank" rel="noopener"><span class="st-ico">ð¬</span><span>FlixFlare</span></a>
     </div>
     <p class="hint">Opens the service &mdash; jumps to the app if you have it installed.</p>
   </div>
@@ -114,6 +114,10 @@
       <button class="cat" data-q="technology">Tech</button>
       <button class="cat" data-q="sports">Sports</button>
     </div>
+    <div class="row" style="margin:8px 0">
+      <button class="btn outline" id="newsSourcesBtn" onclick="toggleSources()">&#9881; Sources</button>
+    </div>
+    <div id="newsSources" style="display:none"></div>
     <button class="btn solid wide" id="briefBtn">&#128266; Play audio briefing</button>
     <p class="hint" id="briefStatus">Reads the top headlines aloud on your phone. No key needed.</p>
     <div id="newsList"><p class="empty">Loading headlines&hellip;</p></div>
@@ -172,8 +176,9 @@
       <button class="tool-tile" data-tool="tracker"><span class="tic">&#127925;</span><span class="tname">Music Project Tracker</span></button>
       <button class="tool-tile" data-tool="story"><span class="tic">&#128203;</span><span class="tname">Storyboard Tool</span></button>
       <button class="tool-tile" data-tool="lyric"><span class="tic">&#127916;</span><span class="tname">Lyric Video Generator</span></button>
+      <a class="tool-tile" href="https://aistudio.google.com" target="_blank" rel="noopener"><span class="tic">&#127820;</span><span class="tname">Nano Banana</span></a>
     </div>
-    <p class="hint">All three run fully on your phone. Nothing leaves the device.</p>
+    <p class="hint">The three builder tools run fully on your phone. Nothing leaves the device. Nano Banana opens Google AI Studio.</p>
   </div>
 
   <div class="card" id="toolView" hidden>
