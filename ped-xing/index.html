@@ -433,6 +433,7 @@
     <div class="side-foot">
       <span id="footText">$0/mo · free tiers + local M1</span>
       <button class="keysbtn" id="keysOpen">🔑 Keys</button>
+      <button class="keysbtn" id="nbOpen">🍌 Nano Banana</button>
     </div>
   </aside>
 
@@ -471,6 +472,39 @@
     <p class="dim">Keys take effect immediately — no restart. Stored only on this machine.</p>
     <div id="keysRows"></div>
     <div class="fsrow"><button class="pill-btn ghost" id="keysClose">Close</button></div>
+  </div>
+</div>
+
+<!-- NANO BANANA MODAL -->
+<div class="modal" id="nbModal" hidden>
+  <div class="sheet" style="max-width:520px">
+    <h3>🍌 Nano Banana</h3>
+    <p class="dim">Upload a photo, describe what you want, hit Create. Uses your Gemini API key (Settings > Keys).</p>
+    <div id="nbNoKey" class="err" hidden style="margin-bottom:10px">⚠️ No Gemini API key — add it in Settings > Keys (free at aistudio.google.com).</div>
+    <div class="fsrow" style="margin-bottom:10px">
+      <button class="pill-btn" id="nbModeGen">✨ Generate</button>
+      <button class="pill-btn ghost" id="nbModeEdit">🖼️ Edit photo</button>
+    </div>
+    <div class="fsrow" id="nbUploadRow" hidden style="margin-bottom:10px">
+      <label class="pill-btn ghost" style="cursor:pointer">📷 Pick photo<input type="file" id="nbImage" accept="image/*" hidden></label>
+      <span class="dim" id="nbImageName"></span>
+    </div>
+    <div id="nbPreviewWrap" hidden style="margin-bottom:10px;text-align:center">
+      <img id="nbPreview" alt="Upload preview" style="max-width:100%;max-height:200px;border-radius:10px">
+    </div>
+    <textarea id="nbPrompt" rows="3" placeholder="Describe what you want…" style="width:100%;margin-bottom:10px;background:#1a1d24;border:1px solid #2e323b;color:#fff;border-radius:8px;padding:10px;font-size:14px"></textarea>
+    <div class="fsrow" style="margin-bottom:10px">
+      <button class="pill-btn" id="nbGenerate">🍌 Create</button>
+      <span class="dim" id="nbStatus"></span>
+    </div>
+    <div id="nbResult" hidden style="text-align:center">
+      <img id="nbResultImg" alt="Generated image" style="max-width:100%;border-radius:12px;margin-bottom:10px">
+      <div class="fsrow" style="justify-content:center">
+        <a id="nbDownload" class="pill-btn" download="nano-banana.png" style="text-decoration:none">⬇ Download</a>
+        <button class="pill-btn ghost" id="nbAgain">🔄 New</button>
+      </div>
+    </div>
+    <div class="fsrow" style="margin-top:14px"><button class="pill-btn ghost" id="nbClose">Close</button></div>
   </div>
 </div>
 
@@ -886,6 +920,61 @@ $("#keysOpen").onclick=()=>{
   });
 };
 $("#keysClose").onclick=()=>$("#keysModal").hidden=true;
+
+/* ---------- Nano Banana (Gemini 2.5 Flash Image) ---------- */
+let nbMode='generate',nbImageData=null,nbImageMime=null;
+$("#nbOpen").onclick=()=>{
+  $("#nbModal").hidden=false;
+  const has=!!getKey("gemini_key");
+  $("#nbNoKey").hidden=has;
+};
+$("#nbClose").onclick=()=>$("#nbModal").hidden=true;
+function nbSetMode(m){
+  nbMode=m;
+  $("#nbModeGen").classList.toggle("ghost",m!=='generate');
+  $("#nbModeEdit").classList.toggle("ghost",m!=='edit');
+  $("#nbUploadRow").hidden=(m!=='edit');
+  if(m==='generate'){$("#nbPreviewWrap").hidden=true;nbImageData=null;}
+}
+$("#nbModeGen").onclick=()=>nbSetMode('generate');
+$("#nbModeEdit").onclick=()=>nbSetMode('edit');
+$("#nbImage").addEventListener("change",()=>{
+  const f=$("#nbImage").files[0];if(!f)return;
+  $("#nbImageName").textContent=f.name;
+  const r=new FileReader();
+  r.onload=()=>{
+    nbImageMime=f.type||'image/jpeg';
+    nbImageData=r.result.split(',')[1];
+    $("#nbPreview").src=r.result;
+    $("#nbPreviewWrap").hidden=false;
+  };
+  r.readAsDataURL(f);
+});
+$("#nbAgain").onclick=()=>{$("#nbResult").hidden=true;$("#nbStatus").textContent='';};
+$("#nbGenerate").onclick=async()=>{
+  const k=getKey("gemini_key");
+  if(!k){$("#nbNoKey").hidden=false;return;}
+  const prompt=$("#nbPrompt").value.trim();
+  if(!prompt){$("#nbStatus").textContent='Type what you want first.';return;}
+  if(nbMode==='edit'&&!nbImageData){$("#nbStatus").textContent='Pick a photo to edit.';return;}
+  $("#nbGenerate").disabled=true;
+  $("#nbStatus").textContent='🍌 Creating… (10-30s)';
+  $("#nbResult").hidden=true;
+  try{
+    const parts=[{text:prompt}];
+    if(nbMode==='edit'&&nbImageData)parts.push({inlineData:{mimeType:nbImageMime,data:nbImageData}});
+    const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key="+encodeURIComponent(k),
+      {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:parts}]})});
+    if(!r.ok)throw new Error(r.status===400?'Bad API key — check Settings > Keys.':'API error '+r.status);
+    const d=await r.json();
+    const p=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts||[]).find(x=>x.inlineData&&x.inlineData.data);
+    if(!p)throw new Error('No image in response — try a different prompt.');
+    const url='data:'+(p.inlineData.mimeType||'image/png')+';base64,'+p.inlineData.data;
+    $("#nbResultImg").src=url;$("#nbDownload").href=url;
+    $("#nbResult").hidden=false;$("#nbStatus").textContent='Done!';
+  }catch(e){$("#nbStatus").textContent='❌ '+e.message;}
+  $("#nbGenerate").disabled=false;
+};
 
 /* ---------- activity (local log, no backend) ---------- */
 $("#activityBtn").onclick=()=>{

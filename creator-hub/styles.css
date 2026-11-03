@@ -220,3 +220,6 @@ select{flex:0 1 auto}
 .btn.ghost{background:transparent;border-color:var(--line,#3a3a44);color:var(--text,#fff);padding:6px 10px;font-size:13px}
 #newsSources input[type=text]{flex:1;min-width:180px}
 #newsSources .row span{text-transform:capitalize}
+
+.err{background:#3a1a1a;border:1px solid #e5484d;border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:12px;color:#ffb4b4}
+.err a{text-decoration:underline}

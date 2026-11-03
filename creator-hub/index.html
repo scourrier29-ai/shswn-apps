@@ -176,9 +176,9 @@
       <button class="tool-tile" data-tool="tracker"><span class="tic">&#127925;</span><span class="tname">Music Project Tracker</span></button>
       <button class="tool-tile" data-tool="story"><span class="tic">&#128203;</span><span class="tname">Storyboard Tool</span></button>
       <button class="tool-tile" data-tool="lyric"><span class="tic">&#127916;</span><span class="tname">Lyric Video Generator</span></button>
-      <a class="tool-tile" href="https://aistudio.google.com" target="_blank" rel="noopener"><span class="tic">&#127820;</span><span class="tname">Nano Banana</span></a>
+      <button class="tool-tile" data-tool="nanobanana"><span class="tic">&#127820;</span><span class="tname">Nano Banana</span></button>
     </div>
-    <p class="hint">The three builder tools run fully on your phone. Nothing leaves the device. Nano Banana opens Google AI Studio.</p>
+    <p class="hint">Builder tools run fully on your phone. Nano Banana uses your Gemini API key — images go to Google's API only.</p>
   </div>
 
   <div class="card" id="toolView" hidden>
@@ -222,6 +222,33 @@
       <canvas id="lyrCanvas" width="720" height="1280"></canvas>
       <p class="hint" id="lyrStatus"></p>
     </div>
+    <div id="tool-nanobanana" class="tool-pane" hidden>
+      <p class="hint">Upload a photo, describe what you want, hit Create. Powered by Nano Banana (Gemini 2.5 Flash Image) — same quality as the Dad's app photos. Needs your free Gemini API key in Settings.</p>
+      <div id="nbNoKey" class="err" hidden>⚠️ No Gemini API key saved. <a href="#panel-settings" id="nbGoSettings" style="color:var(--accent)">Add one in Settings</a> (free at <a href="https://aistudio.google.com" target="_blank" rel="noopener" style="color:var(--accent)">aistudio.google.com</a>).</div>
+      <div class="form-row">
+        <button class="cat active" id="nbModeGen" type="button">✨ Generate</button>
+        <button class="cat" id="nbModeEdit" type="button">🖼️ Edit photo</button>
+      </div>
+      <div class="form-row" id="nbUploadRow" hidden>
+        <label class="btn outline file-label">📷 Pick photo<input type="file" id="nbImage" accept="image/*" hidden></label>
+        <span id="nbImageName" class="pill-dim"></span>
+      </div>
+      <div id="nbPreviewWrap" hidden style="margin-bottom:12px">
+        <img id="nbPreview" alt="Upload preview" style="max-width:100%;max-height:220px;border-radius:10px;border:1px solid var(--border)">
+      </div>
+      <textarea id="nbPrompt" rows="3" placeholder="Describe what you want… e.g. 'a cowboy riding into sunset, photorealistic'" style="width:100%;margin-bottom:12px"></textarea>
+      <div class="form-row">
+        <button class="btn solid" id="nbGenerate">🍌 Create</button>
+        <span id="nbStatus" class="pill-dim"></span>
+      </div>
+      <div id="nbResult" hidden style="margin-top:14px">
+        <img id="nbResultImg" alt="Generated image" style="max-width:100%;border-radius:12px;border:1px solid var(--border)">
+        <div class="form-row" style="margin-top:10px">
+          <a id="nbDownload" class="btn solid" download="nano-banana.png">⬇ Download</a>
+          <button class="btn outline" id="nbAgain">🔄 New</button>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -247,6 +274,11 @@
     <div class="form-row">
       <input id="newsKey" type="password" placeholder="Paste key here" autocomplete="off">
       <button class="btn solid" id="newsKeySave">Save</button>
+    </div>
+    <label class="fld-label" for="geminiKey" style="margin-top:14px">Gemini API key <span class="pill-dim">(free at <a href="https://aistudio.google.com" target="_blank" rel="noopener" style="color:var(--accent)">aistudio.google.com</a> — for Nano Banana)</span></label>
+    <div class="form-row">
+      <input id="geminiKey" type="password" placeholder="Paste key here" autocomplete="off">
+      <button class="btn solid" id="geminiKeySave">Save</button>
     </div>
     <p class="hint">Keys stay in this phone's local storage. They are never sent anywhere except the service's own API, called directly from your device.</p>
   </div>

@@ -355,7 +355,7 @@ renderRecs();
 /* ---------- tools ---------- */
 document.querySelectorAll('.tool-tile[data-tool]').forEach(t=>t.addEventListener('click',()=>openTool(t.dataset.tool)));
 $('toolBack').addEventListener('click',()=>{ $('toolView').hidden=true; $('toolsMenu').hidden=false; });
-const TOOL_NAMES={tracker:'Music Project Tracker',story:'Storyboard Tool',lyric:'Lyric Video Generator'};
+const TOOL_NAMES={tracker:'Music Project Tracker',story:'Storyboard Tool',lyric:'Lyric Video Generator',nanobanana:'Nano Banana'};
 function openTool(k){
   $('toolsMenu').hidden=true; $('toolView').hidden=false;
   $('toolTitle').textContent="🛠️ "+TOOL_NAMES[k];
@@ -363,6 +363,7 @@ function openTool(k){
   $('tool-'+k).hidden=false;
   if(k==='tracker') renderTracker();
   if(k==='story') renderStory();
+  if(k==='nanobanana') nbCheckKey();
 }
 
 /* tracker */
@@ -472,7 +473,85 @@ $('lyrExport').addEventListener('click',()=>{
 });
 lyrDraw('Your lyrics appear here','paste lines above');
 
+
+/* ---------- Nano Banana (Gemini 2.5 Flash Image) ---------- */
+let nbMode='generate', nbImageData=null, nbImageMime=null;
+function nbGetKey(){ return store.get('geminikey',''); }
+function nbCheckKey(){
+  const has=!!nbGetKey();
+  $('nbNoKey').hidden=has;
+  return has;
+}
+function nbSetMode(m){
+  nbMode=m;
+  $('nbModeGen').classList.toggle('active',m==='generate');
+  $('nbModeEdit').classList.toggle('active',m==='edit');
+  $('nbUploadRow').hidden=(m!=='edit');
+  if(m==='generate'){ $('nbPreviewWrap').hidden=true; nbImageData=null; }
+}
+$('nbModeGen').addEventListener('click',()=>nbSetMode('generate'));
+$('nbModeEdit').addEventListener('click',()=>nbSetMode('edit'));
+$('nbImage').addEventListener('change',()=>{
+  const f=$('nbImage').files[0]; if(!f) return;
+  $('nbImageName').textContent=f.name;
+  const r=new FileReader();
+  r.onload=()=>{
+    const dataUrl=r.result;
+    nbImageMime=f.type||'image/jpeg';
+    nbImageData=dataUrl.split(',')[1];
+    $('nbPreview').src=dataUrl;
+    $('nbPreviewWrap').hidden=false;
+  };
+  r.readAsDataURL(f);
+});
+$('nbGoSettings').addEventListener('click',(e)=>{
+  e.preventDefault();
+  $('toolView').hidden=true; $('toolsMenu').hidden=false;
+  goTab('settings');
+});
+$('nbAgain').addEventListener('click',()=>{
+  $('nbResult').hidden=true; $('nbStatus').textContent='';
+});
+$('nbGenerate').addEventListener('click', async()=>{
+  if(!nbCheckKey()) return;
+  const prompt=$('nbPrompt').value.trim();
+  if(!prompt){ $('nbStatus').textContent='Type what you want first.'; return; }
+  if(nbMode==='edit' && !nbImageData){ $('nbStatus').textContent='Pick a photo to edit.'; return; }
+  $('nbGenerate').disabled=true;
+  $('nbStatus').textContent='🍌 Creating… (10-30s)';
+  $('nbResult').hidden=true;
+  try{
+    const parts=[{text:prompt}];
+    if(nbMode==='edit'&&nbImageData) parts.push({inlineData:{mimeType:nbImageMime,data:nbImageData}});
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key='+encodeURIComponent(nbGetKey()),{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:parts}]})
+    });
+    if(!r.ok){
+      const e=await r.text();
+      throw new Error(r.status===400&&e.includes('API_KEY')?'Bad API key — check Settings.':'API error '+r.status);
+    }
+    const d=await r.json();
+    const p=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts||[])
+      .find(x=>x.inlineData&&x.inlineData.data);
+    if(!p) throw new Error('No image in response — try a different prompt.');
+    const imgUrl='data:'+(p.inlineData.mimeType||'image/png')+';base64,'+p.inlineData.data;
+    $('nbResultImg').src=imgUrl;
+    $('nbDownload').href=imgUrl;
+    $('nbResult').hidden=false;
+    $('nbStatus').textContent='Done!';
+  }catch(err){
+    $('nbStatus').textContent='❌ '+err.message;
+  }
+  $('nbGenerate').disabled=false;
+});
+
 /* ---------- settings ---------- */
+$('geminiKey').value = store.get('geminikey','');
+$('geminiKeySave').addEventListener('click',()=>{
+  store.set('geminikey', $('geminiKey').value.trim());
+  alert('Gemini key saved on this phone.');
+});
 $('newsKey').value = store.get('newskey','');
 $('newsKeySave').addEventListener('click',()=>{
   store.set('newskey', $('newsKey').value.trim());
