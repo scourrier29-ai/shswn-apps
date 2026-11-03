@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1A120B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Mom's Short Dramas</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+:root{
+  --gold:#D4A24C;--gold-dim:#8D6E2A;--gold-glow:rgba(212,162,76,.4);
+  --bg:#1A120B;--panel:#2C1E12;--panel2:#3E2A18;
+  --text:#F5EFE0;--muted:#C4A882;
+}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,Roboto,sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+.header{position:fixed;top:0;left:0;right:0;height:64px;z-index:50;display:flex;align-items:center;justify-content:center;padding:0 12px;background:rgba(26,18,11,.95);border-bottom:1px solid rgba(212,162,76,.3)}
+.header h1{font-size:20px;font-weight:700;letter-spacing:.02em;color:var(--gold)}
+.main{position:fixed;top:64px;bottom:76px;left:0;right:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.tab-panel{display:none;padding:16px 16px 28px;max-width:640px;margin:0 auto}
+.tab-panel.active{display:block;animation:fadein .28s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{background:rgba(44,30,18,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(212,162,76,.35);border-radius:14px;padding:18px;margin-bottom:16px;cursor:pointer;transition:transform .15s ease,border-color .15s ease}
+.card:active{transform:scale(.98);border-color:var(--gold)}
+.card h3{font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
+.card .meta{font-size:13px;color:var(--gold);font-weight:600;margin-bottom:8px}
+.card .desc{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:14px}
+.play-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--gold),#B8892F);color:#1A120B;font-size:17px;font-weight:700;cursor:pointer}
+.play-btn:active{transform:scale(.97)}
+.sect-hdr{font-size:15px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin:4px 0 14px;text-align:center}
+.tabbar{position:fixed;bottom:0;left:0;right:0;height:76px;z-index:50;display:flex;background:rgba(26,18,11,.97);border-top:1px solid rgba(212,162,76,.3);padding-bottom:env(safe-area-inset-bottom);overflow-x:auto;scrollbar-width:none}
+.tabbar::-webkit-scrollbar{display:none}
+.tabbtn{flex:1 1 0;min-width:76px;border:none;background:transparent;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:60px;touch-action:manipulation;padding:0 6px}
+.tabbtn.active{color:var(--gold)}
+.tabbtn .ticon{font-size:22px;line-height:1}
+/* Player overlay */
+.player-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:100;background:#000;display:none;flex-direction:column}
+.player-overlay.open{display:flex}
+.player-top{display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(26,18,11,.95);border-bottom:1px solid rgba(212,162,76,.3)}
+.back-btn{min-width:52px;min-height:48px;border:none;border-radius:10px;background:rgba(212,162,76,.15);color:var(--gold);font-size:16px;font-weight:700;cursor:pointer}
+.player-title{font-size:15px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.player-frame{flex:1;position:relative}
+.player-frame iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+.hint{text-align:center;color:var(--muted);font-size:13px;padding:8px 16px 0;line-height:1.5}
+</style>
+</head>
+<body>
+<header class="header"><h1>🎬 Mom's Short Dramas</h1></header>
+<main class="main" id="main">
+
+  <section class="tab-panel active" id="tab-romance">
+    <div class="sect-hdr">💕 Romance</div>
+    <p class="hint">Tap a show, then tap Play — it starts right here.</p>
+    <div class="card" data-vid="VZRlu4tNnXw" data-title="Don't Let The Blind Heiress's Dog Die">
+      <h3>Don't Let The Blind Heiress's Dog Die</h3>
+      <div class="meta">Full series • Romance / Mystery / Revenge</div>
+      <div class="desc">A blind heiress surrounded by betrayal, family secrets and shocking twists — love and revenge collide.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+    <div class="card" data-vid="O2IVaBpslUQ" data-title="The Ace Takes All">
+      <h3>The Ace Takes All</h3>
+      <div class="meta">52 episodes • Romance / Drama</div>
+      <div class="desc">A sweeping 52-episode romance full of twists — one of the most-watched short drama series.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+    <div class="card" data-vid="shG06NFP1TA" data-title="Make You Officially Mine">
+      <h3>Make You Officially Mine</h3>
+      <div class="meta">Full series • Comedy / Romance</div>
+      <div class="desc">A playboy CEO tied by a business marriage — she wants a divorce, he's been secretly in love for years.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+  </section>
+
+  <section class="tab-panel" id="tab-thriller">
+    <div class="sect-hdr">🔍 Thriller / Mystery</div>
+    <p class="hint">Tap a show, then tap Play — it starts right here.</p>
+    <div class="card" data-vid="s7Ycafm9rEc" data-title="Horror Game: She's a Monster, I See a Hottie">
+      <h3>Horror Game: She's a Monster, I See a Hottie</h3>
+      <div class="meta">Full series • Dark Fantasy / Mystery / Romance</div>
+      <div class="desc">Gothic horror meets gamified romance — supernatural mysteries and unexpected plot twists.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+    <div class="card" data-vid="UB0K7lWGQzA" data-title="Stone Wardens">
+      <h3>Stone Wardens</h3>
+      <div class="meta">11 episodes • Thriller / Mystery</div>
+      <div class="desc">An 11-episode mystery thriller that keeps you guessing to the very end.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+    <div class="card" data-vid="ps9MS0_WnJk" data-title="My Stepmom Is a Vampire">
+      <h3>My Stepmom Is a Vampire</h3>
+      <div class="meta">Full movie • Supernatural / Mystery / Thriller</div>
+      <div class="desc">Family secrets, supernatural powers and suspense — a thrilling full-length short drama.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+  </section>
+
+  <section class="tab-panel" id="tab-drama">
+    <div class="sect-hdr">🎭 Drama</div>
+    <p class="hint">Tap a show, then tap Play — it starts right here.</p>
+    <div class="card" data-vid="PhtEmI-Io30" data-title="I Stopped Fighting, She Panicked">
+      <h3>I Stopped Fighting, She Panicked</h3>
+      <div class="meta">Full series • Drama</div>
+      <div class="desc">When he finally stops fighting for her, everything changes — an emotional rollercoaster.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+    <div class="card" data-vid="cY2KKBN-6Lw" data-title="From Zero to Primordial Alpha">
+      <h3>From Zero to Primordial Alpha</h3>
+      <div class="meta">Full drama • Fantasy / Drama</div>
+      <div class="desc">A bullied underdog awakens an ancient bloodline to claim his place — family betrayal and payback.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+    <div class="card" data-vid="mXT49-i-6fo" data-title="You Are Still The One">
+      <h3>You Are Still The One</h3>
+      <div class="meta">Full series • Drama / Romance / Revenge</div>
+      <div class="desc">A fallen heiress discovers her mystery groom is the billionaire CEO she dumped five years ago.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+  </section>
+
+  <section class="tab-panel" id="tab-comedy">
+    <div class="sect-hdr">😂 Comedy</div>
+    <p class="hint">Tap a show, then tap Play — it starts right here.</p>
+    <div class="card" data-vid="tBBwrnte4Xk" data-title="Billionaire CEO Plays Poor">
+      <h3>Billionaire CEO Plays Poor</h3>
+      <div class="meta">Full series • Comedy / Romance</div>
+      <div class="desc">A billionaire CEO pretends to be broke — his son picks a pig farmer as his new mom. Hilarious!</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+    <div class="card" data-vid="shG06NFP1TA" data-title="Make You Officially Mine">
+      <h3>Make You Officially Mine</h3>
+      <div class="meta">Full series • Comedy / Romance</div>
+      <div class="desc">A playboy CEO tied by a business marriage — she wants a divorce, he's been secretly in love for years.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+    <div class="card" data-vid="MD3tUy5FQPU" data-title="My Six Secret Babies &amp; Their CEO Dad">
+      <h3>My Six Secret Babies &amp; Their CEO Dad</h3>
+      <div class="meta">Full series • Comedy / Billionaire</div>
+      <div class="desc">She raised six kids alone for six years — never knowing their father was a billionaire CEO!</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+  </section>
+
+  <section class="tab-panel" id="tab-revenge">
+    <div class="sect-hdr">⚔️ Revenge</div>
+    <p class="hint">Tap a show, then tap Play — it starts right here.</p>
+    <div class="card" data-vid="ZpFpobLNkhU" data-title="He Sent Me To Prison, Then Begged On Knees">
+      <h3>He Sent Me To Prison, Then Begged On Knees</h3>
+      <div class="meta">Full drama • Revenge</div>
+      <div class="desc">An ex-fighter takes the blame and goes to prison — then learns her husband stole everything. Payback time.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+    <div class="card" data-vid="1RR3u3b_vjo" data-title="They Stole Her $10M Deal">
+      <h3>They Stole Her $10M Deal</h3>
+      <div class="meta">Full series • Revenge / Billionaire</div>
+      <div class="desc">Fired after saving the company — she returns as a global VP with her billionaire husband. They made them pay.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+    <div class="card" data-vid="VZRlu4tNnXw" data-title="Don't Let The Blind Heiress's Dog Die">
+      <h3>Don't Let The Blind Heiress's Dog Die</h3>
+      <div class="meta">Full series • Revenge / Romance / Mystery</div>
+      <div class="desc">A blind heiress surrounded by betrayal, family secrets and shocking twists — love and revenge collide.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+  </section>
+
+  <section class="tab-panel" id="tab-billionaire">
+    <div class="sect-hdr">💎 Billionaire</div>
+    <p class="hint">Tap a show, then tap Play — it starts right here.</p>
+    <div class="card" data-vid="t_8wkkIU9Ks" data-title="Claimed by My Ex's Billionaire Uncle">
+      <h3>Claimed by My Ex's Billionaire Uncle</h3>
+      <div class="meta">Full episode • Billionaire / Romance</div>
+      <div class="desc">Betrayed in marriage, she escapes — only to be claimed by her ex's powerful billionaire uncle.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+    <div class="card" data-vid="MD3tUy5FQPU" data-title="My Six Secret Babies &amp; Their CEO Dad">
+      <h3>My Six Secret Babies &amp; Their CEO Dad</h3>
+      <div class="meta">Full series • Billionaire / Comedy</div>
+      <div class="desc">She raised six kids alone for six years — never knowing their father was a billionaire CEO!</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+    <div class="card" data-vid="1RR3u3b_vjo" data-title="They Stole Her $10M Deal">
+      <h3>They Stole Her $10M Deal</h3>
+      <div class="meta">Full series • Billionaire / Revenge</div>
+      <div class="desc">Fired after saving the company — she returns as a global VP with her billionaire husband. They made them pay.</div>
+      <button class="play-btn">▶ Play Now</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="player-overlay" id="playerOverlay">
+  <div class="player-top">
+    <button class="back-btn" id="backBtn">‹ Back</button>
+    <div class="player-title" id="playerTitle">Now Playing</div>
+  </div>
+  <div class="player-frame"><iframe id="playerFrame" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
+</div>
+
+<nav class="tabbar" id="tabbar">
+  <button class="tabbtn active" data-tab="romance"><span class="ticon">💕</span>Romance</button>
+  <button class="tabbtn" data-tab="thriller"><span class="ticon">🔍</span>Thriller</button>
+  <button class="tabbtn" data-tab="drama"><span class="ticon">🎭</span>Drama</button>
+  <button class="tabbtn" data-tab="comedy"><span class="ticon">😂</span>Comedy</button>
+  <button class="tabbtn" data-tab="revenge"><span class="ticon">⚔️</span>Revenge</button>
+  <button class="tabbtn" data-tab="billionaire"><span class="ticon">💎</span>Billionaire</button>
+</nav>
+
+<script>
+(function(){
+  var tabbar=document.getElementById('tabbar');
+  tabbar.addEventListener('click',function(e){
+    var btn=e.target.closest('.tabbtn');if(!btn)return;
+    tabbar.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('active')});
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    document.getElementById('main').scrollTop=0;
+  });
+  var overlay=document.getElementById('playerOverlay'),
+      frame=document.getElementById('playerFrame'),
+      ptitle=document.getElementById('playerTitle');
+  document.getElementById('main').addEventListener('click',function(e){
+    var card=e.target.closest('.card');if(!card)return;
+    var vid=card.dataset.vid;
+    ptitle.textContent=card.dataset.title;
+    frame.src='https://www.youtube-nocookie.com/embed/'+vid+'?autoplay=1&rel=0&playsinline=1';
+    overlay.classList.add('open');
+  });
+  document.getElementById('backBtn').addEventListener('click',function(){
+    frame.src='';
+    overlay.classList.remove('open');
+  });
+})();
+</script>
+</body>
+</html>
