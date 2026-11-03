@@ -145,7 +145,7 @@ updateArrows();
 <nav class="bottomnav" id="bottomnav"></nav>
 
 <!-- 🐈‍⬛ Grumpy cat mascot -->
-<div id="cat" style="position:fixed;z-index:9999;width:96px;height:96px;cursor:pointer;user-select:none;transition:transform .1s;pointer-events:auto;font-size:84px;line-height:96px;text-align:center;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))">🐈‍⬛</div><div id="catname" style="position:fixed;z-index:9999;pointer-events:none;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 4px #000;text-align:center;width:96px">Sasha</div>
+<div id="cat" style="position:fixed;z-index:9999;width:96px;height:96px;cursor:pointer;user-select:none;transition:transform .1s;pointer-events:auto;font-size:84px;line-height:96px;text-align:center;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))">🐈‍⬛</div><div id="catname" style="position:fixed;z-index:9999;pointer-events:none;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 4px #000;text-align:center;width:96px">Sasha</div><div id="catzzz" style="position:fixed;z-index:9999;pointer-events:none;font-size:28px;display:none;animation:zfloat 2s ease-in-out infinite">💤</div><style>@keyframes zfloat{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-12px);opacity:.4}}</style>
 <script>
 (function(){
 const cat=document.getElementById("cat");
@@ -158,11 +158,12 @@ function isVideoOpen(){return document.getElementById("player").classList.contai
 function critterY(){return isVideoOpen()?innerHeight-140:clampY(y);} // bottom edge during video
 function clampX(v){return Math.max(0,Math.min(innerWidth-100,v));}
 function clampY(v){return Math.max(110,Math.min(innerHeight-110,v));}
-function place(){cat.style.transform=`translate(${x}px,${y}px) scaleX(${dx>=0?1:-1})`;const n=document.getElementById("catname");if(n){n.style.transform=`translate(${x}px,${y+92}px)`;}}
+function place(){cat.style.transform=`translate(${x}px,${y}px) scaleX(${dx>=0?1:-1})`;const n=document.getElementById("catname");if(n){n.style.transform=`translate(${x}px,${y+92}px)`;}const z=document.getElementById("catzzz");if(z){z.style.transform=`translate(${x+60}px,${y-10}px)`;}}
+function showZZZ(on){const z=document.getElementById("catzzz");if(z)z.style.display=on?"block":"none";}
 function setState(s,dur){
  state=s;stateUntil=Date.now()+dur;
- if(s==="sleep"){cat.textContent="💤";cat.style.fontSize="64px";}
- else if(s==="walk"){cat.textContent="\uD83D\uDC08\u200D⬛";cat.style.fontSize="84px";}
+ if(s==="sleep"){cat.textContent="😴";cat.style.fontSize="80px";showZZZ(true);}
+ else{showZZZ(false);if(s==="walk"){cat.textContent="\uD83D\uDC08\u200D⬛";cat.style.fontSize="84px";}}
 }
 function tick(){
  const now=Date.now();
@@ -275,7 +276,7 @@ function spawnDog(){
  walk();
  setTimeout(spawnDog,120000+Math.random()*120000); // every 2-4 minutes
 }
-setTimeout(spawnDog,90000+Math.random()*60000); // first dog in 1.5-2.5 min
+setTimeout(spawnDog,30000+Math.random()*30000); // first dog in 30-60s
 // --- TAP ---
 cat.addEventListener("click",()=>{
  const now=Date.now();
@@ -298,7 +299,13 @@ cat.addEventListener("click",()=>{
   wakeTimer=setTimeout(()=>{
    state="angry";cat.textContent="🙀";cat.style.fontSize="92px";
    playSnd("hiss");
-   cat.animate([{transform:`translate(${x}px,${y}px) scale(1)`},{transform:`translate(${x}px,${y-60}px) scale(1.5) rotate(-18deg)`},{transform:`translate(${x}px,${y}px) scale(1) rotate(12deg)`},{transform:`translate(${x}px,${y}px) scale(1)`}],{duration:700});
+   cat.animate([
+    {transform:`translate(${x}px,${y}px) scale(1) rotate(0deg)`},
+    {transform:`translate(${x-20}px,${y-10}px) scale(1.3) rotate(-25deg)`},
+    {transform:`translate(${x+30}px,${y-40}px) scale(1.6) rotate(20deg)`},
+    {transform:`translate(${x-15}px,${y-20}px) scale(1.4) rotate(-15deg)`},
+    {transform:`translate(${x}px,${y}px) scale(1) rotate(0deg)`}
+   ],{duration:900});
    setTimeout(()=>{setState("walk",6000+Math.random()*8000);dx=(Math.random()-0.5)*3;dy=(Math.random()-0.5)*2;taps=0;},2600);
   },900);
   return;
