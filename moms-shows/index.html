@@ -6,142 +6,134 @@
 <title>ReelDrama — Mom's Short Dramas</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--red:#e50914;--bg:#0a0a0a;--bg2:#141414;--card:#1a1a1a;--text:#fff;--muted:#8c8c8c}
+:root{--red:#e50914;--bg:#0a0a0a;--bg2:#141414;--card:#1c1c1c;--text:#fff;--muted:#999}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;min-height:100vh;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
-/* HEADER */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent);transition:background .3s}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;padding:14px 20px;background:linear-gradient(to bottom,rgba(0,0,0,.92),transparent);transition:background .3s}
 .topbar.solid{background:rgba(10,10,10,.97)}
 .logo{font-size:24px;font-weight:900;color:var(--red);letter-spacing:-.5px}
 .logo span{color:#fff;font-weight:300}
-/* HERO */
-.hero{position:relative;height:52vh;min-height:380px;display:flex;align-items:flex-end;overflow:hidden}
-.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#2b0a0a 0%,#1a0a1a 40%,#0a0a0a 100%)}
-.hero-bg::after{content:'';position:absolute;inset:0;background:
- radial-gradient(ellipse 60% 50% at 70% 20%,rgba(229,9,20,.25),transparent),
- radial-gradient(ellipse 50% 40% at 20% 80%,rgba(120,20,80,.2),transparent)}
-.hero-content{position:relative;z-index:2;padding:24px 20px;width:100%;background:linear-gradient(to top,rgba(10,10,10,1) 0%,rgba(10,10,10,.7) 60%,transparent 100%);padding-top:80px}
-.hero-kicker{font-size:12px;font-weight:700;letter-spacing:3px;color:var(--red);margin-bottom:8px}
-.hero-title{font-size:34px;font-weight:900;line-height:1.1;margin-bottom:10px;max-width:90%}
-.hero-desc{font-size:14px;color:#ccc;line-height:1.5;margin-bottom:18px;max-width:85%;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hero{position:relative;min-height:46vh;display:flex;align-items:flex-end;overflow:hidden;background:linear-gradient(135deg,#1a0505,#0d0d1a 60%,#0a0a0a)}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 70% 20%,rgba(229,9,20,.22),transparent),radial-gradient(ellipse 50% 40% at 20% 80%,rgba(120,20,80,.18),transparent)}
+.hero-content{position:relative;z-index:2;padding:90px 20px 24px;width:100%;background:linear-gradient(to top,#0a0a0a 0%,rgba(10,10,10,.75) 55%,transparent 100%)}
+.hero-kicker{font-size:11px;font-weight:700;letter-spacing:3px;color:var(--red);margin-bottom:8px}
+.hero-title{font-size:32px;font-weight:900;line-height:1.12;margin-bottom:10px}
+.hero-desc{font-size:14px;color:#ccc;line-height:1.5;margin-bottom:18px;max-width:88%}
 .hero-btns{display:flex;gap:10px}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:6px;font-size:16px;font-weight:700;border:none;cursor:pointer}
 .btn-play{background:#fff;color:#000}
-.btn-play:active{background:#ddd}
 .btn-more{background:rgba(109,109,110,.7);color:#fff}
-.btn-more:active{background:rgba(109,109,110,.4)}
-/* ROWS */
-.row{margin:18px 0;padding-left:20px}
-.row-title{font-size:18px;font-weight:700;margin-bottom:12px;padding-right:20px}
-.carousel{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-right:20px;padding-bottom:8px;scrollbar-width:none}
+.row{margin:20px 0;padding-left:16px}
+.row-title{font-size:18px;font-weight:700;margin-bottom:12px;padding-right:16px}
+.carousel{display:flex;gap:12px;overflow-x:auto;padding-right:16px;padding-bottom:10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .carousel::-webkit-scrollbar{display:none}
-.poster{flex:0 0 auto;width:130px;scroll-snap-align:start;border-radius:8px;overflow:hidden;background:var(--card);cursor:pointer;transition:transform .2s;position:relative}
-.poster:active{transform:scale(.96)}
-.poster-art{width:130px;height:195px;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;overflow:hidden}
-.poster-art::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6),transparent 50%)}
-.poster-label{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:8px;font-size:12px;font-weight:700;line-height:1.3}
-.poster-wide{flex:0 0 auto;width:240px;scroll-snap-align:start;border-radius:8px;overflow:hidden;background:var(--card);cursor:pointer;position:relative}
-.poster-wide:active{transform:scale(.97)}
-.poster-wide .poster-art{width:240px;height:135px;font-size:36px}
-/* Genre art gradients */
-.g-romance{background:linear-gradient(135deg,#5c1030,#a02050)}
-.g-thriller{background:linear-gradient(135deg,#0a0a1a,#2a1a3a)}
-.g-revenge{background:linear-gradient(135deg,#3a0a0a,#7a1a1a)}
-.g-billionaire{background:linear-gradient(135deg,#1a2a1a,#3a5a2a)}
-.g-comedy{background:linear-gradient(135deg,#3a2a0a,#8a5a1a)}
-.g-drama{background:linear-gradient(135deg,#1a1a2a,#3a3a5a)}
-.g-app{background:linear-gradient(135deg,#0a2a3a,#1a5a7a)}
-/* DETAIL MODAL */
-.modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);display:none;align-items:flex-end;justify-content:center}
-.modal.show{display:flex}
-.sheet{background:var(--bg2);border-radius:16px 16px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;padding:24px;animation:slideup .3s}
-@keyframes slideup{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
-.sheet h2{font-size:22px;margin-bottom:6px}
-.sheet .meta{font-size:13px;color:var(--red);font-weight:700;margin-bottom:12px}
-.sheet p{font-size:14px;color:#ccc;line-height:1.6;margin-bottom:20px}
-.sheet .btn{width:100%;justify-content:center;margin-bottom:10px}
-.close-x{position:absolute;top:16px;right:20px;font-size:28px;color:#fff;background:rgba(0,0,0,.5);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
-/* BOTTOM NAV */
+.ep{flex:0 0 auto;width:220px;background:var(--card);border-radius:10px;overflow:hidden;cursor:pointer;border:1px solid #2a2a2a}
+.ep:active{transform:scale(.97)}
+.ep-art{height:120px;display:flex;align-items:center;justify-content:center;font-size:44px;position:relative}
+.ep-art::after{content:'▶';position:absolute;font-size:28px;color:rgba(255,255,255,.9);text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.ep-body{padding:12px}
+.ep-title{font-size:14px;font-weight:700;line-height:1.35;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ep-src{font-size:11px;color:var(--red);font-weight:700;letter-spacing:.5px;margin-bottom:6px}
+.ep-desc{font-size:12px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.g1{background:linear-gradient(135deg,#4a0e2e,#7a1a4a)}.g2{background:linear-gradient(135deg,#0d0d20,#2a1a4a)}
+.g3{background:linear-gradient(135deg,#3a0d0d,#6e1a1a)}.g4{background:linear-gradient(135deg,#0e2a0e,#2a5a1a)}
+.g5{background:linear-gradient(135deg,#2e230e,#6e4e14)}.g6{background:linear-gradient(135deg,#101828,#2e3e5a)}
+.g7{background:linear-gradient(135deg,#1a0e2e,#4a1a6e)}.g8{background:linear-gradient(135deg,#0e2a2a,#1a5a5a)}
+.appsrow{display:flex;gap:12px;padding:0 16px;margin:20px 0}
+.appbtn{flex:1;background:var(--card);border:1px solid #2a2a2a;border-radius:12px;padding:16px 8px;text-align:center;cursor:pointer}
+.appbtn:active{transform:scale(.96)}
+.appbtn .ai{font-size:32px;margin-bottom:6px}
+.appbtn .an{font-size:13px;font-weight:700}
+.appbtn .ad{font-size:11px;color:var(--muted);margin-top:2px}
 .bottomnav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;background:rgba(10,10,10,.97);border-top:1px solid #222;padding:10px 4px calc(10px + env(safe-area-inset-bottom))}
 .bottomnav button{flex:1;background:none;border:none;color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px}
 .bottomnav button.active{color:#fff}
 .bottomnav .ico{font-size:22px}
 .spacer{height:90px}
+.note{margin:16px;font-size:12px;color:var(--muted);line-height:1.6;background:#141414;border-radius:10px;padding:14px}
+.note b{color:#fff}
 </style>
 </head>
 <body>
-
 <div class="topbar" id="topbar"><div class="logo">REEL<span>DRAMA</span></div></div>
 
-<!-- HERO -->
 <div class="hero">
-<div class="hero-bg"></div>
 <div class="hero-content">
-<div class="hero-kicker">FEATURED COLLECTION</div>
-<div class="hero-title">Thousands of Short Dramas.<br>One Tap Away.</div>
-<div class="hero-desc">The shows you love from FreeReels, DramaBox and ReelShort — romance, revenge, billionaires, thrillers. Full episodes free on their official channels.</div>
+<div class="hero-kicker">FREE SHORT DRAMAS</div>
+<div class="hero-title">Tap Any Story.<br>It Plays Instantly.</div>
+<div class="hero-desc">Real episodes from DramaBox and ReelShort's official channels — romance, revenge, billionaires, thrillers. No accounts, no payments, just tap and watch.</div>
 <div class="hero-btns">
-<button class="btn btn-play" onclick="openLink('https://www.youtube.com/@dramaboxapp','DramaBox')">▶ Play</button>
-<button class="btn btn-more" onclick="openLink('https://www.youtube.com/@reelshortapp','ReelShort')">ⓘ More</button>
+<button class="btn btn-play" onclick="go('https://www.youtube.com/@dramaboxapp')">▶ Play</button>
+<button class="btn btn-more" onclick="go('https://www.youtube.com/@reelshortapp')">ⓘ More Shows</button>
 </div>
 </div>
 </div>
 
-<!-- APPS ROW -->
-<div class="row"><div class="row-title">📱 Get the Apps</div>
-<div class="carousel">
-<div class="poster-wide" onclick="openLink('https://play.google.com/store/apps/details?id=com.freereels.app','FreeReels')"><div class="poster-art g-app">📱</div><div class="poster-label">FreeReels<br><span style="color:#888;font-weight:400">250M+ downloads</span></div></div>
-<div class="poster-wide" onclick="openLink('https://play.google.com/store/apps/details?id=com.storymatrix.drama','DramaBox App')"><div class="poster-art g-app">🎭</div><div class="poster-label">DramaBox<br><span style="color:#888;font-weight:400">16M on YouTube too</span></div></div>
-<div class="poster-wide" onclick="openLink('https://play.google.com/store/apps/details?id=com.newreading.reelshort','ReelShort App')"><div class="poster-art g-app">🎬</div><div class="poster-label">ReelShort<br><span style="color:#888;font-weight:400">108 series free</span></div></div>
-</div></div>
+<div class="appsrow">
+<div class="appbtn" onclick="go('https://play.google.com/store/apps/details?id=com.freereels.app')"><div class="ai">📱</div><div class="an">FreeReels</div><div class="ad">250M+ downloads</div></div>
+<div class="appbtn" onclick="go('https://play.google.com/store/apps/details?id=com.storymatrix.drama')"><div class="ai">🎭</div><div class="an">DramaBox</div><div class="ad">Get the app</div></div>
+<div class="appbtn" onclick="go('https://play.google.com/store/apps/details?id=com.newreading.reelshort')"><div class="ai">🎬</div><div class="an">ReelShort</div><div class="ad">108 free series</div></div>
+</div>
 
-<!-- ROMANCE -->
-<div class="row"><div class="row-title">💕 Romance</div>
-<div class="carousel">
-<div class="poster" onclick="openLink('https://www.youtube.com/@dramaboxapp','DramaBox Romance')"><div class="poster-art g-romance">💕</div><div class="poster-label">DramaBox Romance</div></div>
-<div class="poster" onclick="openLink('https://www.youtube.com/@reelshortapp','ReelShort Romance')"><div class="poster-art g-romance">💒</div><div class="poster-label">ReelShort Romance</div></div>
-<div class="poster" onclick="openLink('https://www.youtube.com/results?search_query=short+drama+romance+full+movie','Romance Search')"><div class="poster-art g-romance">🔍</div><div class="poster-label">All Romance</div></div>
-</div></div>
+<div class="row"><div class="row-title">🔥 Trending Now</div><div class="carousel" id="row-trending"></div></div>
+<div class="row"><div class="row-title">💕 Romance</div><div class="carousel" id="row-romance"></div></div>
+<div class="row"><div class="row-title">⚔️ Revenge</div><div class="carousel" id="row-revenge"></div></div>
+<div class="row"><div class="row-title">💎 Billionaire</div><div class="carousel" id="row-billionaire"></div></div>
+<div class="row"><div class="row-title">🐺 Werewolf & Fantasy</div><div class="carousel" id="row-fantasy"></div></div>
+<div class="row"><div class="row-title">🔍 Thriller</div><div class="carousel" id="row-thriller"></div></div>
 
-<!-- THRILLER -->
-<div class="row"><div class="row-title">🔍 Thriller & Mystery</div>
-<div class="carousel">
-<div class="poster" onclick="openLink('https://www.youtube.com/@dramaboxapp','DramaBox Thriller')"><div class="poster-art g-thriller">🔍</div><div class="poster-label">DramaBox Thrillers</div></div>
-<div class="poster" onclick="openLink('https://www.youtube.com/results?search_query=short+drama+thriller+full+episode','Thriller Search')"><div class="poster-art g-thriller">🌙</div><div class="poster-label">All Thrillers</div></div>
-</div></div>
-
-<!-- REVENGE -->
-<div class="row"><div class="row-title">⚔️ Revenge</div>
-<div class="carousel">
-<div class="poster" onclick="openLink('https://www.youtube.com/results?search_query=dramabox+revenge+full+episode','Revenge Search')"><div class="poster-art g-revenge">⚔️</div><div class="poster-label">Revenge Dramas</div></div>
-<div class="poster" onclick="openLink('https://www.youtube.com/@reelshortapp','ReelShort Revenge')"><div class="poster-art g-revenge">🔥</div><div class="poster-label">ReelShort Revenge</div></div>
-</div></div>
-
-<!-- BILLIONAIRE -->
-<div class="row"><div class="row-title">💎 Billionaire</div>
-<div class="carousel">
-<div class="poster" onclick="openLink('https://www.youtube.com/results?search_query=reelshort+billionaire+full+episode','Billionaire Search')"><div class="poster-art g-billionaire">💎</div><div class="poster-label">Billionaire Dramas</div></div>
-<div class="poster" onclick="openLink('https://www.youtube.com/@dramaboxapp','DramaBox Billionaire')"><div class="poster-art g-billionaire">👔</div><div class="poster-label">DramaBox CEOs</div></div>
-</div></div>
-
-<!-- COMEDY -->
-<div class="row"><div class="row-title">😂 Comedy</div>
-<div class="carousel">
-<div class="poster" onclick="openLink('https://www.youtube.com/results?search_query=short+drama+comedy+full+episode','Comedy Search')"><div class="poster-art g-comedy">😂</div><div class="poster-label">Comedy Dramas</div></div>
-</div></div>
-
+<div class="note"><b>How it works:</b> Tap any story and YouTube opens with the episodes ready to play. These are the official channels — DramaBox (16M subscribers) and ReelShort — so everything is free and legitimate. No accounts, no coins, no payments.</div>
 <div class="spacer"></div>
 
 <nav class="bottomnav">
-<button class="active" onclick="scrollTop_()"> <span class="ico">🏠</span>Home</button>
-<button onclick="openLink('https://www.youtube.com/@dramaboxapp','DramaBox')"> <span class="ico">🔍</span>Browse</button>
-<button onclick="openLink('https://play.google.com/store/apps/details?id=com.freereels.app','FreeReels')"> <span class="ico">📱</span>Apps</button>
+<button class="active" onclick="window.scrollTo({top:0,behavior:'smooth'})"><span class="ico">🏠</span>Home</button>
+<button onclick="go('https://www.youtube.com/@dramaboxapp')"><span class="ico">🔍</span>Browse</button>
+<button onclick="go('https://play.google.com/store/apps/details?id=com.freereels.app')"><span class="ico">📱</span>Apps</button>
 </nav>
 
 <script>
-function openLink(url,title){window.open(url,'_blank')}
-function scrollTop_(){window.scrollTo({top:0,behavior:'smooth'})}
-window.addEventListener('scroll',()=>{document.getElementById('topbar').classList.toggle('solid',window.scrollY>40)});
+const EP=[
+ // trending
+ {t:"I Was Hired as a Surrogate. A Twist Forced Us to Do It the Old Way.",s:"DramaBox",d:"A surrogate arrangement takes an unexpected turn when old-fashioned sparks fly. Full episodes on DramaBox's official channel.",g:"g1",q:"dramabox hired as a surrogate full episode"},
+ {t:"My Alpha Boss Gave Me Triplets [EP1-13]",s:"ReelShort",d:"Evie, a talented designer, becomes bound to Leopold, the ruthless Alpha of the Stonehearth Pack — leaving her pregnant with his rare triplets.",g:"g7",q:"reelshort my alpha boss gave me triplets"},
+ {t:"I Accidentally Sexted My Enemy [EP1-8]",s:"ReelShort",d:"One wrong text to the wrong person — and now enemies are tangled in something neither expected.",g:"g5",q:"reelshort i accidentally sexted my enemy"},
+ {t:"8 Months Pregnant — And He Left Her for Another Woman",s:"DramaBox",d:"Abandoned at her most vulnerable, she rebuilds her life — and he comes crawling back.",g:"g3",q:"dramabox 8 months pregnant left her"},
+ // romance
+ {t:"I Slept With My CEO Boss. Now He's Ordering Me to Find His Lover.",s:"DramaBox",d:"One reckless night with her CEO boss turns into an impossible assignment — find the woman he truly loves.",g:"g1",q:"dramabox slept with my ceo boss"},
+ {t:"Her Billionaire Father Spoils Her Rotten [EP1-12]",s:"ReelShort",d:"She grew up with nothing — until her billionaire father finds her and showers her with everything.",g:"g4",q:"reelshort her billionaire father spoils her rotten"},
+ {t:"Don't Toy with My Heart, Mr. Billionaire [EP1-7]",s:"ReelShort",d:"He's rich, ruthless, and used to getting what he wants. She's not playing his game.",g:"g1",q:"reelshort dont toy with my heart mr billionaire"},
+ {t:"He Rejected Me. So I Married His Nephew.",s:"DramaBox",d:"Scorned by the man she loved, she marries into his family — right under his nose.",g:"g1",q:"dramabox he rejected me so i married his nephew"},
+ // revenge
+ {t:"My Wife Brought Home a Bastard. So I Stopped Hiding My True Power.",s:"DramaBox",d:"Betrayed and humiliated, he drops the act — revealing the power he kept hidden for years.",g:"g3",q:"dramabox my wife brought home a bastard"},
+ {t:"They Called My Fiancé a Fool. Then He Summoned the Divine Dragon.",s:"DramaBox",d:"Everyone mocked him — until he called down a power no one believed was real.",g:"g3",q:"dramabox they called my fiance a fool divine dragon"},
+ {t:"Fiancée's Betrayal, Dante's Inferno [EP1-12]",s:"ReelShort",d:"Betrayed by his fiancée, he descends into a world of vengeance from which no one returns unchanged.",g:"g3",q:"reelshort fiancees betrayal dantes inferno"},
+ {t:"They Stole My Bugatti & Fired Me. They Forgot Who Owns the Company.",s:"DramaBox",d:"They took his car, his job, his dignity. They forgot he built the whole company.",g:"g3",q:"dramabox they stole my bugatti fired me"},
+ // billionaire
+ {t:"I Sold Myself for One Night. I Woke Up Pregnant By My CEO Boss.",s:"DramaBox",d:"One desperate night to save her family — and she wakes up carrying her CEO's child.",g:"g4",q:"dramabox i sold myself for one night pregnant ceo"},
+ {t:"We Never Said We Went Bankrupt! [EP1-8]",s:"ReelShort",d:"Everyone thinks the family lost everything. The truth is far more interesting.",g:"g4",q:"reelshort we never said we went bankrupt"},
+ {t:"Virginity Pact [EP1-14]",s:"ReelShort",d:"A pact made in youth collides with billionaire reality years later.",g:"g4",q:"reelshort virginity pact"},
+ // fantasy
+ {t:"He Rejected Our Mate Bond. Now I Must Hide His Secret Triplets.",s:"DramaBox",d:"Rejected by her mate, she hides a secret that could change the pack forever — his triplets.",g:"g7",q:"dramabox he rejected our mate bond secret triplets"},
+ {t:"Not the Bride He Wanted [EP1-13]",s:"ReelShort",d:"Forced into a marriage neither wanted, the Alpha discovers his bride is nothing like he assumed.",g:"g7",q:"reelshort not the bride he wanted"},
+ {t:"I Loved the Demon Prince. Then I Saw What He Did in the Dark.",s:"DramaBox",d:"She fell for a prince with a dark secret — and what she witnessed changed everything.",g:"g7",q:"dramabox i loved the demon prince"},
+ {t:"The Werewolf Heir and the Vampire Prince Both Want Her",s:"ReelShort",d:"Caught between a werewolf heir and a vampire prince — either choice is dangerous.",g:"g7",q:"reelshort werewolf heir vampire prince both want her"},
+ // thriller
+ {t:"My ER Fiancé Left Me to Die on Thanksgiving. So I Walked Away.",s:"DramaBox",d:"Left for dead by the man who swore to protect her, she disappears — and returns unrecognizable.",g:"g2",q:"dramabox er fiance left me to die thanksgiving"},
+ {t:"Death Touch [EP1-13]",s:"ReelShort",d:"One touch can kill. She never asked for this power — now everyone wants to control it.",g:"g2",q:"reelshort death touch"},
+ {t:"Rise of the Caged King [EP1-12]",s:"ReelShort",d:"Imprisoned and broken, he claws his way back to take everything they stole.",g:"g2",q:"reelshort rise of the caged king"},
+];
+const rows={trending:["row-trending",0,4],romance:["row-romance",4,8],revenge:["row-revenge",8,12],billionaire:["row-billionaire",12,15],fantasy:["row-fantasy",15,19],thriller:["row-thriller",19,22]};
+for(const[k,[id,a,b]]of Object.entries(rows)){
+ const el=document.getElementById(id);
+ EP.slice(a,b).forEach((e,i)=>{
+  const d=document.createElement("div");d.className="ep";
+  d.innerHTML=`<div class="ep-art ${e.g}">🎬</div><div class="ep-body"><div class="ep-title">${e.t}</div><div class="ep-src">${e.s.toUpperCase()} · FREE</div><div class="ep-desc">${e.d}</div></div>`;
+  d.onclick=()=>go("https://www.youtube.com/results?search_query="+encodeURIComponent(e.q));
+  el.appendChild(d);
+ });
+}
+function go(u){window.open(u,"_blank")}
+window.addEventListener("scroll",()=>document.getElementById("topbar").classList.toggle("solid",scrollY>40));
 </script>
 </body>
 </html>
