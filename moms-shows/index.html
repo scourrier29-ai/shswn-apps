@@ -165,27 +165,57 @@ function setState(s,dur){
  if(s==="sleep"){cat.textContent="😴";cat.style.fontSize="80px";showZZZ(true);}
  else{showZZZ(false);if(s==="walk"){cat.textContent="\uD83D\uDC08\u200D⬛";cat.style.fontSize="84px";}}
 }
+// Natural cat movement: pick a destination, stroll there, pause, look around
+let destX=x, destY=y, pauseUntil=0, birdWatch=null;
+function pickDest(){
+ destX=40+Math.random()*(innerWidth-140);
+ destY=isVideoOpen()?innerHeight-140:(130+Math.random()*(innerHeight-260));
+}
 function tick(){
  const now=Date.now();
  if(state==="walk"){
-  x=clampX(x+dx);y=clampY(y+dy);
-  if(x<=0||x>=innerWidth-100)dx*=-1;
-  if(isVideoOpen()){y=innerHeight-140;dy=Math.abs(dy)*-1;} // hug bottom during video
-  else if(y<=110||y>=innerHeight-110)dy*=-1;
-  if(Math.random()<0.008){dx=(Math.random()-0.5)*3;dy=(Math.random()-0.5)*2;}
-  place();
+  // BIRD AWARENESS: if birds are flying, stop and watch them
+  if(birdWatch&&now<birdWatch.until){
+   // face the flock, crouch slightly
+   const bx=birdWatch.x;
+   cat.style.transform="translate("+x+"px,"+(y+6)+"px) scaleX("+(bx>=x+48?1:-1)+") scale(1.05)";
+   const n2=document.getElementById("catname");if(n2){n2.style.transform="translate("+x+"px,"+(y+98)+")";}
+   requestAnimationFrame(tick);return;
+  }
+  birdWatch=null;
+  if(now<pauseUntil){
+   // sitting, occasional look-around (subtle shift)
+   if(Math.random()<0.02){cat.style.transform="translate("+x+"px,"+y+"px) scaleX("+(Math.random()<0.5?1:-1)+")";}
+   requestAnimationFrame(tick);return;
+  }
+  // stroll toward destination
+  const dxT=destX-x, dyT=destY-y;
+  const dist=Math.hypot(dxT,dyT);
+  if(dist<15){
+   // arrived: pause and look around, then pick new spot
+   pauseUntil=now+2000+Math.random()*5000;
+   pickDest();
+  }else{
+   const spd=1.2;
+   x+=dxT/dist*spd; y+=dyT/dist*spd;
+   x=clampX(x); y=clampY(y);
+   // face direction of travel
+   cat.style.transform="translate("+x+"px,"+y+"px) scaleX("+(dxT>=0?1:-1)+")";
+   const n2=document.getElementById("catname");if(n2){n2.style.transform="translate("+x+"px,"+(y+92)+")";}
+  }
   if(now>stateUntil){
    if(Math.random()<0.5)setState("sleep",8000+Math.random()*12000);
-   else stateUntil=now+6000+Math.random()*10000;
+   else{stateUntil=now+8000+Math.random()*12000;pickDest();}
   }
  }else if(state==="sleep"){
   const bob=Math.sin(now/600)*4;
-  cat.style.transform=`translate(${x}px,${y+bob}px)`;
-  const n2=document.getElementById("catname");if(n2){n2.style.transform=`translate(${x}px,${y+92+bob}px)`;}
-  if(now>stateUntil)setState("walk",6000+Math.random()*10000);
+  cat.style.transform="translate("+x+"px,"+(y+bob)+"px)";
+  const n2=document.getElementById("catname");if(n2){n2.style.transform="translate("+x+"px,"+(y+92+bob)+"px)";}
+  if(now>stateUntil){setState("walk",6000+Math.random()*10000);pickDest();}
  }
  requestAnimationFrame(tick);
 }
+pickDest();
 cat.style.position="fixed";cat.style.left="0";cat.style.top="0";
 setState("walk",8000);place();tick();
 cat.style.display="";document.getElementById("catname").style.display="";crittersHidden=false;
@@ -206,8 +236,9 @@ function spawnBird(){
   document.body.appendChild(b);
   birds.push({el:b,ox:offX,oy:offY,caught:false,bx:dir>0?-60:innerWidth+60});
  }
- // CAT JUMPS UP when flock appears
+ // SASHA NOTICES the flock: watch + jump + try to catch
  if(state!=="sleep"&&!isVideoOpen()&&!crittersHidden){
+  birdWatch={x:innerWidth/2,until:Date.now()+8000};
   const jx=x, jy=y;
   cat.animate([
    {transform:"translate("+jx+"px,"+jy+"px) scale(1)"},
@@ -226,6 +257,7 @@ function spawnBird(){
    const birdY=baseY+bd.oy+Math.sin(bd.bx/70)*25;
    bd.el.style.left=(bd.bx+bd.ox)+"px";
    bd.el.style.top=birdY+"px";
+   if(birdWatch)birdWatch.x=bd.bx+bd.ox;
    const cx=x+48,cy=y+48;
    const dist=Math.hypot(bd.bx+bd.ox+18-cx,birdY+18-cy);
    if(dist<130&&state!=="sleep"&&!isVideoOpen()&&!crittersHidden&&Math.random()<0.05){
@@ -264,7 +296,7 @@ function catchBird(bx,by){
  setTimeout(()=>{if(state==="walk"){cat.textContent="\uD83D\uDC08\u200D\u2B1B";cat.style.fontSize="84px";}},2000);
 }
 setTimeout(spawnBird,20000+Math.random()*15000);
-// --- BUDDY THE DOG: sleeps in bottom corner, Sasha attacks him sometimes ---
+// --- BUDDY THE DOG: walks bottom back-and-forth, naps, Sasha scratches him ---
 (function(){
  const buddy=document.createElement("div");
  buddy.style.cssText="position:fixed;z-index:9997;font-size:72px;pointer-events:none;left:20px;";
@@ -273,59 +305,76 @@ setTimeout(spawnBird,20000+Math.random()*15000);
  zzz.textContent="\uD83D\uDCA4";
  zzz.style.cssText="position:fixed;z-index:9997;font-size:24px;pointer-events:none;left:80px;display:none;";
  document.body.appendChild(zzz);
+ let bX=20, bDir=1, bState="sleep"; // sleep | walk | flee
+ const bSpeed=1.5;
+ function bY(){ return innerHeight-110; }
  function placeBuddy(){
-  const by=innerHeight-110;
-  buddy.style.top=by+"px";
-  zzz.style.top=(by-30)+"px";
+  buddy.style.top=bY()+"px";
+  buddy.style.left=bX+"px";
+  zzz.style.top=(bY()-30)+"px";
+  zzz.style.left=(bX+60)+"px";
  }
- placeBuddy();
+ function setBuddySleep(on){
+  bState=on?"sleep":"walk";
+  buddy.textContent=on?"\uD83D\uDC15":"\uD83D\uDC36";
+  zzz.style.display=on?"block":"none";
+  placeBuddy();
+ }
+ setBuddySleep(true);
  window.addEventListener("resize",placeBuddy);
- let sleeping=true;
- buddy.textContent="\uD83D\uDC15"; // sleeping dog face
- zzz.style.display="block";
- // Buddy dozes: occasionally lifts head, then back to sleep
- function buddyDoze(){
-  if(sleeping&&Math.random()<0.3){
-   buddy.textContent="\uD83D\uDC36"; // awake dog face
-   zzz.style.display="none";
-   setTimeout(()=>{buddy.textContent="\uD83D\uDC15";zzz.style.display="block";},4000);
+ // Buddy behavior loop
+ function buddyTick(){
+  if(crittersHidden||isVideoOpen()){requestAnimationFrame(buddyTick);return;}
+  if(bState==="walk"){
+   bX+=bSpeed*bDir;
+   if(bX>innerWidth-100){bDir=-1;}
+   if(bX<10){bDir=1;}
+   buddy.style.transform="scaleX("+(bDir>0?1:-1)+")";
+   placeBuddy();
+   // Sasha scratches him when she passes close
+   const dist=Math.hypot((bX+36)-(x+48),(bY()+36)-(y+48));
+   if(dist<110&&state!=="sleep"){
+    // SCRATCH!
+    try{playSnd("angry");}catch(e){}
+    cat.textContent="\uD83D\ude40";cat.style.fontSize="92px";
+    cat.animate([
+     {transform:"translate("+x+"px,"+y+"px) scale(1) rotate(0deg)"},
+     {transform:"translate("+x+"px,"+(y-20)+"px) scale(1.3) rotate(-20deg)"},
+     {transform:"translate("+x+"px,"+y+"px) scale(1) rotate(10deg)"}
+    ],{duration:500});
+    // Buddy YELPS and RUNS AWAY to another part
+    try{playSnd("whimper");}catch(e){}
+    bState="flee";
+    const fleeTo=Math.random()<(0.5)?20:innerWidth-120;
+    bDir=fleeTo>bX?1:-1;
+    buddy.textContent="\uD83D\uDE31"; // scared face
+    zzz.style.display="none";
+    (function flee(){
+     bX+=6*bDir;
+     buddy.style.transform="scaleX("+(bDir>0?1:-1)+")";
+     placeBuddy();
+     if((bDir>0&&bX<fleeTo)||(bDir<0&&bX>fleeTo)){requestAnimationFrame(flee);}
+     else{
+      // reached safe spot, lay down
+      setTimeout(()=>setBuddySleep(true),2000);
+     }
+    })();
+    setTimeout(()=>{if(state!=="sleep"){cat.textContent="\uD83D\uDC08\u200D\u2B1B";cat.style.fontSize="84px";}},1500);
+   }
   }
-  setTimeout(buddyDoze,20000+Math.random()*20000);
+  requestAnimationFrame(buddyTick);
  }
- setTimeout(buddyDoze,10000);
- // SASHA ATTACKS BUDDY every now and again
- function catAttack(){
-  if(crittersHidden||isVideoOpen()||state==="sleep"){scheduleNext();return;}
-  const sx=x, sy=y;
-  const bx=20, by=innerHeight-110;
-  try{playSnd("angry");}catch(e){}
-  cat.textContent="\uD83D\ude40";cat.style.fontSize="92px";
-  cat.animate([
-   {transform:"translate("+sx+"px,"+sy+"px) scale(1)"},
-   {transform:"translate("+(bx+10)+"px,"+(by-50)+"px) scale(1.5)"},
-   {transform:"translate("+(bx+40)+"px,"+(by-70)+"px) scale(1.6) rotate(-15deg)"},
-   {transform:"translate("+(bx+10)+"px,"+(by-50)+"px) scale(1.5) rotate(15deg)"},
-   {transform:"translate("+sx+"px,"+sy+"px) scale(1)"}
-  ],{duration:1400});
-  // Buddy wakes up scared and whimpers
-  setTimeout(()=>{
-   buddy.textContent="\uD83D\uDC36";
-   zzz.style.display="none";
-   try{playSnd("whimper");}catch(e){}
-   buddy.animate([
-    {transform:"translateX(0)"},
-    {transform:"translateX(30px)"},
-    {transform:"translateX(0)"}
-   ],{duration:800});
-  },700);
-  // Buddy goes back to sleep
-  setTimeout(()=>{buddy.textContent="\uD83D\uDC15";zzz.style.display="block";sleeping=true;},4000);
-  scheduleNext();
+ requestAnimationFrame(buddyTick);
+ // Buddy cycle: sleep -> walk around -> sleep
+ function buddyCycle(){
+  if(bState==="sleep"&&!crittersHidden&&!isVideoOpen()){
+   setBuddySleep(false); // wake up and walk
+   // walk for 20-40s then nap
+   setTimeout(()=>{if(bState==="walk")setBuddySleep(true);},20000+Math.random()*20000);
+  }
+  setTimeout(buddyCycle,30000+Math.random()*30000);
  }
- function scheduleNext(){
-  setTimeout(catAttack,90000+Math.random()*120000);
- }
- setTimeout(catAttack,60000+Math.random()*60000);
+ setTimeout(buddyCycle,15000);
 })();
 // --- TAP ---
 cat.addEventListener("click",()=>{
