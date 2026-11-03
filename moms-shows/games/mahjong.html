@@ -18,7 +18,7 @@ header{width:100%;max-width:720px;display:flex;align-items:center;justify-conten
 .btn.ghost{background:#1c1c1c;border:1px solid #444;color:#fff}
 #wrap{width:100%;max-width:720px;overflow:hidden;position:relative}
 #board{position:relative;transform-origin:top left}
-.tile{position:absolute;display:flex;align-items:center;justify-content:center;cursor:pointer;
+.tile{position:absolute;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
   background:linear-gradient(145deg,#fffdf4 0%,#f3ecd9 60%,#e7dcc0 100%);
   border:2px solid #9a8a63;border-radius:9px;
   box-shadow:2px 3px 0 #6e6247, 3px 5px 6px rgba(0,0,0,.55);
@@ -142,7 +142,8 @@ function render(){
     d.style.left=((t.x-MINX)*UW + t.z*ZX)+'px';
     d.style.top=(t.y*UH - t.z*ZY)+'px';
     d.textContent=t.face;
-    d.addEventListener('pointerdown',e=>{e.preventDefault();onTap(t);});
+    d.addEventListener('touchstart',e=>{e.preventDefault();onTap(t);},{passive:false});
+    d.addEventListener('click',()=>onTap(t));
     t.el=d; board.appendChild(d);
   }
   fitBoard();

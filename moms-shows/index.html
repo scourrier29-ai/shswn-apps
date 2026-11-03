@@ -145,7 +145,7 @@ updateArrows();
 <nav class="bottomnav" id="bottomnav"></nav>
 
 <!-- 🐈‍⬛ Grumpy cat mascot -->
-<div id="cat" style="position:fixed;z-index:9999;width:96px;height:96px;cursor:pointer;user-select:none;transition:transform .1s;pointer-events:auto;font-size:84px;line-height:96px;text-align:center;">🐈‍⬛</div><div id="catname" style="position:fixed;z-index:9999;pointer-events:none;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 4px #000;text-align:center;width:96px">Sasha</div><div id="catzzz" style="position:fixed;z-index:9999;pointer-events:none;font-size:28px;display:none;animation:zfloat 2s ease-in-out infinite">💤</div><style>@keyframes zfloat{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-12px);opacity:.4}}</style>
+<div id="cat" style="position:fixed;z-index:9999;width:96px;height:96px;cursor:pointer;user-select:none;transition:transform .1s;pointer-events:auto;font-size:84px;line-height:96px;text-align:center;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))">🐈‍⬛</div><div id="catname" style="position:fixed;z-index:9999;pointer-events:none;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 4px #000;text-align:center;width:96px">Sasha</div><div id="catzzz" style="position:fixed;z-index:9999;pointer-events:none;font-size:28px;display:none;animation:zfloat 2s ease-in-out infinite">💤</div><style>@keyframes zfloat{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-12px);opacity:.4}}</style>
 <script>
 (function(){
 const cat=document.getElementById("cat");
@@ -165,11 +165,8 @@ function setState(s,dur){
  if(s==="sleep"){cat.textContent="😴";cat.style.fontSize="80px";showZZZ(true);}
  else{showZZZ(false);if(s==="walk"){cat.textContent="\uD83D\uDC08\u200D⬛";cat.style.fontSize="84px";}}
 }
-let lastTick=0;
 function tick(){
  const now=Date.now();
- if(now-lastTick<33){requestAnimationFrame(tick);return;}
- lastTick=now;
  if(state==="walk"){
   x=clampX(x+dx);y=clampY(y+dy);
   if(x<=0||x>=innerWidth-100)dx*=-1;
@@ -194,92 +191,142 @@ setState("walk",8000);place();tick();
 cat.style.display="";document.getElementById("catname").style.display="";crittersHidden=false;
 // --- BIRD ---
 function spawnBird(){
- const b=document.createElement("div");
- const birdTop=isVideoOpen()?innerHeight-120:(120+Math.random()*(innerHeight-300));
- b.textContent="🐦";b.style.cssText="position:fixed;z-index:9998;font-size:36px;pointer-events:none;left:-50px;top:"+birdTop+"px";
- document.body.appendChild(b);
+ // FLOCK: 3-5 birds fly by together
+ const flockSize=3+Math.floor(Math.random()*3);
  const dir=Math.random()<0.5?1:-1;
- if(dir<0){b.style.left="auto";b.style.right="-50px";b.style.transform="scaleX(-1)";}
- let bx=dir>0?-50:innerWidth+50;const by=parseFloat(b.style.top);
- const speed=2+Math.random()*2;
- let caught=false;
- function fly(){
-  if(caught)return;
-  bx+=speed*dir;
-  b.style.left=bx+"px";b.style.top=(by+Math.sin(bx/60)*20)+"px";
-  // cat catches bird if close
-  const cx=x+48,cy=y+48,dxb=bx+18-cx,dyb=by+18-cy;
-  if(Math.hypot(dxb,dyb)<70&&state!=="sleep"&&!isVideoOpen()&&!crittersHidden){
-   caught=true;catchBird(bx,by);b.remove();return;
-  }
-  if((dir>0&&bx>innerWidth+60)||(dir<0&&bx<-60)){b.remove();return;}
-  requestAnimationFrame(fly);
+ const baseY=isVideoOpen()?innerHeight-140:(100+Math.random()*Math.max(100,innerHeight-350));
+ const speed=2.5+Math.random()*2;
+ const birds=[];
+ for(let i=0;i<flockSize;i++){
+  const b=document.createElement("div");
+  b.textContent="\uD83D\uDC26";
+  const offY=(Math.random()-0.5)*120, offX=(Math.random()-0.5)*100;
+  b.style.cssText="position:fixed;z-index:9998;font-size:"+(30+Math.random()*12)+"px;pointer-events:none;";
+  if(dir<0)b.style.transform="scaleX(-1)";
+  document.body.appendChild(b);
+  birds.push({el:b,ox:offX,oy:offY,caught:false,bx:dir>0?-60:innerWidth+60});
  }
- fly();
- setTimeout(spawnBird,15000+Math.random()*25000); // every 15-40s
+ // CAT JUMPS UP when flock appears
+ if(state!=="sleep"&&!isVideoOpen()&&!crittersHidden){
+  const jx=x, jy=y;
+  cat.animate([
+   {transform:"translate("+jx+"px,"+jy+"px) scale(1)"},
+   {transform:"translate("+jx+"px,"+(jy-120)+"px) scale(1.3)"},
+   {transform:"translate("+jx+"px,"+jy+"px) scale(1)"}
+  ],{duration:700});
+  cat.textContent="\uD83D\uDC08\u200D\u2B1B";cat.style.fontSize="96px";
+  try{playSnd("meow");}catch(e){}
+ }
+ function flyFlock(){
+  let alive=false;
+  for(const bd of birds){
+   if(bd.caught)continue;
+   alive=true;
+   bd.bx+=speed*dir;
+   const birdY=baseY+bd.oy+Math.sin(bd.bx/70)*25;
+   bd.el.style.left=(bd.bx+bd.ox)+"px";
+   bd.el.style.top=birdY+"px";
+   const cx=x+48,cy=y+48;
+   const dist=Math.hypot(bd.bx+bd.ox+18-cx,birdY+18-cy);
+   if(dist<130&&state!=="sleep"&&!isVideoOpen()&&!crittersHidden&&Math.random()<0.05){
+    bd.caught=true;catchBird(bd.bx+bd.ox,birdY);bd.el.remove();continue;
+   }
+   if((dir>0&&bd.bx>innerWidth+80)||(dir<0&&bd.bx<-80)){bd.el.remove();bd.caught=true;}
+  }
+  if(alive)requestAnimationFrame(flyFlock);
+ }
+ flyFlock();
+ setTimeout(spawnBird,50000+Math.random()*25000);
 }
 function catchBird(bx,by){
- playSnd("angry");
- cat.textContent="😼";cat.style.fontSize="90px";
- // pounce animation
- cat.animate([{transform:`translate(${x}px,${y}px) scale(1)`},{transform:`translate(${bx-48}px,${by-48}px) scale(1.6)`},{transform:`translate(${x}px,${y}px) scale(1)`}],{duration:500});
- // FEATHERS EVERYWHERE
+ try{playSnd("angry");}catch(e){}
+ cat.textContent="\uD83D\ude3c";cat.style.fontSize="90px";
+ cat.animate([
+  {transform:"translate("+x+"px,"+y+"px) scale(1)"},
+  {transform:"translate("+(bx-48)+"px,"+(by-48)+"px) scale(1.6)"},
+  {transform:"translate("+x+"px,"+y+"px) scale(1)"}
+ ],{duration:500});
  for(let i=0;i<24;i++){
   const f=document.createElement("div");
-  f.textContent=["🪶","🤍","🪶"][Math.floor(Math.random()*3)];
-  f.style.cssText=`position:fixed;z-index:9999;font-size:${14+Math.random()*20}px;pointer-events:none;left:${bx}px;top:${by}px`;
+  f.textContent=["\uD83E\uDEB6","\uD83E\uDD0D","\uD83E\uDEB6"][Math.floor(Math.random()*3)];
+  f.style.cssText="position:fixed;z-index:9999;font-size:"+(14+Math.random()*20)+"px;pointer-events:none;left:"+bx+"px;top:"+by+"px";
   document.body.appendChild(f);
-  const ang=Math.random()*Math.PI*2,vx=Math.cos(ang)*(2+Math.random()*5),vy=Math.sin(ang)*(2+Math.random()*5)-3;
+  const ang=Math.random()*Math.PI*2,vx=Math.cos(ang)*(2+Math.random()*5);
+  let vy=Math.sin(ang)*(2+Math.random()*5)-3;
   let fx=bx,fy=by,rot=0,life=0;
   (function fall(){
    fx+=vx;fy+=vy;vy+=0.25;rot+=8;life++;
-   f.style.left=fx+"px";f.style.top=fy+"px";f.style.transform=`rotate(${rot}deg)`;
+   f.style.left=fx+"px";f.style.top=fy+"px";f.style.transform="rotate("+rot+"deg)";
    f.style.opacity=Math.max(0,1-life/90);
    if(life<90&&fy<innerHeight)requestAnimationFrame(fall);else f.remove();
   })();
  }
- setTimeout(()=>{if(state==="walk"){cat.textContent="\uD83D\uDC08\u200D⬛";cat.style.fontSize="84px";}},2000);
+ setTimeout(()=>{if(state==="walk"){cat.textContent="\uD83D\uDC08\u200D\u2B1B";cat.style.fontSize="84px";}},2000);
 }
-setTimeout(spawnBird,8000+Math.random()*10000); // first bird in 8-18s
-// --- BUDDY THE DOG ---
-function spawnDog(){
- if(isVideoOpen()||crittersHidden){setTimeout(spawnDog,60000);return;} // wait out the video
- const d=document.createElement("div");
- d.textContent="🐕";d.style.cssText="position:fixed;z-index:9998;font-size:88px;pointer-events:none;left:-110px;top:"+(innerHeight-220)+"px;transition:none";
- document.body.appendChild(d);
- let dx2=-110;const speed=2.5;
- let scared=false,whimpered=false;
- function walk(){
-  if(scared){
-   // run away
-   dx2-=7;d.style.left=dx2+"px";
-   if(dx2<-130){d.remove();return;}
-   requestAnimationFrame(walk);return;
-  }
-  dx2+=speed;d.style.left=dx2+"px";
-  d.style.transform=`translateY(${Math.sin(dx2/25)*6}px)`;
-  // Sasha notices the dog when close
-  const dist=Math.abs((dx2+44)-(x+48));
-  if(dist<220&&state!=="angry"&&!whimpered&&!isVideoOpen()&&!crittersHidden){
-   whimpered=true;
-   // Sasha hisses
-   cat.textContent="🙀";cat.style.fontSize="92px";
-   playSnd("hiss");
-   cat.animate([{transform:`translate(${x}px,${y}px) scale(1)`},{transform:`translate(${x}px,${y-30}px) scale(1.4)`},{transform:`translate(${x}px,${y}px) scale(1)`}],{duration:500});
-   setTimeout(()=>{
-    // dog whimpers and runs
-    playSnd("whimper")
-    d.textContent="🥺";scared=true;
-    setTimeout(()=>{if(state!=="sleep"){cat.textContent="\uD83D\uDC08\u200D⬛";cat.style.fontSize="84px";}},1500);
-   },600);
-  }
-  if(dx2>innerWidth+60){d.remove();return;}
-  requestAnimationFrame(walk);
+setTimeout(spawnBird,20000+Math.random()*15000);
+// --- BUDDY THE DOG: sleeps in bottom corner, Sasha attacks him sometimes ---
+(function(){
+ const buddy=document.createElement("div");
+ buddy.style.cssText="position:fixed;z-index:9997;font-size:72px;pointer-events:none;left:20px;";
+ document.body.appendChild(buddy);
+ const zzz=document.createElement("div");
+ zzz.textContent="\uD83D\uDCA4";
+ zzz.style.cssText="position:fixed;z-index:9997;font-size:24px;pointer-events:none;left:80px;display:none;";
+ document.body.appendChild(zzz);
+ function placeBuddy(){
+  const by=innerHeight-110;
+  buddy.style.top=by+"px";
+  zzz.style.top=(by-30)+"px";
  }
- walk();
- setTimeout(spawnDog,120000+Math.random()*120000); // every 2-4 minutes
-}
-setTimeout(spawnDog,30000+Math.random()*30000); // first dog in 30-60s
+ placeBuddy();
+ window.addEventListener("resize",placeBuddy);
+ let sleeping=true;
+ buddy.textContent="\uD83D\uDC15"; // sleeping dog face
+ zzz.style.display="block";
+ // Buddy dozes: occasionally lifts head, then back to sleep
+ function buddyDoze(){
+  if(sleeping&&Math.random()<0.3){
+   buddy.textContent="\uD83D\uDC36"; // awake dog face
+   zzz.style.display="none";
+   setTimeout(()=>{buddy.textContent="\uD83D\uDC15";zzz.style.display="block";},4000);
+  }
+  setTimeout(buddyDoze,20000+Math.random()*20000);
+ }
+ setTimeout(buddyDoze,10000);
+ // SASHA ATTACKS BUDDY every now and again
+ function catAttack(){
+  if(crittersHidden||isVideoOpen()||state==="sleep"){scheduleNext();return;}
+  const sx=x, sy=y;
+  const bx=20, by=innerHeight-110;
+  try{playSnd("angry");}catch(e){}
+  cat.textContent="\uD83D\ude40";cat.style.fontSize="92px";
+  cat.animate([
+   {transform:"translate("+sx+"px,"+sy+"px) scale(1)"},
+   {transform:"translate("+(bx+10)+"px,"+(by-50)+"px) scale(1.5)"},
+   {transform:"translate("+(bx+40)+"px,"+(by-70)+"px) scale(1.6) rotate(-15deg)"},
+   {transform:"translate("+(bx+10)+"px,"+(by-50)+"px) scale(1.5) rotate(15deg)"},
+   {transform:"translate("+sx+"px,"+sy+"px) scale(1)"}
+  ],{duration:1400});
+  // Buddy wakes up scared and whimpers
+  setTimeout(()=>{
+   buddy.textContent="\uD83D\uDC36";
+   zzz.style.display="none";
+   try{playSnd("whimper");}catch(e){}
+   buddy.animate([
+    {transform:"translateX(0)"},
+    {transform:"translateX(30px)"},
+    {transform:"translateX(0)"}
+   ],{duration:800});
+  },700);
+  // Buddy goes back to sleep
+  setTimeout(()=>{buddy.textContent="\uD83D\uDC15";zzz.style.display="block";sleeping=true;},4000);
+  scheduleNext();
+ }
+ function scheduleNext(){
+  setTimeout(catAttack,90000+Math.random()*120000);
+ }
+ setTimeout(catAttack,60000+Math.random()*60000);
+})();
 // --- TAP ---
 cat.addEventListener("click",()=>{
  const now=Date.now();
