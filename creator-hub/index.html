@@ -3,882 +3,264 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#0b0b10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Creator Hub</title>
-<link rel="icon" href="icon-192.png">
-<style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
-:root{
-  --gold:#f5b301;--gold-dim:#b8860b;--gold-glow:rgba(245,179,1,.45);
-  --bg:#0a0a0a;--panel:#141414;--panel2:#1c1c1c;
-  --text:#f5f5f5;--muted:#a0a0a0;--cyan:#40daff;--red:#e53935;--green:#4caf50;
-}
-html,body{height:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,Roboto,sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
-.header{position:fixed;top:0;left:0;right:0;height:64px;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:rgba(10,10,10,.95);border-bottom:1px solid rgba(245,179,1,.2)}
-.header h1{font-size:20px;font-weight:700;letter-spacing:.02em}
-.hdr-btn{width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,.12);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center}
-.main{position:fixed;top:64px;bottom:76px;left:0;right:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-.tab-panel{display:none;padding:12px 12px 24px;max-width:640px;margin:0 auto}
-.tab-panel.active{display:block}
-.tabbar{position:fixed;bottom:0;left:0;right:0;height:76px;z-index:50;display:flex;background:rgba(10,10,10,.97);border-top:1px solid rgba(245,179,1,.2);padding-bottom:env(safe-area-inset-bottom);overflow-x:auto;scrollbar-width:none}
-.tabbar::-webkit-scrollbar{display:none}
-.tabbtn{flex:1 0 auto;min-width:72px;border:none;background:transparent;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:60px;touch-action:manipulation;padding:0 6px}
-.tabbtn .ticon{font-size:22px}
-.tabbtn.active{color:var(--gold)}
-.portrait-wrap{position:relative;border-radius:16px;overflow:hidden;border:2px solid var(--gold);box-shadow:0 0 24px var(--gold-glow);margin-bottom:12px}
-.portrait-wrap img{width:100%;display:block}
-.oct-row{position:absolute;left:0;right:0;bottom:18%;display:flex;justify-content:space-evenly;align-items:center;padding:0 4%}
-.oct{width:15%;aspect-ratio:1;position:relative;cursor:pointer;clip-path:polygon(30% 0%,70% 0%,100% 30%,100% 70%,70% 100%,30% 100%,0% 70%,0% 30%);background:linear-gradient(145deg,#3a2c05,#1a1403);border:none;touch-action:manipulation;display:flex;align-items:center;justify-content:center;transition:transform .1s}
-.oct::before{content:"";position:absolute;inset:2px;clip-path:polygon(30% 0%,70% 0%,100% 30%,100% 70%,70% 100%,30% 100%,0% 70%,0% 30%);background:rgba(10,10,10,.92);z-index:0}
-.oct span{position:relative;z-index:1;color:var(--gold);font-size:clamp(7px,2.2vw,11px);font-weight:800;text-align:center;line-height:1.15;letter-spacing:.02em;padding:0 4px}
-.oct:active{transform:scale(.94)}
-.oct:active::before{background:var(--cyan)}
-.oct:active span{color:#000}
-.mcsyn-banner{text-align:center;padding:14px;margin:0 0 12px;border:2px solid var(--gold);border-radius:12px;background:linear-gradient(180deg,rgba(245,179,1,.12),rgba(245,179,1,.04));box-shadow:0 0 18px var(--gold-glow)}
-.mcsyn-banner .m1{font-size:28px;font-weight:900;font-style:italic;letter-spacing:.02em}
-.mcsyn-banner .m2{font-size:22px;font-weight:800;font-style:italic;color:var(--gold)}
-.tagline{text-align:center;font-size:13px;letter-spacing:.18em;color:var(--muted);margin-bottom:12px;font-weight:600}
-.desc{font-size:14px;line-height:1.55;color:#d0d0d0;margin-bottom:16px;padding:0 4px}
-.card{background:var(--panel);border:1px solid rgba(245,179,1,.25);border-radius:14px;padding:14px;margin-bottom:14px}
-.card h2{font-size:14px;letter-spacing:.14em;color:var(--gold);margin-bottom:10px;font-weight:800}
-.stream-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
-.stream-tile{flex:0 0 110px;height:110px;border-radius:12px;border:1px solid rgba(255,255,255,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:700;cursor:pointer;background:var(--panel2);touch-action:manipulation}
-.stream-tile .sic{font-size:28px}
-.live-grid{display:flex;gap:10px;margin-bottom:12px}
-.live-box{flex:1;background:var(--panel);border:1px solid rgba(245,179,1,.25);border-radius:12px;padding:12px;text-align:center}
-.live-box .lbl{font-size:11px;letter-spacing:.12em;color:var(--muted);margin-bottom:6px}
-.live-box .big{font-size:22px;font-weight:800}
-.live-box .sub{font-size:13px;color:var(--muted);margin-top:4px}
-.ottawa-stations{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.station-btn{padding:12px 8px;border-radius:12px;border:1px solid rgba(245,179,1,.35);background:var(--panel2);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:8px;min-height:48px}
-.station-btn.playing{background:var(--gold);color:#000;border-color:var(--gold)}
-.nowplaying{font-size:13px;color:var(--muted);margin:8px 0;line-height:1.4}
-.rec-row{display:flex;align-items:center;gap:10px;margin:10px 0}
-.rec-label{font-size:12px;letter-spacing:.12em;color:var(--gold);font-weight:800}
-.btn-record{flex:1;min-height:52px;border:none;border-radius:28px;cursor:pointer;background:var(--red);color:#fff;font-size:17px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;touch-action:none;box-shadow:0 0 16px rgba(229,57,53,.5)}
-.btn-record:disabled{opacity:.4;box-shadow:none}
-.btn-record.recording{animation:pulse 1.2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-.rec-timer{font-size:14px;font-weight:700;min-width:60px;text-align:center}
-.level-meter{height:8px;background:#333;border-radius:4px;overflow:hidden;flex:1}
-.level-fill{height:100%;background:var(--gold);width:0%;transition:width .1s}
-.saved-flash{font-size:13px;color:var(--green);font-weight:700;opacity:0;transition:opacity .3s}
-.saved-flash.show{opacity:1}
-.search-row{display:flex;gap:8px;margin-bottom:12px}
-.search-row input{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(245,179,1,.3);background:var(--panel2);color:var(--text);font-size:15px;min-height:48px}
-.btn{padding:12px 18px;border-radius:10px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;white-space:nowrap;min-height:48px}
-.btn.solid{background:var(--gold);color:#000}
-.station-list{display:flex;flex-direction:column;gap:8px}
-.station-row{display:flex;align-items:center;gap:10px;padding:12px;background:var(--panel);border:1px solid rgba(255,255,255,.1);border-radius:10px;cursor:pointer;touch-action:manipulation;min-height:48px}
-.station-row .sname{font-weight:700;font-size:14px}
-.station-row .smeta{font-size:12px;color:var(--muted)}
-.station-row .play-ic{font-size:20px;margin-left:auto}
-.rec-item{background:var(--panel);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;margin-bottom:8px}
-.rec-item .rname{font-weight:700;font-size:14px;margin-bottom:8px}
-.rec-item audio{width:100%;margin-bottom:8px}
-.rec-actions{display:flex;gap:8px}
-.rec-actions .btn{flex:1;padding:10px;font-size:13px}
-.short-job{background:var(--panel);border:1px solid rgba(245,179,1,.25);border-radius:12px;padding:14px;margin-bottom:12px}
-.short-job h3{font-size:16px;margin-bottom:6px}
-.short-job .jmeta{font-size:12px;color:var(--muted);margin-bottom:8px}
-.short-job .jdesc{font-size:14px;line-height:1.5;color:#d0d0d0;margin-bottom:10px}
-.short-job video{width:100%;border-radius:8px;background:#000;margin-bottom:8px}
-.short-form input,.short-form textarea{width:100%;padding:12px;border-radius:10px;margin-bottom:10px;border:1px solid rgba(245,179,1,.3);background:var(--panel2);color:var(--text);font-size:15px;font-family:inherit;min-height:48px}
-.short-form textarea{min-height:80px;resize:vertical}
-.arcade-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.arcade-tile{aspect-ratio:1;background:var(--panel);border:1px solid rgba(245,179,1,.25);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-weight:700;font-size:14px;min-height:48px}
-.arcade-tile .aic{font-size:32px}
-/* ===== NEWS ===== */
-.news-cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:10px;scrollbar-width:none}
-.news-cats::-webkit-scrollbar{display:none}
-.ncat{flex:none;padding:10px 16px;border-radius:20px;border:1px solid rgba(245,179,1,.35);background:var(--panel2);color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:44px}
-.ncat.active{background:var(--gold);color:#000;border-color:var(--gold)}
-.news-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer}
-.news-item:last-child{border-bottom:none}
-.news-item img.nthumb{width:80px;height:60px;object-fit:cover;border-radius:8px;flex:none}
-.news-item .nbody{flex:1;min-width:0}
-.news-item .ntitle{font-size:14px;font-weight:600;line-height:1.4}
-.news-item .nsrc{font-size:12px;color:var(--muted);margin-top:4px}
-.brief-card{background:linear-gradient(180deg,rgba(245,179,1,.14),rgba(245,179,1,.05));border:1px solid var(--gold);border-radius:12px;padding:14px;margin-bottom:12px}
-.brief-card .blabel{font-size:12px;letter-spacing:.1em;color:var(--gold);font-weight:800;margin-bottom:8px}
-.brief-text{font-size:14px;line-height:1.6;color:#e8e8e8;margin:10px 0;max-height:200px;overflow-y:auto}
-.brief-controls{display:flex;gap:8px;align-items:center;margin-top:8px}
-.brief-status{font-size:12px;color:var(--muted)}
-/* ===== PODCAST ===== */
-.pod-item{display:flex;gap:12px;padding:12px;background:var(--panel);border:1px solid rgba(255,255,255,.1);border-radius:10px;margin-bottom:8px;cursor:pointer;min-height:48px}
-.pod-item img{width:60px;height:60px;border-radius:8px;flex:none}
-.pod-item .pbody{flex:1;min-width:0}
-.pod-item .ptitle{font-size:14px;font-weight:700;line-height:1.3}
-.pod-item .ppub{font-size:12px;color:var(--muted);margin-top:4px}
-.ep-item{padding:12px;border-bottom:1px solid rgba(255,255,255,.08)}
-.ep-item .etitle{font-size:14px;font-weight:600;line-height:1.4;margin-bottom:4px}
-.ep-item .emeta{font-size:12px;color:var(--muted);margin-bottom:8px}
-.nowbar{position:sticky;bottom:0;background:var(--panel2);border-top:1px solid var(--gold);padding:10px;border-radius:12px 12px 0 0;margin-top:12px}
-.nowbar .nt{font-size:13px;font-weight:700;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nowbar audio{width:100%}
-/* ===== TOOLS ===== */
-.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tool-tile{background:var(--panel);border:1px solid rgba(245,179,1,.3);border-radius:12px;padding:16px;cursor:pointer;text-align:center;min-height:48px}
-.tool-tile .tic{font-size:32px;margin-bottom:8px}
-.tool-tile .tname{font-size:14px;font-weight:700}
-.tool-frame{width:100%;height:70vh;border:1px solid rgba(245,179,1,.3);border-radius:12px;background:#fff}
-.tool-back{margin-bottom:10px}
-/* ===== SPOTIFY ===== */
-.spotify-embed{width:100%;border-radius:12px;margin-bottom:12px}
-/* ===== SETTINGS ===== */
-.set-row{margin-bottom:12px}
-.set-row label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--gold)}
-.set-row input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(245,179,1,.3);background:var(--panel2);color:var(--text);font-size:14px;min-height:48px}
-.set-hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px}
-.empty{text-align:center;color:var(--muted);padding:24px;font-size:14px}
-.hidden{display:none!important}
-</style>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="header">
-  <button class="hdr-btn" onclick="history.back()">‹</button>
-  <h1>Creator Hub</h1>
-  <button class="hdr-btn" onclick="switchTab('tab-settings',document.querySelector('[data-tab=tab-settings]'))">⚙</button>
+<div class="graffiti-bg" aria-hidden="true">
+  <div class="graf-word graf-1">PED</div>
+  <div class="graf-word graf-2">XING</div>
+  <div class="graf-word graf-3">CREATOR</div>
+  <div class="vignette"></div>
 </div>
-<div class="main">
-<!-- ============ HOME TAB ============ -->
-<div class="tab-panel active" id="tab-home">
-  <div class="portrait-wrap">
-    <img src="founder.jpg" alt="Founder portrait">
-    <div class="oct-row">
-      <button class="oct" onclick="openTool('suno')"><span>SUNO</span></button>
-      <button class="oct" onclick="openTool('lipsync')"><span>LIP<br>SYNC</span></button>
-      <button class="oct" onclick="openTool('garageband')"><span>GARAGE<br>BAND</span></button>
-      <button class="oct" onclick="openTool('heygen')"><span>HEYGEN</span></button>
-      <button class="oct" onclick="openTool('distrokid')"><span>DISTRO<br>KID</span></button>
-      <button class="oct" onclick="openTool('metaai')"><span>META<br>AI</span></button>
-    </div>
-  </div>
-  <div class="tagline">PLAN · BUILD · RUN · COLLABORATE</div>
-  <div class="mcsyn-banner"><div class="m1">MCSYN.</div><div class="m2">Productions</div></div>
-  <div class="desc">MCSYN. Productions — your creative command center. Tap the octagons to jump to your tools. Everything below runs 100% on your device.</div>
 
-  <div class="card">
-    <h2>🎵 SPOTIFY</h2>
-    <div class="search-row">
-      <input id="spotify-search" placeholder="Search Spotify…" onkeyup="if(event.key==='Enter')searchSpotify()">
-      <button class="btn" onclick="searchSpotify()">Search</button>
-    </div>
-    <div id="spotify-player">
-      <iframe class="spotify-embed" src="https://open.spotify.com/embed/playlist/37i9dQZEVXbMDoHDwVN2tF" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
-    </div>
-  </div>
+<nav class="top-tabs" id="topTabs" aria-label="Sections">
+  <button class="ttab active" data-tab="home">Home</button>
+  <button class="ttab" data-tab="stream">Stream</button>
+  <button class="ttab" data-tab="news">News</button>
+  <button class="ttab" data-tab="podcast">Podcast</button>
+  <button class="ttab" data-tab="radio">Radio</button>
+  <button class="ttab" data-tab="tools">Tools</button>
+  <button class="ttab" data-tab="arcade">Arcade</button>
+  <button class="ttab" data-tab="settings">Settings</button>
+</nav>
 
+<main id="app">
+
+<!-- ================= HOME ================= -->
+<section class="tab-panel active" id="panel-home">
+  <header class="hero">
+    <div class="hero-photo">
+      <img src="assets/founder.jpg" alt="Shawn Thomas" id="founderPhoto" onerror="this.style.display='none'">
+    </div>
+    <h1 class="hero-title"><span class="cream">Creator</span><br><span class="gold">Hub</span></h1>
+    <p class="tagline">All your music and video tools in one safe place &mdash; your songs, your lip-syncs, your edits,</p>
+    <div class="hero-side">
+      <canvas id="analogClock" width="300" height="300" aria-label="Live clock"></canvas>
+      <div class="pill time-pill"><span id="ottawaTime" class="pill-strong">--:--:--</span><span class="pill-dim">Ottawa</span></div>
+      <div class="pill wx-pill"><span class="wx-ico">&#9729;</span><span id="wxTemp" class="pill-strong">--&deg;C</span><span id="wxDesc" class="pill-dim">Loading weather&hellip;</span></div>
+    </div>
+  </header>
+
+  <section class="live-block">
+    <p class="live-note">Runs 100% on your device; this page re-checks its data every 20 seconds.</p>
+    <p class="live-line"><span class="live-dot" id="liveDot"></span><span class="live-word">LIVE</span></p>
+    <p class="live-sub">Updated <span id="updAgo">just now</span> &middot; auto-refresh 20s</p>
+    <button class="btn outline" id="refreshNow">&#8635; Refresh now</button>
+  </section>
+
+  <section class="card radio-card">
+    <h2 class="card-h"><span class="dim-dot"></span>LIVE OTTAWA RADIO</h2>
+    <div class="station-row">
+      <button class="station-pill" data-stream="https://ice9.securenetsystems.net/CHEZ" data-name="CHEZ 106.1"><span class="play-ico">&#9654;</span>CHEZ 106.1</button>
+      <button class="station-pill" data-stream="https://ice9.securenetsystems.net/CFRA" data-name="CFRA 580"><span class="play-ico">&#9654;</span>CFRA 580</button>
+    </div>
+    <div class="station-row">
+      <button class="station-pill wide" data-stream="https://cbcradiolive.akamaized.net/hls/live/2041052/ES_R1O/master.m3u8" data-name="CBC Radio One 91.5"><span class="play-ico">&#9654;</span>CBC Radio One 91.5</button>
+    </div>
+    <p class="now-playing" id="homeNowPlaying" hidden>Now playing: <span id="homeNpName"></span> <button class="mini-btn" id="homeStop">&#9632; Stop</button></p>
+    <audio id="homeAudio" preload="none"></audio>
+  </section>
+
+  <section class="oct-row" aria-label="Quick sections">
+    <button class="oct" data-tab="stream" aria-label="Stream"><span>&#9654;</span></button>
+    <button class="oct" data-tab="news" aria-label="News"><span>&#128240;</span></button>
+    <button class="oct" data-tab="podcast" aria-label="Podcast"><span>&#127911;</span></button>
+    <button class="oct" data-tab="radio" aria-label="Radio"><span>&#128266;</span></button>
+    <button class="oct" data-tab="tools" aria-label="Tools"><span>&#128736;</span></button>
+    <button class="oct" data-tab="arcade" aria-label="Arcade"><span>&#127918;</span></button>
+    <button class="oct" data-tab="settings" aria-label="Settings"><span>&#9881;</span></button>
+  </section>
+  <p class="oct-caption">Tap an octagon to jump to your tools.</p>
+</section>
+
+<!-- ================= STREAM ================= -->
+<section class="tab-panel" id="panel-stream">
   <div class="card">
-    <h2>STREAMING</h2>
+    <h2 class="card-h">STREAMING</h2>
     <div class="stream-row">
-      <div class="stream-tile" onclick="window.open('https://www.primevideo.com','_blank')"><span class="sic">📦</span>Prime Video</div>
-      <div class="stream-tile" onclick="window.open('https://www.netflix.com','_blank')"><span class="sic" style="color:#e50914">N</span>Netflix</div>
-      <div class="stream-tile" onclick="window.open('https://www.disneyplus.com','_blank')"><span class="sic">✨</span>Disney+</div>
-      <div class="stream-tile" onclick="window.open('https://flixflare.to','_blank')"><span class="sic">🎬</span>FlixFlare</div>
+      <a class="stream-tile" href="https://www.primevideo.com" target="_blank" rel="noopener"><span class="st-ico">📦</span><span>Prime Video</span></a>
+      <a class="stream-tile" href="https://www.netflix.com" target="_blank" rel="noopener"><span class="st-ico">N</span><span>Netflix</span></a>
+      <a class="stream-tile" href="https://www.disneyplus.com" target="_blank" rel="noopener"><span class="st-ico">✨</span><span>Disney+</span></a>
+      <a class="stream-tile" href="https://flixflare.to" target="_blank" rel="noopener"><span class="st-ico">🎬</span><span>FlixFlare</span></a>
     </div>
-  </div>
-</div>
-
-<!-- ============ NEWS TAB ============ -->
-<div class="tab-panel" id="tab-news">
-  <div class="card">
-    <h2>📰 NEWS</h2>
-    <div class="news-cats" id="news-cats">
-      <button class="ncat active" data-cat="all" onclick="setNewsCat('all',this)">All</button>
-      <button class="ncat" data-cat="war" onclick="setNewsCat('war',this)">🔥 War</button>
-      <button class="ncat" data-cat="world" onclick="setNewsCat('world',this)">World</button>
-      <button class="ncat" data-cat="canada" onclick="setNewsCat('canada',this)">Canada</button>
-      <button class="ncat" data-cat="ai" onclick="setNewsCat('ai',this)">AI</button>
-      <button class="ncat" data-cat="scitech" onclick="setNewsCat('scitech',this)">SciTech</button>
-      <button class="ncat" data-cat="entertainment" onclick="setNewsCat('entertainment',this)">Entertainment</button>
-      <button class="ncat" data-cat="sports" onclick="setNewsCat('sports',this)">Sports</button>
-    </div>
-    <div class="brief-card" id="brief-card">
-      <div class="blabel" id="brief-label">🔊 SUMMARIZE — PLAY BRIEFING</div>
-      <button class="btn solid" id="brief-btn" style="width:100%;min-height:52px" onclick="playBriefing()">▶ Play <span id="brief-cat-name">All</span> Briefing</button>
-      <div class="brief-controls hidden" id="brief-controls">
-        <button class="btn" onclick="pauseBriefing()">⏸ Pause</button>
-        <button class="btn" onclick="stopBriefing()">⏹ Stop</button>
-        <span class="brief-status" id="brief-status"></span>
-      </div>
-      <div class="brief-text hidden" id="brief-text"></div>
-    </div>
-    <div id="news-list"><div class="empty">Loading news…</div></div>
-  </div>
-</div>
-
-<!-- ============ PODCAST TAB ============ -->
-<div class="tab-panel" id="tab-podcast">
-  <div class="card">
-    <h2>🎙️ PODCAST</h2>
-    <div class="search-row">
-      <input id="pod-search" placeholder="Search podcasts…" onkeyup="if(event.key==='Enter')searchPods()">
-      <button class="btn" onclick="searchPods()">Search</button>
-    </div>
-    <div id="pod-list"><div class="empty">Search for podcasts above, or try a popular one.</div></div>
-    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn" onclick="loadPopularPods()">🔥 Popular</button>
-    </div>
-  </div>
-  <div class="card hidden" id="pod-eps-card">
-    <h2 id="pod-eps-title">EPISODES</h2>
-    <button class="btn tool-back" onclick="backToPods()">← Back to results</button>
-    <div id="pod-eps"><div class="empty">Loading episodes…</div></div>
-  </div>
-  <div class="nowbar hidden" id="pod-nowbar">
-    <div class="nt" id="pod-nowtitle"></div>
-    <audio id="pod-audio" controls style="width:100%"></audio>
-  </div>
-</div>
-
-<!-- ============ RADIO TAB ============ -->
-<div class="tab-panel" id="tab-radio">
-  <div class="card">
-    <h2>📻 RADIO</h2>
-    <div class="search-row">
-      <input id="radio-search" placeholder="Search stations…" onkeyup="if(event.key==='Enter')searchStations()">
-      <button class="btn" onclick="searchStations()">Search</button>
-    </div>
-    <div style="margin-bottom:10px"><button class="btn" onclick="loadPopular()">↻ Popular</button></div>
-    <div id="radio-player" style="display:none;margin-bottom:12px">
-      <div class="nowplaying" id="radio-nowplaying"></div>
-      <audio id="radio-audio" controls crossorigin="anonymous" style="width:100%;margin:8px 0"></audio>
-      <div class="rec-row"><button class="btn-record" id="radio-rec-btn">● Record</button></div>
-      <div class="rec-row" id="radio-rec-ui" style="display:none">
-        <span class="rec-timer" id="radio-timer">0:00</span>
-        <div class="level-meter"><div class="level-fill" id="radio-level"></div></div>
-        <button class="btn" id="radio-stop-btn">■ Stop</button>
-      </div>
-      <div class="saved-flash" id="radio-saved">Saved ✓</div>
-    </div>
-    <h2 style="margin-top:8px">POPULAR STATIONS</h2>
-    <div class="station-list" id="radio-stations"><div class="empty">Loading stations…</div></div>
+    <p class="hint">Opens the service &mdash; jumps to the app if you have it installed.</p>
   </div>
   <div class="card">
-    <h2>🎙️ MY RECORDINGS</h2>
-    <div id="my-recordings"><div class="empty">No recordings yet.</div></div>
+    <h2 class="card-h">SPOTIFY</h2>
+    <div class="form-row">
+      <input id="spotifySearch" type="search" placeholder="Search Spotify&hellip;" enterkeyhint="search">
+      <button class="btn solid" id="spotifyGo">Search</button>
+    </div>
+    <iframe id="spotifyFrame" title="Spotify player" src="https://open.spotify.com/embed/playlist/37i9dQZEVXbMDoHDwVN2tF" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
   </div>
-</div>
+</section>
 
-<!-- ============ TOOLS TAB ============ -->
-<div class="tab-panel" id="tab-tools">
-  <div class="card" id="tools-grid-card">
-    <h2>🛠️ LAURA'S TOOLS</h2>
+<!-- ================= NEWS ================= -->
+<section class="tab-panel" id="panel-news">
+  <div class="card">
+    <h2 class="card-h">NEWS</h2>
+    <div class="cat-row" id="newsCats">
+      <button class="cat active" data-q="">Top</button>
+      <button class="cat" data-q="war OR Ukraine OR Gaza">War</button>
+      <button class="cat" data-q="world">World</button>
+      <button class="cat" data-q="Canada">Canada</button>
+      <button class="cat" data-q="technology">Tech</button>
+      <button class="cat" data-q="sports">Sports</button>
+    </div>
+    <button class="btn solid wide" id="briefBtn">&#128266; Play audio briefing</button>
+    <p class="hint" id="briefStatus">Reads the top headlines aloud on your phone. No key needed.</p>
+    <div id="newsList"><p class="empty">Loading headlines&hellip;</p></div>
+  </div>
+</section>
+
+<!-- ================= PODCAST ================= -->
+<section class="tab-panel" id="panel-podcast">
+  <div class="card">
+    <h2 class="card-h">PODCAST</h2>
+    <div class="form-row">
+      <input id="podSearch" type="search" placeholder="Search podcasts&hellip;" enterkeyhint="search">
+      <button class="btn solid" id="podGo">Search</button>
+    </div>
+    <div id="podList"><p class="empty">Try a search above, e.g. &ldquo;Mystery Boys&rdquo;.</p></div>
+  </div>
+  <div class="card" id="podEpsCard" hidden>
+    <h2 class="card-h" id="podEpsTitle">Episodes</h2>
+    <div id="podEps"></div>
+  </div>
+  <div class="nowbar" id="podNowbar" hidden>
+    <p id="podNowTitle"></p>
+    <audio id="podAudio" controls preload="none"></audio>
+  </div>
+</section>
+
+<!-- ================= RADIO ================= -->
+<section class="tab-panel" id="panel-radio">
+  <div class="card">
+    <h2 class="card-h">RADIO</h2>
+    <div class="form-row">
+      <input id="radioSearch" type="search" placeholder="Search stations&hellip;" enterkeyhint="search">
+      <button class="btn solid" id="radioGo">Search</button>
+    </div>
+    <div id="radioList"><p class="empty">Search above, or use the Ottawa stations on Home.</p></div>
+    <p class="now-playing" id="radioNowPlaying" hidden>Now playing: <span id="radioNpName"></span> <button class="mini-btn" id="radioStop">&#9632; Stop</button></p>
+    <audio id="radioAudio" preload="none"></audio>
+  </div>
+  <div class="card">
+    <h2 class="card-h">&#9208; RECORDER</h2>
+    <p class="hint">Record what's playing. Saved on this phone only.</p>
+    <div class="form-row">
+      <button class="btn solid" id="recBtn">&#9679; Record</button>
+      <button class="btn outline" id="recStopBtn" disabled>&#9632; Stop</button>
+      <span id="recTimer" class="pill-dim"></span>
+    </div>
+    <div id="myRecordings"><p class="empty">No recordings yet.</p></div>
+  </div>
+</section>
+
+<!-- ================= TOOLS ================= -->
+<section class="tab-panel" id="panel-tools">
+  <div class="card" id="toolsMenu">
+    <h2 class="card-h">&#128736; LAURA'S TOOLS</h2>
     <div class="tool-grid">
-      <div class="tool-tile" onclick="openToolPage('lyric-video-generator.html','Lyric Video Generator')"><div class="tic">🎬</div><div class="tname">Lyric Video Generator</div></div>
-      <div class="tool-tile" onclick="openToolPage('music-project-tracker.html','Music Project Tracker')"><div class="tic">🎵</div><div class="tname">Music Project Tracker</div></div>
-      <div class="tool-tile" onclick="openToolPage('storyboard-tool.html','Storyboard Tool')"><div class="tic">📋</div><div class="tname">Storyboard Tool</div></div>
-      <div class="tool-tile" onclick="openToolPage('ffmpeg-assembly.html','FFmpeg Assembly')"><div class="tic">⚙️</div><div class="tname">FFmpeg Assembly</div></div>
+      <button class="tool-tile" data-tool="tracker"><span class="tic">&#127925;</span><span class="tname">Music Project Tracker</span></button>
+      <button class="tool-tile" data-tool="story"><span class="tic">&#128203;</span><span class="tname">Storyboard Tool</span></button>
+      <button class="tool-tile" data-tool="lyric"><span class="tic">&#127916;</span><span class="tname">Lyric Video Generator</span></button>
+    </div>
+    <p class="hint">All three run fully on your phone. Nothing leaves the device.</p>
+  </div>
+
+  <div class="card" id="toolView" hidden>
+    <button class="btn outline" id="toolBack">&larr; Back to tools</button>
+    <h2 class="card-h" id="toolTitle">Tool</h2>
+
+    <div id="tool-tracker" class="tool-pane" hidden>
+      <div class="form-row">
+        <input id="trkTitle" placeholder="Song / project title">
+        <select id="trkStatus">
+          <option>Idea</option><option>Writing</option><option>Recording</option>
+          <option>Mixing</option><option>Done</option><option>Released</option>
+        </select>
+        <button class="btn solid" id="trkAdd">Add</button>
+      </div>
+      <input id="trkNote" placeholder="Note (optional)">
+      <div id="trkList"></div>
+    </div>
+
+    <div id="tool-story" class="tool-pane" hidden>
+      <div class="form-row">
+        <input id="sbShot" placeholder="Shot 1, 2, 3&hellip;">
+        <input id="sbCam" placeholder="Camera / angle">
+        <button class="btn solid" id="sbAdd">Add shot</button>
+      </div>
+      <textarea id="sbDesc" rows="2" placeholder="What happens in this shot&hellip;"></textarea>
+      <div id="sbList"></div>
+    </div>
+
+    <div id="tool-lyric" class="tool-pane" hidden>
+      <p class="hint">Paste lyrics (one line per screen), pick your audio, preview, then export a video file.</p>
+      <textarea id="lyrText" rows="6" placeholder="Line one&#10;Line two&#10;Line three&hellip;"></textarea>
+      <div class="form-row">
+        <label class="btn outline file-label">Pick audio<input type="file" id="lyrAudio" accept="audio/*" hidden></label>
+        <span id="lyrAudioName" class="pill-dim"></span>
+      </div>
+      <div class="form-row">
+        <button class="btn solid" id="lyrPreview">&#9654; Preview</button>
+        <button class="btn outline" id="lyrExport">&#8681; Export video</button>
+      </div>
+      <canvas id="lyrCanvas" width="720" height="1280"></canvas>
+      <p class="hint" id="lyrStatus"></p>
     </div>
   </div>
-  <div class="card hidden" id="tool-view-card">
-    <h2 id="tool-view-title">TOOL</h2>
-    <button class="btn tool-back" onclick="backToTools()">← Back to tools</button>
-    <iframe class="tool-frame" id="tool-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-modals"></iframe>
-  </div>
-</div>
+</section>
 
-<!-- ============ SHORTS TAB ============ -->
-<div class="tab-panel" id="tab-shorts">
+<!-- ================= ARCADE ================= -->
+<section class="tab-panel" id="panel-arcade">
   <div class="card">
-    <h2>🎬 SHORTS STUDIO</h2>
-    <div class="short-form">
-      <input id="short-topic" placeholder="Topic (e.g. Haunted Ottawa locations)">
-      <input id="short-duration" type="number" placeholder="Duration in seconds (default 60)" min="15" max="180">
-      <textarea id="short-script" placeholder="Script (optional — Lapis drafts it when empty)"></textarea>
-      <button class="btn solid" style="width:100%;min-height:52px" onclick="queueShort()">＋ Queue Short Job</button>
+    <h2 class="card-h">&#127918; ARCADE</h2>
+    <div class="tool-grid">
+      <a class="tool-tile" href="https://www.crazygames.com/t/driving" target="_blank" rel="noopener"><span class="tic">&#127950;</span><span class="tname">Driving</span></a>
+      <a class="tool-tile" href="https://www.crazygames.com/t/sports" target="_blank" rel="noopener"><span class="tic">&#9917;</span><span class="tname">Sports</span></a>
+      <a class="tool-tile" href="https://www.crazygames.com/t/retro" target="_blank" rel="noopener"><span class="tic">&#128126;</span><span class="tname">Retro</span></a>
+      <a class="tool-tile" href="https://www.crazygames.com/t/puzzle" target="_blank" rel="noopener"><span class="tic">&#129513;</span><span class="tname">Puzzle</span></a>
+    </div>
+    <p class="hint">Free games open in a new tab.</p>
+  </div>
+</section>
+
+<!-- ================= SETTINGS ================= -->
+<section class="tab-panel" id="panel-settings">
+  <div class="card">
+    <h2 class="card-h">&#9881; SETTINGS &amp; KEYS</h2>
+    <label class="fld-label" for="newsKey">NewsData.io API key <span class="pill-dim">(free at newsdata.io)</span></label>
+    <div class="form-row">
+      <input id="newsKey" type="password" placeholder="Paste key here" autocomplete="off">
+      <button class="btn solid" id="newsKeySave">Save</button>
+    </div>
+    <p class="hint">Keys stay in this phone's local storage. They are never sent anywhere except the service's own API, called directly from your device.</p>
+  </div>
+  <div class="card">
+    <h2 class="card-h">DATA ON THIS PHONE</h2>
+    <div class="form-row">
+      <button class="btn outline" id="wipeRec">Delete recordings</button>
+      <button class="btn outline" id="wipeTools">Delete tool data</button>
     </div>
   </div>
   <div class="card">
-    <h2>📥 COMPLETED VIDEOS</h2>
-    <div id="shorts-completed"><div class="empty">No completed videos yet. <button class="btn" onclick="pollShortsQueue()">↻ Check queue</button></div></div>
+    <h2 class="card-h">&#8505; ABOUT</h2>
+    <p class="about">Creator Hub is fully independent. No servers, no accounts, no backend &mdash; every API is called directly from your device. Your keys and data never leave this phone.</p>
+    <p class="about dim">MCSYN. Productions</p>
   </div>
-  <div id="shorts-list"></div>
-</div>
+</section>
 
-<!-- ============ LIVE TAB ============ -->
-<div class="tab-panel" id="tab-live">
-  <div class="card">
-    <h2>⏰ LIVE</h2>
-    <div class="live-grid">
-      <div class="live-box"><div class="lbl">OTTAWA TIME</div><div class="big" id="live-clock">--:--:--</div><div class="sub" id="live-date">---</div></div>
-      <div class="live-box"><div class="lbl">WEATHER</div><div class="big" id="wx-temp">--°C</div><div class="sub" id="wx-desc">Loading…</div></div>
-    </div>
-  </div>
-  <div class="card">
-    <h2>📻 LIVE OTTAWA RADIO</h2>
-    <div class="ottawa-stations" id="ottawa-stations"></div>
-    <div class="nowplaying" id="ottawa-nowplaying">Tap a station to play.</div>
-    <div class="rec-row">
-      <span class="rec-label">⏺ RECORDER</span>
-      <button class="btn-record" id="ottawa-rec-btn" disabled>● Record</button>
-    </div>
-    <div class="rec-row" id="ottawa-rec-ui" style="display:none">
-      <span class="rec-timer" id="ottawa-timer">0:00</span>
-      <div class="level-meter"><div class="level-fill" id="ottawa-level"></div></div>
-      <button class="btn" id="ottawa-stop-btn">■ Stop</button>
-    </div>
-    <div class="saved-flash" id="ottawa-saved">Saved ✓ — find it in Radio → My Recordings</div>
-    <audio id="ottawa-audio" crossorigin="anonymous" style="display:none"></audio>
-  </div>
-</div>
+</main>
 
-<!-- ============ ARCADE TAB ============ -->
-<div class="tab-panel" id="tab-arcade">
-  <div class="card">
-    <h2>🕹️ ARCADE</h2>
-    <div class="arcade-grid">
-      <div class="arcade-tile" onclick="window.open('https://www.crazygames.com/t/driving','_blank')"><span class="aic">🏎️</span>Driving</div>
-      <div class="arcade-tile" onclick="window.open('https://www.crazygames.com/t/sports','_blank')"><span class="aic">⚽</span>Sports</div>
-      <div class="arcade-tile" onclick="window.open('https://www.crazygames.com/t/retro','_blank')"><span class="aic">👾</span>Retro</div>
-      <div class="arcade-tile" onclick="window.open('https://www.crazygames.com/t/puzzle','_blank')"><span class="aic">🧩</span>Puzzle</div>
-    </div>
-    <div class="empty">Tap a category to play free games. More arcade titles coming.</div>
-  </div>
-</div>
-
-<!-- ============ SETTINGS TAB ============ -->
-<div class="tab-panel" id="tab-settings">
-  <div class="card">
-    <h2>⚙️ SETTINGS & KEYS</h2>
-    <div class="set-row">
-      <label>NewsData.io API Key (free at newsdata.io)</label>
-      <input id="set-newskey" type="text" placeholder="Paste your free API key here" autocomplete="off">
-      <div class="set-hint">Get a free key at <b>newsdata.io</b> (200 requests/day free). The News tab needs this to fetch live stories. Your key stays on your device.</div>
-    </div>
-    <button class="btn solid" style="width:100%" onclick="saveSettings()">💾 Save Settings</button>
-    <div class="set-hint" style="margin-top:10px" id="set-status"></div>
-  </div>
-  <div class="card">
-    <h2>ℹ️ ABOUT</h2>
-    <div class="desc">Creator Hub — fully independent. No servers, no Muse backend. All APIs called directly from your device. Your data stays in this app.<br><br><b>MCSYN. Productions</b></div>
-  </div>
-</div>
-</div><!-- /main -->
-
-<div class="tabbar">
-  <button class="tabbtn active" data-tab="tab-home" onclick="switchTab('tab-home',this)"><span class="ticon">🏠</span><span>Home</span></button>
-  <button class="tabbtn" data-tab="tab-news" onclick="switchTab('tab-news',this)"><span class="ticon">📰</span><span>News</span></button>
-  <button class="tabbtn" data-tab="tab-podcast" onclick="switchTab('tab-podcast',this)"><span class="ticon">🎙️</span><span>Podcast</span></button>
-  <button class="tabbtn" data-tab="tab-radio" onclick="switchTab('tab-radio',this)"><span class="ticon">📻</span><span>Radio</span></button>
-  <button class="tabbtn" data-tab="tab-tools" onclick="switchTab('tab-tools',this)"><span class="ticon">🛠️</span><span>Tools</span></button>
-  <button class="tabbtn" data-tab="tab-shorts" onclick="switchTab('tab-shorts',this)"><span class="ticon">🎬</span><span>Shorts</span></button>
-  <button class="tabbtn" data-tab="tab-live" onclick="switchTab('tab-live',this)"><span class="ticon">⏰</span><span>Live</span></button>
-  <button class="tabbtn" data-tab="tab-arcade" onclick="switchTab('tab-arcade',this)"><span class="ticon">🕹️</span><span>Arcade</span></button>
-  <button class="tabbtn hidden" data-tab="tab-settings" onclick="switchTab('tab-settings',this)"><span class="ticon">⚙</span><span>Settings</span></button>
-</div>
-
-<script>
-/* ================= UTILITIES ================= */
-function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-function load(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
-
-/* ================= TAB SWITCHING ================= */
-function switchTab(id,btn){
-  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('active')});
-  if(btn)btn.classList.add('active');
-  if(id==='tab-radio'&&!window._radioLoaded)loadPopular();
-  if(id==='tab-news'&&!window._newsLoaded)loadNews('all');
-  if(id==='tab-podcast'&&!window._podsLoaded)loadPopularPods();
-  if(id==='tab-shorts')pollShortsQueue();
-  document.querySelector('.main').scrollTop=0;
-}
-/* ================= SWIPE TAB NAVIGATION ================= */
-(function(){
-  var TAB_ORDER=['tab-home','tab-news','tab-podcast','tab-radio','tab-tools','tab-shorts','tab-live','tab-arcade'];
-  var touchStartX=0,touchStartY=0;
-  var mainEl=document.querySelector('.main');
-  if(!mainEl)return;
-  mainEl.addEventListener('touchstart',function(e){
-    touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;
-  },{passive:true});
-  mainEl.addEventListener('touchend',function(e){
-    var dx=e.changedTouches[0].clientX-touchStartX;
-    var dy=e.changedTouches[0].clientY-touchStartY;
-    if(Math.abs(dx)>80&&Math.abs(dx)>Math.abs(dy)*1.5){
-      var cur=document.querySelector('.tab-panel.active');
-      var curId=cur?cur.id:'tab-home';
-      var idx=TAB_ORDER.indexOf(curId);
-      if(idx<0)idx=0;
-      var next=dx<0?TAB_ORDER[(idx+1)%TAB_ORDER.length]:TAB_ORDER[(idx-1+TAB_ORDER.length)%TAB_ORDER.length];
-      var btn=document.querySelector('[data-tab="'+next+'"]');
-      switchTab(next,btn||null);
-    }
-  },{passive:true});
-})();
-function openTool(name){
-  var urls={suno:'https://suno.com',lipsync:'https://www.capcut.com',garageband:'#',heygen:'https://heygen.com',distrokid:'https://distrokid.com',metaai:'https://www.meta.ai'};
-  if(urls[name]&&urls[name]!=='#')window.open(urls[name],'_blank');
-}
-
-/* ================= SPOTIFY ================= */
-function searchSpotify(){
-  var q=document.getElementById('spotify-search').value.trim();
-  if(!q)return;
-  // Spotify embed search via track search — use embed with search query
-  document.getElementById('spotify-player').innerHTML='<iframe class="spotify-embed" src="https://open.spotify.com/embed/search/'+encodeURIComponent(q)+'" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
-}
-
-/* ================= LIVE CLOCK ================= */
-function tickClock(){
-  var d=new Date();
-  document.getElementById('live-clock').textContent=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
-  document.getElementById('live-date').textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+' · Ottawa';
-}
-setInterval(tickClock,1000);tickClock();
-
-/* ================= WEATHER (Open-Meteo, free, no key) ================= */
-fetch('https://api.open-meteo.com/v1/forecast?latitude=45.42&longitude=-75.7&current=temperature_2m,weathercode&daily=temperature_2m_max,temperature_2m_min&timezone=America%2FToronto&forecast_days=1')
-.then(function(r){return r.json()}).then(function(d){
-  document.getElementById('wx-temp').textContent=Math.round(d.current.temperature_2m)+'°C';
-  document.getElementById('wx-desc').textContent='H '+Math.round(d.daily.temperature_2m_max[0])+'° / L '+Math.round(d.daily.temperature_2m_min[0])+'° · Ottawa';
-}).catch(function(){document.getElementById('wx-desc').textContent='Unavailable'});
-
-/* ================= OTTAWA RADIO ================= */
-var OTTAWA=[
-  {name:'CHEZ 106.1',genre:'Rock',url:'https://ice9.securenetsystems.net/CHEZ'},
-  {name:'CFRA 580',genre:'News/Talk',url:'https://ice9.securenetsystems.net/CFRA'},
-  {name:'CBC Radio One 91.5',genre:'News',url:'https://cbcradiolive.akamaized.net/hls/live/2041052/ES_R1O/master.m3u8'},
-  {name:'KiSS 105.3',genre:'Top 40',url:'https://ice9.securenetsystems.net/CISS'},
-  {name:'Hot 89.9',genre:'Top 40',url:'https://ice9.securenetsystems.net/CIHT'},
-  {name:'CKCU 93.1',genre:'Campus',url:'https://ice9.securenetsystems.net/CKCU'}
-];
-var ottAudio=document.getElementById('ottawa-audio'),ottPlaying=null;
-function renderOttawa(){
-  var w=document.getElementById('ottawa-stations');w.innerHTML='';
-  OTTAWA.forEach(function(s,i){
-    var b=document.createElement('button');
-    b.className='station-btn'+(ottPlaying===i?' playing':'');
-    b.innerHTML='<span>'+(ottPlaying===i?'⏸':'▶')+'</span> '+esc(s.name);
-    b.onclick=function(){toggleOttawa(i)};
-    w.appendChild(b);
-  });
-}
-function toggleOttawa(i){
-  if(ottPlaying===i){ottAudio.pause();ottAudio.src='';ottPlaying=null;
-    document.getElementById('ottawa-nowplaying').textContent='Tap a station to play.';
-    document.getElementById('ottawa-rec-btn').disabled=true;
-  }else{ottPlaying=i;ottAudio.src=OTTAWA[i].url;ottAudio.play().catch(function(){});
-    document.getElementById('ottawa-nowplaying').textContent='Now playing: '+OTTAWA[i].name+' — '+OTTAWA[i].genre+', live from Ottawa.';
-    document.getElementById('ottawa-rec-btn').disabled=false;
-  }
-  renderOttawa();
-}
-renderOttawa();
-var ottRec=null,ottChunks=[],ottTimer=null,ottSecs=0,ottCtx=null,ottAnalyser=null,ottSrc=null;
-document.getElementById('ottawa-rec-btn').onclick=function(){
-  if(!ottAudio.src)return;
-  try{
-    ottCtx=ottCtx||new (window.AudioContext||window.webkitAudioContext)();
-    if(ottCtx.state==='suspended')ottCtx.resume();
-    if(!ottSrc)ottSrc=ottCtx.createMediaElementSource(ottAudio);
-    var dest=ottCtx.createMediaStreamDestination();
-    ottAnalyser=ottCtx.createAnalyser();ottAnalyser.fftSize=256;
-    ottSrc.connect(ottAnalyser);ottAnalyser.connect(dest);ottSrc.connect(ottCtx.destination);
-    var mime=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(function(m){try{return MediaRecorder.isTypeSupported(m)}catch(e){return false}});
-    ottRec=new MediaRecorder(dest.stream,mime?{mimeType:mime}:undefined);
-    ottChunks=[];ottRec.ondataavailable=function(e){if(e.data.size)ottChunks.push(e.data)};
-    ottRec.onstop=finishOttawaRec;ottRec.start();ottSecs=0;
-    document.getElementById('ottawa-rec-ui').style.display='flex';
-    var b=document.getElementById('ottawa-rec-btn');b.classList.add('recording');b.textContent='● Recording…';b.disabled=true;
-    ottTimer=setInterval(function(){ottSecs++;
-      document.getElementById('ottawa-timer').textContent=Math.floor(ottSecs/60)+':'+String(ottSecs%60).padStart(2,'0');
-      if(ottAnalyser){var d=new Uint8Array(ottAnalyser.frequencyBinCount);ottAnalyser.getByteFrequencyData(d);
-        var avg=d.reduce(function(a,x){return a+x},0)/d.length;
-        document.getElementById('ottawa-level').style.width=Math.min(100,avg/1.28)+'%';}
-    },250);
-  }catch(err){alert('Recording not available: '+err.message)}
-};
-document.getElementById('ottawa-stop-btn').onclick=function(){if(ottRec&&ottRec.state!=='inactive')ottRec.stop()};
-function finishOttawaRec(){
-  clearInterval(ottTimer);
-  document.getElementById('ottawa-rec-ui').style.display='none';
-  var b=document.getElementById('ottawa-rec-btn');b.classList.remove('recording');b.textContent='● Record';b.disabled=false;
-  saveRecording(OTTAWA[ottPlaying].name,ottSecs,new Blob(ottChunks,{type:ottRec.mimeType||'audio/webm'}));
-  var f=document.getElementById('ottawa-saved');f.classList.add('show');setTimeout(function(){f.classList.remove('show')},2000);
-}
-
-/* ================= RADIO BROWSER (free, no key) ================= */
-var RB='https://de1.api.radio-browser.info/json';
-var radioAudio=document.getElementById('radio-audio'),curStation=null;
-function loadPopular(){
-  window._radioLoaded=true;
-  fetch(RB+'/stations/topvote/20').then(function(r){return r.json()}).then(function(st){
-    renderRadioStations(st.filter(function(s){return s.url_resolved}));
-  }).catch(function(){
-    document.getElementById('radio-stations').innerHTML='<div class="empty">Couldn\'t reach radio. <button class="btn" onclick="loadPopular()">Retry</button></div>';
-  });
-}
-function searchStations(){
-  var q=document.getElementById('radio-search').value.trim();
-  if(!q){loadPopular();return}
-  fetch(RB+'/stations/byname/'+encodeURIComponent(q)).then(function(r){return r.json()}).then(function(st){
-    renderRadioStations(st.filter(function(s){return s.url_resolved}).slice(0,30));
-  }).catch(loadPopular);
-}
-function renderRadioStations(list){
-  var w=document.getElementById('radio-stations');w.innerHTML='';
-  if(!list.length){w.innerHTML='<div class="empty">No stations found.</div>';return}
-  list.forEach(function(s){
-    var r=document.createElement('div');r.className='station-row';
-    r.innerHTML='<div><div class="sname">'+esc(s.name)+'</div><div class="smeta">'+esc(s.country||'')+'</div></div><span class="play-ic">▶</span>';
-    r.onclick=function(){playRadioStation(s)};
-    w.appendChild(r);
-  });
-}
-function playRadioStation(s){
-  curStation=s;
-  document.getElementById('radio-player').style.display='block';
-  document.getElementById('radio-nowplaying').textContent=s.name+' · '+(s.country||'');
-  radioAudio.src=s.url_resolved;radioAudio.play().catch(function(){});
-}
-var rRec=null,rChunks=[],rTimer=null,rSecs=0,rCtx=null,rAnalyser=null,rSrc=null;
-document.getElementById('radio-rec-btn').onclick=function(){
-  if(!radioAudio.src)return;
-  try{
-    rCtx=rCtx||new (window.AudioContext||window.webkitAudioContext)();
-    if(rCtx.state==='suspended')rCtx.resume();
-    if(!rSrc)rSrc=rCtx.createMediaElementSource(radioAudio);
-    var dest=rCtx.createMediaStreamDestination();
-    rAnalyser=rCtx.createAnalyser();rAnalyser.fftSize=256;
-    rSrc.connect(rAnalyser);rAnalyser.connect(dest);rSrc.connect(rCtx.destination);
-    var mime=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(function(m){try{return MediaRecorder.isTypeSupported(m)}catch(e){return false}});
-    rRec=new MediaRecorder(dest.stream,mime?{mimeType:mime}:undefined);
-    rChunks=[];rRec.ondataavailable=function(e){if(e.data.size)rChunks.push(e.data)};
-    rRec.onstop=finishRadioRec;rRec.start();rSecs=0;
-    document.getElementById('radio-rec-ui').style.display='flex';
-    var b=document.getElementById('radio-rec-btn');b.classList.add('recording');b.textContent='● Recording…';b.disabled=true;
-    rTimer=setInterval(function(){rSecs++;
-      document.getElementById('radio-timer').textContent=Math.floor(rSecs/60)+':'+String(rSecs%60).padStart(2,'0');
-      if(rAnalyser){var d=new Uint8Array(rAnalyser.frequencyBinCount);rAnalyser.getByteFrequencyData(d);
-        var avg=d.reduce(function(a,x){return a+x},0)/d.length;
-        document.getElementById('radio-level').style.width=Math.min(100,avg/1.28)+'%';}
-    },250);
-  }catch(err){alert('Recording not available: '+err.message)}
-};
-document.getElementById('radio-stop-btn').onclick=function(){if(rRec&&rRec.state!=='inactive')rRec.stop()};
-function finishRadioRec(){
-  clearInterval(rTimer);
-  document.getElementById('radio-rec-ui').style.display='none';
-  var b=document.getElementById('radio-rec-btn');b.classList.remove('recording');b.textContent='● Record';b.disabled=false;
-  saveRecording(curStation?curStation.name:'Radio',rSecs,new Blob(rChunks,{type:rRec.mimeType||'audio/webm'}));
-  var f=document.getElementById('radio-saved');f.classList.add('show');setTimeout(function(){f.classList.remove('show')},2000);
-}
-function getRecs(){try{return JSON.parse(localStorage.getItem('px-radio-recordings')||'[]')}catch(e){return[]}}
-function saveRecording(station,secs,blob){
-  var rd=new FileReader();
-  rd.onload=function(){
-    var recs=getRecs();
-    recs.unshift({station:station,duration:secs,date:new Date().toLocaleString(),data:rd.result,mime:blob.type});
-    try{localStorage.setItem('px-radio-recordings',JSON.stringify(recs))}catch(e){recs=recs.slice(0,5);try{localStorage.setItem('px-radio-recordings',JSON.stringify(recs))}catch(e2){}}
-    renderMyRecs();
-  };
-  rd.readAsDataURL(blob);
-}
-function renderMyRecs(){
-  var w=document.getElementById('my-recordings'),recs=getRecs();
-  if(!recs.length){w.innerHTML='<div class="empty">No recordings yet.</div>';return}
-  w.innerHTML='';
-  recs.forEach(function(r,i){
-    var d=document.createElement('div');d.className='rec-item';
-    var dur=Math.floor(r.duration/60)+':'+String(r.duration%60).padStart(2,'0');
-    d.innerHTML='<div class="rname">🎙️ '+esc(r.station)+' · '+dur+'<br><small style="color:var(--muted)">'+esc(r.date)+'</small></div>'
-      +'<audio controls src="'+r.data+'"></audio>'
-      +'<div class="rec-actions"><a class="btn" style="text-align:center;text-decoration:none" download="recording-'+i+'.webm" href="'+r.data+'">⬇ Download</a>'
-      +'<button class="btn" onclick="delRec('+i+')">Delete</button></div>';
-    w.appendChild(d);
-  });
-}
-function delRec(i){var recs=getRecs();recs.splice(i,1);localStorage.setItem('px-radio-recordings',JSON.stringify(recs));renderMyRecs()}
-renderMyRecs();
-/* ================= NEWS (NewsData.io — direct, key in Settings) ================= */
-var NEWS_KEY=load('ch-newsdata-key','');
-var newsCache=load('ch-news-cache',{});
-var curCat='all';
-var CAT_LABEL={all:'All',war:'War',world:'World',canada:'Canada',ai:'AI',scitech:'SciTech',entertainment:'Entertainment',sports:'Sports'};
-var WAR_QUERIES=['war','Ukraine Russia','Gaza','Yemen Houthi','military conflict','airstrike'];
-function setNewsCat(cat,btn){
-  curCat=cat;
-  document.querySelectorAll('.ncat').forEach(function(b){b.classList.remove('active')});
-  btn.classList.add('active');
-  document.getElementById('brief-cat-name').textContent=CAT_LABEL[cat]||cat;
-  loadNews(cat);
-  stopBriefing();
-}
-function newsApiUrl(cat){
-  var key=NEWS_KEY;
-  var base='https://newsdata.io/api/1/news?apikey='+encodeURIComponent(key)+'&language=en&size=10';
-  if(cat==='war')return base+'&q='+encodeURIComponent(WAR_QUERIES.join(' OR '));
-  if(cat==='world')return base+'&category=world';
-  if(cat==='canada')return base+'&country=ca';
-  if(cat==='ai')return base+'&q='+encodeURIComponent('artificial intelligence AI');
-  if(cat==='scitech')return base+'&category=technology,science';
-  if(cat==='entertainment')return base+'&category=entertainment';
-  if(cat==='sports')return base+'&category=sports';
-  return base;
-}
-function loadNews(cat){
-  window._newsLoaded=true;
-  var w=document.getElementById('news-list');
-  if(!NEWS_KEY){
-    w.innerHTML='<div class="empty">📰 <b>Add your free NewsData.io API key</b> in Settings (⚙ top-right) to load live news.<br><br>Get one free at <b>newsdata.io</b> — 200 requests/day, no card needed.<br><br>Your key stays on your device.</div>';
-    store('ch-news-stories-'+cat,[]);
-    return;
-  }
-  // Check cache (30 min)
-  var ck='ch-news-'+cat, cached=load(ck,null);
-  if(cached&&Date.now()-cached.ts<30*60*1000){renderNews(cached.stories);return}
-  w.innerHTML='<div class="empty">Loading '+esc(CAT_LABEL[cat]||cat)+' news…</div>';
-  fetch(newsApiUrl(cat)).then(function(r){return r.json()}).then(function(d){
-    var stories=(d.results||[]).map(function(a){
-      return {title:a.title,desc:a.description,src:a.source_id,url:a.link,img:a.image_url,time:a.pubDate};
-    });
-    store(ck,{ts:Date.now(),stories:stories});
-    store('ch-news-stories-'+cat,stories);
-    renderNews(stories);
-  }).catch(function(){
-    var old=load(ck,null);
-    if(old&&old.stories.length){renderNews(old.stories)}
-    else w.innerHTML='<div class="empty">Couldn\'t reach news. <button class="btn" onclick="loadNews(curCat)">Retry</button></div>';
-  });
-}
-function renderNews(stories){
-  var w=document.getElementById('news-list');
-  if(!stories.length){w.innerHTML='<div class="empty">No stories in this category right now.</div>';return}
-  w.innerHTML='';
-  stories.forEach(function(s){
-    var d=document.createElement('div');d.className='news-item';
-    d.innerHTML=(s.img?'<img class="nthumb" src="'+esc(s.img)+'" loading="lazy" onerror="this.style.display=\'none\'">':'')
-      +'<div class="nbody"><div class="ntitle">'+esc(s.title)+'</div><div class="nsrc">'+esc(s.src||'')+(s.time?' · '+esc(new Date(s.time).toLocaleString()):'')+'</div></div>';
-    if(s.url)d.onclick=function(){window.open(s.url,'_blank')};
-    w.appendChild(d);
-  });
-}
-
-/* ================= NEWS BRIEFINGS (browser speechSynthesis — offline) ================= */
-var briefUtter=null,briefingText='';
-function pickMaleVoice(){
-  var vs=window.speechSynthesis?speechSynthesis.getVoices():[];
-  if(!vs.length)return null;
-  // Prefer male English voices
-  var male=/male|david|daniel|james|alex|fred|daniel|george|thomas|matthew|mike/i;
-  var en=vs.filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf('en')===0});
-  var pick=en.find(function(v){return male.test(v.name)})||vs.find(function(v){return male.test(v.name)})||en[0]||vs[0];
-  return pick||null;
-}
-if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){};
-function buildBriefing(cat){
-  var stories=load('ch-news-stories-'+cat,[]);
-  if(cat==='all'){
-    var cats=['war','world','canada','ai','scitech','entertainment','sports'],parts=[];
-    cats.forEach(function(c){
-      var ss=load('ch-news-stories-'+c,[]).slice(0,2);
-      if(ss.length)parts.push({cat:c,stories:ss});
-    });
-    if(!parts.length)stories=load('ch-news-stories-all',[]);
-    else{
-      var txt='Here is your MCSYN Productions news briefing. ';
-      parts.forEach(function(p){
-        txt+='In '+CAT_LABEL[p.cat]+' news. ';
-        p.stories.forEach(function(s){txt+=s.title+'. ';});
-      });
-      txt+='That is all for now. Stay sharp.';
-      return txt;
-    }
-  }
-  if(!stories.length)return null;
-  var label=CAT_LABEL[cat]||cat;
-  var txt='Your '+label+' briefing from MCSYN Productions. ';
-  stories.slice(0,3).forEach(function(s){txt+=s.title+'. ';});
-  txt+='That wraps up '+label+'.';
-  return txt;
-}
-function playBriefing(){
-  if(!window.speechSynthesis){alert('Voice playback not supported on this device.');return}
-  stopBriefing();
-  var txt=buildBriefing(curCat);
-  if(!txt){
-    document.getElementById('brief-text').textContent='No stories to summarize in this tab yet — load the news first.';
-    document.getElementById('brief-text').classList.remove('hidden');
-    return;
-  }
-  briefingText=txt;
-  document.getElementById('brief-text').textContent=txt;
-  document.getElementById('brief-text').classList.remove('hidden');
-  // Chunk into sentences for reliable playback
-  var chunks=txt.match(/[^.!?]+[.!?]+/g)||[txt];
-  var voice=pickMaleVoice();
-  var idx=0;
-  document.getElementById('brief-controls').classList.remove('hidden');
-  document.getElementById('brief-btn').classList.add('hidden');
-  function speakNext(){
-    if(idx>=chunks.length){
-      document.getElementById('brief-status').textContent='Done ✓';
-      return;
-    }
-    briefUtter=new SpeechSynthesisUtterance(chunks[idx].trim());
-    if(voice)briefUtter.voice=voice;
-    briefUtter.rate=1.0;briefUtter.pitch=1.0;
-    document.getElementById('brief-status').textContent='Reading '+(idx+1)+' of '+chunks.length+'…';
-    briefUtter.onend=function(){idx++;speakNext()};
-    briefUtter.onerror=function(){document.getElementById('brief-status').textContent='Playback stopped.'};
-    speechSynthesis.speak(briefUtter);
-  }
-  speakNext();
-}
-function pauseBriefing(){
-  if(!window.speechSynthesis)return;
-  if(speechSynthesis.paused){speechSynthesis.resume();document.getElementById('brief-status').textContent='Resumed…'}
-  else{speechSynthesis.pause();document.getElementById('brief-status').textContent='Paused.'}
-}
-function stopBriefing(){
-  if(window.speechSynthesis)speechSynthesis.cancel();
-  briefUtter=null;
-  document.getElementById('brief-controls').classList.add('hidden');
-  var b=document.getElementById('brief-btn');if(b)b.classList.remove('hidden');
-  var s=document.getElementById('brief-status');if(s)s.textContent='';
-}
-
-/* ================= PODCAST (iTunes Search — free, no key, CORS-open) ================= */
-var IT='https://itunes.apple.com';
-function searchPods(){
-  var q=document.getElementById('pod-search').value.trim();
-  if(!q)return;
-  document.getElementById('pod-list').innerHTML='<div class="empty">Searching…</div>';
-  fetch(IT+'/search?term='+encodeURIComponent(q)+'&media=podcast&limit=20').then(function(r){return r.json()}).then(function(d){
-    renderPods(d.results||[]);
-    window._podsLoaded=true;
-  }).catch(function(){
-    document.getElementById('pod-list').innerHTML='<div class="empty">Couldn\'t reach podcast directory. <button class="btn" onclick="searchPods()">Retry</button></div>';
-  });
-}
-function loadPopularPods(){
-  document.getElementById('pod-list').innerHTML='<div class="empty">Loading popular…</div>';
-  fetch(IT+'/search?term=news&media=podcast&limit=20').then(function(r){return r.json()}).then(function(d){
-    renderPods(d.results||[]);
-    window._podsLoaded=true;
-  }).catch(function(){
-    document.getElementById('pod-list').innerHTML='<div class="empty">Couldn\'t reach podcast directory.</div>';
-  });
-}
-function renderPods(list){
-  var w=document.getElementById('pod-list');
-  document.getElementById('pod-eps-card').classList.add('hidden');
-  if(!list.length){w.innerHTML='<div class="empty">No podcasts found.</div>';return}
-  w.innerHTML='';
-  list.forEach(function(p){
-    var d=document.createElement('div');d.className='pod-item';
-    d.innerHTML='<img src="'+esc(p.artworkUrl100||'')+'" loading="lazy" onerror="this.style.display=\'none\'">'
-      +'<div class="pbody"><div class="ptitle">'+esc(p.collectionName||p.trackName||'Untitled')+'</div><div class="ppub">'+esc(p.artistName||'')+'</div></div>';
-    d.onclick=function(){loadEps(p.collectionId,p.collectionName||p.trackName)};
-    w.appendChild(d);
-  });
-}
-function loadEps(id,name){
-  document.getElementById('pod-eps-title').textContent='🎙️ '+name;
-  document.getElementById('pod-eps-card').classList.remove('hidden');
-  document.getElementById('pod-eps').innerHTML='<div class="empty">Loading episodes…</div>';
-  document.getElementById('pod-eps-card').scrollIntoView({behavior:'smooth'});
-  fetch(IT+'/lookup?id='+id+'&entity=podcastEpisode&limit=30').then(function(r){return r.json()}).then(function(d){
-    var eps=(d.results||[]).filter(function(e){return e.episodeUrl});
-    var w=document.getElementById('pod-eps');
-    if(!eps.length){w.innerHTML='<div class="empty">No playable episodes found.</div>';return}
-    w.innerHTML='';
-    eps.forEach(function(e){
-      var div=document.createElement('div');div.className='ep-item';
-      var mins=e.trackTimeMillis?Math.round(e.trackTimeMillis/60000)+' min':'';
-      var dt=e.releaseDate?new Date(e.releaseDate).toLocaleDateString():'';
-      div.innerHTML='<div class="etitle">'+esc(e.trackName||'Episode')+'</div><div class="emeta">'+esc(dt)+(mins?' · '+mins:'')+'</div><button class="btn" style="min-height:44px">▶ Play</button>';
-      div.querySelector('button').onclick=function(){playEp(e.trackName,e.episodeUrl)};
-      w.appendChild(div);
-    });
-  }).catch(function(){
-    document.getElementById('pod-eps').innerHTML='<div class="empty">Couldn\'t load episodes.</div>';
-  });
-}
-function playEp(title,url){
-  document.getElementById('pod-nowbar').classList.remove('hidden');
-  document.getElementById('pod-nowtitle').textContent='▶ '+title;
-  var a=document.getElementById('pod-audio');a.src=url;a.play().catch(function(){});
-  document.getElementById('pod-nowbar').scrollIntoView({behavior:'smooth',block:'nearest'});
-}
-function backToPods(){
-  document.getElementById('pod-eps-card').classList.add('hidden');
-  document.getElementById('pod-nowbar').classList.add('hidden');
-  document.getElementById('pod-audio').pause();
-}
-
-/* ================= TOOLS (Laura's 4 — local files) ================= */
-function openToolPage(file,title){
-  document.getElementById('tools-grid-card').classList.add('hidden');
-  document.getElementById('tool-view-card').classList.remove('hidden');
-  document.getElementById('tool-view-title').textContent='🛠️ '+title;
-  document.getElementById('tool-frame').src='tools/'+file;
-  document.getElementById('tool-view-card').scrollIntoView();
-}
-function backToTools(){
-  document.getElementById('tool-view-card').classList.add('hidden');
-  document.getElementById('tools-grid-card').classList.remove('hidden');
-  document.getElementById('tool-frame').src='about:blank';
-}
-
-/* ================= SHORTS STUDIO ================= */
-var SHORTS_WEBHOOK='https://script.google.com/macros/s/AKfycbwWrGTEfm3TWXyNgdVCB-QlaEHkFk69GzR2EA2qk-rUR4Aej9dDoJqSO2iIOd3dKLQk/exec';
-function queueShort(){
-  var t=document.getElementById('short-topic').value.trim();
-  if(!t){alert('Enter a topic first.');return}
-  var dur=parseInt(document.getElementById('short-duration').value,10)||60;
-  var script=document.getElementById('short-script').value.trim();
-  var list=document.getElementById('shorts-list');
-  var j=document.createElement('div');j.className='short-job';
-  j.innerHTML='<h3>'+esc(t)+'</h3><div class="jmeta">'+dur+'s · sending '+new Date().toLocaleString()+'</div><div class="jdesc">Sending to queue…</div>';
-  list.prepend(j);
-  fetch(SHORTS_WEBHOOK,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({request:t+' ('+dur+'s)',notes:script})}).then(function(){
-    j.querySelector('.jdesc').textContent='Job queued — your video will appear under Completed Videos when done.';
-    j.querySelector('.jmeta').textContent=dur+'s · queued '+new Date().toLocaleString();
-  }).catch(function(){j.querySelector('.jdesc').textContent='Queued locally — will sync when online.'});
-  document.getElementById('short-topic').value='';
-  document.getElementById('short-script').value='';
-}
-function pollShortsQueue(){
-  var w=document.getElementById('shorts-completed');
-  w.innerHTML='<div class="empty">Checking queue…</div>';
-  fetch(SHORTS_WEBHOOK).then(function(r){return r.json()}).then(function(d){
-    var jobs=(d.jobs||[]).filter(function(j){return j.video_url});
-    if(!jobs.length){w.innerHTML='<div class="empty">No completed videos yet. <button class="btn" onclick="pollShortsQueue()">↻ Check again</button></div>';return}
-    w.innerHTML='';
-    jobs.forEach(function(j){
-      var div=document.createElement('div');div.className='short-job';
-      div.innerHTML='<h3>'+esc(j.request||'Short')+'</h3><div class="jmeta">'+esc(j.timestamp||'')+'</div>'
-        +'<video controls src="'+esc(j.video_url)+'" preload="metadata"></video>'
-        +'<div class="rec-actions"><a class="btn solid" style="text-align:center;text-decoration:none" href="'+esc(j.video_url)+'" download>⬇ Download</a></div>';
-      w.appendChild(div);
-    });
-  }).catch(function(){
-    w.innerHTML='<div class="empty">Couldn\'t reach queue. <button class="btn" onclick="pollShortsQueue()">Retry</button></div>';
-  });
-}
-
-/* ================= SETTINGS ================= */
-function saveSettings(){
-  var k=document.getElementById('set-newskey').value.trim();
-  NEWS_KEY=k;store('ch-newsdata-key',k);
-  document.getElementById('set-status').textContent=k?'✓ Key saved. Head to the News tab to load stories.':'Key cleared.';
-  window._newsLoaded=false;
-}
-(function initSettings(){
-  var k=load('ch-newsdata-key','');
-  if(k)document.getElementById('set-newskey').value=k;
-})();
-
-/* ================= INIT ================= */
-renderMyRecs();
-</script>
+<script src="app.js"></script>
 </body>
 </html>
