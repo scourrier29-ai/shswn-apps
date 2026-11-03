@@ -260,7 +260,7 @@ function spawnBird(){
    if(birdWatch)birdWatch.x=bd.bx+bd.ox;
    const cx=x+48,cy=y+48;
    const dist=Math.hypot(bd.bx+bd.ox+18-cx,birdY+18-cy);
-   if(dist<130&&state!=="sleep"&&!isVideoOpen()&&!crittersHidden&&Math.random()<0.05){
+   if(dist<150&&state!=="sleep"&&!isVideoOpen()&&!crittersHidden&&Math.random()<0.12){
     bd.caught=true;catchBird(bd.bx+bd.ox,birdY);bd.el.remove();continue;
    }
    if((dir>0&&bd.bx>innerWidth+80)||(dir<0&&bd.bx<-80)){bd.el.remove();bd.caught=true;}
@@ -268,7 +268,7 @@ function spawnBird(){
   if(alive)requestAnimationFrame(flyFlock);
  }
  flyFlock();
- setTimeout(spawnBird,50000+Math.random()*25000);
+ setTimeout(spawnBird,35000+Math.random()*15000);
 }
 function catchBird(bx,by){
  try{playSnd("angry");}catch(e){}
@@ -295,7 +295,7 @@ function catchBird(bx,by){
  }
  setTimeout(()=>{if(state==="walk"){cat.textContent="\uD83D\uDC08\u200D\u2B1B";cat.style.fontSize="84px";}},2000);
 }
-setTimeout(spawnBird,20000+Math.random()*15000);
+setTimeout(spawnBird,10000+Math.random()*10000);
 // --- BUDDY THE DOG: walks bottom back-and-forth, naps, Sasha scratches him ---
 (function(){
  const buddy=document.createElement("div");
@@ -527,6 +527,14 @@ function play(e){
  document.getElementById("ptitle").textContent=e.t;
  document.getElementById("frame").src=`https://www.youtube.com/embed/${e.id}?autoplay=1&rel=0`;
  document.getElementById("player").classList.add("show");
+ // STOP ALL critter animation during video - hide everything
+ crittersHidden=true;
+ cat.style.display="none";document.getElementById("catname").style.display="none";
+ const zzz=document.getElementById("catzzz");if(zzz)zzz.style.display="none";
+ document.querySelectorAll("div").forEach(d=>{
+  const t=d.textContent;
+  if(t==="\uD83D\uDC26"||t==="\uD83D\uDC15"||t==="\uD83D\uDC36"||t==="\uD83E\uDD7A"||t==="\uD83D\uDC15"||t==="\uD83D\uDE31"||t==="\uD83D\uDCA4"||t==="\uD83E\uDEB6"||t==="\uD83E\uDD0D")d.style.display="none";
+ });
 }
 function closePlayer(){document.getElementById("player").classList.remove("show");document.getElementById("frame").src="";
  // bring critters back
