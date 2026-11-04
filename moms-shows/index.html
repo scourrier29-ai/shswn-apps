@@ -60,7 +60,7 @@ a{color:inherit;text-decoration:none}
 </style>
 </head>
 <body>
-<div class="topbar" id="topbar"><div class="logo" style="font-size:15px;line-height:1.2;text-align:center">Real Drama<br><span style="font-size:11px;color:#ccc">for Jo-Anne by MCSYN Productions</span></div><button id="petsToggle" onclick="togglePets()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#222;border:1px solid #444;color:#fff;border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer">🐾 Pets: ON</button></div>
+<div class="topbar" id="topbar"><div class="logo" style="font-size:15px;line-height:1.2;text-align:center">Real Drama<br><span style="font-size:11px;color:#ccc">for Jo-Anne by MCSYN Productions</span></div><button id="petsToggle" onclick="togglePets()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#222;border:1px solid #444;color:#fff;border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer">🐾 Pets: ON</button><button id="careBtn" onclick="openCare()" style="position:absolute;right:115px;top:50%;transform:translateY(-50%);background:#222;border:1px solid #444;color:#fff;border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer">🐾 Care</button></div>
 <div class="tabs" id="tabs"></div>
 
 <!-- TV GUIDE PAGE -->
@@ -226,7 +226,16 @@ a{color:inherit;text-decoration:none}
 </div>
 
 
-<button id="tabPrev" onclick="stepTab(-1)" style="display:none;position:fixed;z-index:9990;left:6px;top:50%;transform:translateY(-50%);width:52px;height:88px;border:none;border-radius:14px;background:rgba(229,9,20,.85);color:#fff;font-size:28px;cursor:pointer">◀</button>
+<div id="carePanel" style="display:none;position:fixed;inset:0;z-index:10002;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:20px;box-sizing:border-box">
+<div style="background:linear-gradient(180deg,#1d1d2a,#12121c);border:1px solid rgba(255,255,255,.14);border-radius:20px;max-width:430px;width:100%;max-height:86vh;overflow-y:auto;padding:20px;box-sizing:border-box">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+<div style="font-size:20px;font-weight:800;color:#fff">🐾 Pet Care</div>
+<button onclick="closeCare()" style="width:36px;height:36px;border:none;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:16px;cursor:pointer">✕</button>
+</div>
+<div style="font-size:13px;color:#999;margin-bottom:14px;line-height:1.5">Feed and play with Sasha &amp; Buddy to keep them happy and healthy. They get hungry over time — even while the app is closed!</div>
+<div id="carePets"></div>
+</div>
+</div><button id="tabPrev" onclick="stepTab(-1)" style="display:none;position:fixed;z-index:9990;left:6px;top:50%;transform:translateY(-50%);width:52px;height:88px;border:none;border-radius:14px;background:rgba(229,9,20,.85);color:#fff;font-size:28px;cursor:pointer">◀</button>
 <button id="tabNext" onclick="stepTab(1)" style="display:none;position:fixed;z-index:9990;right:6px;top:50%;transform:translateY(-50%);width:52px;height:88px;border:none;border-radius:14px;background:rgba(229,9,20,.85);color:#fff;font-size:28px;cursor:pointer">▶</button>
 <script>
 function stepTab(d){
@@ -250,7 +259,7 @@ updateArrows();
 <nav class="bottomnav" id="bottomnav"></nav>
 
 <!-- 🐈‍⬛ Grumpy cat mascot -->
-<div id="cat" style="position:fixed;z-index:9999;width:96px;height:96px;cursor:pointer;user-select:none;transition:transform .1s;pointer-events:auto;font-size:84px;line-height:96px;text-align:center;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))">🐈‍⬛</div><div id="catname" style="position:fixed;z-index:9999;pointer-events:none;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 4px #000;text-align:center;width:96px">Sasha</div><div id="catzzz" style="position:fixed;z-index:9999;pointer-events:none;font-size:28px;display:none;animation:zfloat 2s ease-in-out infinite">💤</div><style>@keyframes zfloat{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-12px);opacity:.4}}</style>
+<div id="cat" style="position:fixed;z-index:9999;width:96px;height:96px;cursor:pointer;user-select:none;transition:transform .1s;pointer-events:auto;font-size:84px;line-height:96px;text-align:center;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))">🐈‍⬛</div><div id="catname" style="position:fixed;z-index:9999;pointer-events:none;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 4px #000;text-align:center;width:96px">Sasha</div><div id="catzzz" style="position:fixed;z-index:9999;pointer-events:none;font-size:28px;display:none;animation:zfloat 2s ease-in-out infinite">💤</div><div id="catsick" style="position:fixed;z-index:9999;pointer-events:none;font-size:26px;display:none">🤒</div><style>@keyframes zfloat{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-12px);opacity:.4}}</style>
 <script>
 (function(){
 const cat=document.getElementById("cat");
@@ -270,7 +279,7 @@ function togglePets(){
  try{
   if(!petsEnabled){
    // OFF: hide cat immediately, stop sounds
-   cat.style.display="none";document.getElementById("catname").style.display="none";
+   cat.style.display="none";document.getElementById("catname").style.display="none";document.getElementById("catsick").style.display="none";
    const zzz=document.getElementById("catzzz");if(zzz)zzz.style.display="none";
    if(typeof buddy!=="undefined"&&buddy)buddy.style.display="none";
   }else{
@@ -285,13 +294,122 @@ function togglePets(){
  }catch(e){}
 }
 window.togglePets=togglePets;
+
+// ===== TAMAGOTCHI PET CARE =====
+// Sasha (cat) and Buddy (dog) have Food / Happiness / Health stats that decay
+// over time — including while the app is closed (elapsed-time decay).
+// They whine (whimper sound) when hungry or sick. Starving tanks health and
+// makes them sick (🤒 badge). Feed / Play / Cure from the 🐾 Care panel.
+let petCare={cat:{hunger:80,happiness:80,health:100},dog:{hunger:80,happiness:80,health:100},lastTick:Date.now()};
+try{
+ const pc=JSON.parse(localStorage.getItem("petCare")||"null");
+ if(pc&&pc.cat&&pc.dog){petCare.cat=Object.assign(petCare.cat,pc.cat);petCare.dog=Object.assign(petCare.dog,pc.dog);petCare.lastTick=pc.lastTick||Date.now();}
+}catch(e){}
+function savePetCare(){try{petCare.lastTick=Date.now();localStorage.setItem("petCare",JSON.stringify(petCare));}catch(e){}}
+function petSick(k){try{return petCare[k].health<35;}catch(e){return false;}}
+function petDecay(){
+ const now=Date.now();
+ const mins=Math.min(360,Math.max(0,(now-(petCare.lastTick||now))/60000));
+ petCare.lastTick=now;
+ if(mins>=1){
+  ["cat","dog"].forEach(function(k){
+   const p=petCare[k];
+   p.hunger=Math.max(0,Math.round((p.hunger-1.5*mins)*10)/10);
+   p.happiness=Math.max(0,Math.round((p.happiness-1*mins)*10)/10);
+   if(p.hunger<=0)p.health=Math.max(0,Math.round((p.health-4*mins)*10)/10);
+   else if(p.hunger>40)p.health=Math.min(100,Math.round((p.health+1*mins)*10)/10);
+  });
+ }
+ savePetCare();
+ syncPetUI();
+}
+function syncPetUI(){
+ try{
+  const anySick=petSick("cat")||petSick("dog");
+  const cb=document.getElementById("careBtn");
+  if(cb)cb.textContent=anySick?"\uD83D\uDC3E Care \uD83E\uDD12":"\uD83D\uDC3E Care";
+ }catch(e){}
+}
+let lastWhineCat=0,lastWhineDog=0;
+setInterval(function(){
+ try{
+  if(!petsEnabled||crittersHidden||isVideoOpen())return;
+  if(typeof isShowsTab==="function"&&!isShowsTab())return;
+  const now=Date.now();
+  if((petSick("cat")||petCare.cat.hunger<25)&&now-lastWhineCat>45000){lastWhineCat=now;playSnd("whimper");}
+  else if((petSick("dog")||petCare.dog.hunger<25)&&now-lastWhineDog>45000){lastWhineDog=now;playSnd("whimper");}
+ }catch(e){}
+},40000);
+setInterval(petDecay,60000);
+function tamaStatBar(label,val,icon){
+ const v=Math.max(0,Math.min(100,Math.round(val)));
+ const c=v>60?"#2ecc71":v>30?"#f39c12":"#e74c3c";
+ return '<div style="margin:7px 0"><div style="display:flex;justify-content:space-between;font-size:12px;color:#bbb"><span>'+icon+' '+label+'</span><span>'+v+'</span></div><div style="height:10px;background:rgba(255,255,255,.1);border-radius:6px;overflow:hidden;margin-top:3px"><div style="height:100%;width:'+v+'%;background:'+c+';border-radius:6px"></div></div></div>';
+}
+function tamaPetCard(key,name,emoji){
+ const p=petCare[key],sick=petSick(key);
+ let h='<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px;margin-bottom:12px">';
+ h+='<div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:2px">'+emoji+' '+name+(sick?' \uD83E\uDD12':'')+'</div>';
+ if(sick)h+='<div style="font-size:12px;color:#e74c3c;margin-bottom:4px">Feeling sick \u2014 give medicine!</div>';
+ else if(p.hunger<25)h+='<div style="font-size:12px;color:#f39c12;margin-bottom:4px">Hungry \u2014 needs food!</div>';
+ h+=tamaStatBar("Food",p.hunger,"\uD83C\uDF56")+tamaStatBar("Happiness",p.happiness,"\uD83D\uDE0A")+tamaStatBar("Health",p.health,"\u2764\uFE0F");
+ h+='<div style="display:flex;gap:8px;margin-top:10px">';
+ h+='<button onclick="feedPet(\u0027'+key+'\u0027)" style="flex:1;padding:10px;border:none;border-radius:10px;background:#27ae60;color:#fff;font-size:14px;font-weight:600;cursor:pointer">\uD83C\uDF56 Feed</button>';
+ h+='<button onclick="playWithPet(\u0027'+key+'\u0027)" style="flex:1;padding:10px;border:none;border-radius:10px;background:#2980b9;color:#fff;font-size:14px;font-weight:600;cursor:pointer">\u26BD Play</button>';
+ h+='<button onclick="curePet(\u0027'+key+'\u0027)"'+(sick?'':' disabled')+' style="flex:1;padding:10px;border:none;border-radius:10px;background:'+(sick?'#8e44ad':'rgba(255,255,255,.08)')+';color:'+(sick?'#fff':'#666')+';font-size:14px;font-weight:600;cursor:pointer">\uD83D\uDC8A Cure</button>';
+ h+='</div></div>';
+ return h;
+}
+function renderCare(){
+ const el=document.getElementById("carePets");
+ if(!el)return;
+ el.innerHTML=tamaPetCard("cat","Sasha","\uD83D\uDC08\u200D\u2B1B")+tamaPetCard("dog","Buddy","\uD83D\uDC36");
+}
+function openCare(){
+ petDecay();
+ renderCare();
+ const p=document.getElementById("carePanel");
+ if(p)p.style.display="flex";
+ try{
+  if(petSick("cat")||petSick("dog")||petCare.cat.hunger<25||petCare.dog.hunger<25)playSnd("whimper");
+  else playSnd("meow");
+ }catch(e){}
+}
+function closeCare(){
+ const p=document.getElementById("carePanel");
+ if(p)p.style.display="none";
+}
+function feedPet(k){
+ const p=petCare[k];if(!p)return;
+ p.hunger=Math.min(100,p.hunger+30);
+ p.happiness=Math.min(100,p.happiness+5);
+ if(p.hunger>0)p.health=Math.min(100,p.health+5);
+ savePetCare();renderCare();syncPetUI();
+ try{playSnd("meow");}catch(e){}
+}
+function playWithPet(k){
+ const p=petCare[k];if(!p)return;
+ p.happiness=Math.min(100,p.happiness+30);
+ p.hunger=Math.max(0,p.hunger-10);
+ savePetCare();renderCare();syncPetUI();
+ try{playSnd("meow");}catch(e){}
+}
+function curePet(k){
+ const p=petCare[k];if(!p||!petSick(k))return;
+ p.health=70;
+ savePetCare();renderCare();syncPetUI();
+ try{playSnd("meow");}catch(e){}
+}
+window.openCare=openCare;window.closeCare=closeCare;window.feedPet=feedPet;window.playWithPet=playWithPet;window.curePet=curePet;
+petDecay();
+
 // Set correct button label on page load
 try{
  const _btn=document.getElementById("petsToggle");
  if(_btn)_btn.textContent=petsEnabled?"🐾 Pets: ON":"🐾 Pets: OFF";
  if(!petsEnabled){
   setTimeout(()=>{try{
-   cat.style.display="none";document.getElementById("catname").style.display="none";
+   cat.style.display="none";document.getElementById("catname").style.display="none";document.getElementById("catsick").style.display="none";
    const _zzz=document.getElementById("catzzz");if(_zzz)_zzz.style.display="none";
   }catch(e){}},100);
  }
@@ -300,7 +418,7 @@ function isVideoOpen(){return document.getElementById("player").classList.contai
 function critterY(){return isVideoOpen()?innerHeight-140:clampY(y);} // bottom edge during video
 function clampX(v){return Math.max(0,Math.min(innerWidth-100,v));}
 function clampY(v){return Math.max(110,Math.min(innerHeight-110,v));}
-function place(){cat.style.transform=`translate(${x}px,${y}px) scaleX(${dx>=0?1:-1})`;const n=document.getElementById("catname");if(n){n.style.transform=`translate(${x}px,${y+92}px)`;}const z=document.getElementById("catzzz");if(z){z.style.transform=`translate(${x+60}px,${y-10}px)`;}}
+function place(){cat.style.transform=`translate(${x}px,${y}px) scaleX(${dx>=0?1:-1})`;const n=document.getElementById("catname");if(n){n.style.transform=`translate(${x}px,${y+92}px)`;}const z=document.getElementById("catzzz");if(z){z.style.transform=`translate(${x+60}px,${y-10}px)`;}const sb=document.getElementById("catsick");if(sb){sb.style.transform="translate("+(x+66)+"px,"+(y-28)+"px)";sb.style.display=(typeof petCare!=="undefined"&&petCare.cat.health<35&&cat.style.display!=="none")?"":"none";}}
 function showZZZ(on){const z=document.getElementById("catzzz");if(z)z.style.display=on?"block":"none";}
 function setState(s,dur){
  state=s;stateUntil=Date.now()+dur;
@@ -361,7 +479,7 @@ function tick(){
 pickDest();
 cat.style.position="fixed";cat.style.left="0";cat.style.top="0";
 setState("walk",8000);place();tick();
-if(!petsEnabled){cat.style.display="none";document.getElementById("catname").style.display="none";}
+if(!petsEnabled){cat.style.display="none";document.getElementById("catname").style.display="none";document.getElementById("catsick").style.display="none";}
 else{cat.style.display="";document.getElementById("catname").style.display="";}
 crittersHidden=false;
 (function(){const b=document.getElementById("petsToggle");if(b)b.textContent=petsEnabled?"🐾 Pets: ON":"🐾 Pets: OFF";})();
@@ -520,7 +638,7 @@ function startRodeo(){
   if(rodeoActive||!petsEnabled||crittersHidden||isVideoOpen()||!isShowsTab()){scheduleRodeo();return;}
   rodeoActive=true;
   // hide normal cat + buddy
-  cat.style.display="none";document.getElementById("catname").style.display="none";
+  cat.style.display="none";document.getElementById("catname").style.display="none";document.getElementById("catsick").style.display="none";
   const zzz=document.getElementById("catzzz");if(zzz)zzz.style.display="none";
   buddy.style.display="none";
   // build rodeo rig: dog with cat+cowboy hat on top
@@ -567,9 +685,31 @@ function startRodeo(){
  }catch(e){rodeoActive=false;scheduleRodeo();}
 }
 let rodeoFirst=true;
-function scheduleRodeo(){const d=rodeoFirst?15000:60000+Math.random()*60000;rodeoFirst=false;setTimeout(startRodeo,d);}
+function scheduleRodeo(){const d=rodeoFirst?10000:20000;rodeoFirst=false;setTimeout(startRodeo,d);}
 
 // ===== HUNTER v2: peek -> stand -> shoot birds -> laugh -> run off (page 1 only) =====
+const HUNTER_SVG='<svg width="64" height="80" viewBox="0 0 16 20" shape-rendering="crispEdges" style="image-rendering:pixelated">'
++'<rect x="4" y="0" width="8" height="2" fill="#8B4513"/>'
++'<rect x="3" y="2" width="10" height="1" fill="#8B4513"/>'
++'<rect x="2" y="3" width="12" height="1" fill="#6B3410"/>'
++'<rect x="5" y="4" width="6" height="4" fill="#FFDAB9"/>'
++'<rect x="6" y="5" width="1" height="1" fill="#000"/>'
++'<rect x="9" y="5" width="1" height="1" fill="#000"/>'
++'<rect x="7" y="7" width="2" height="1" fill="#8B4513"/>'
++'<rect x="4" y="8" width="8" height="5" fill="#CC0000"/>'
++'<rect x="4" y="9" width="8" height="1" fill="#990000"/>'
++'<rect x="4" y="11" width="8" height="1" fill="#990000"/>'
++'<rect x="6" y="8" width="1" height="5" fill="#990000"/>'
++'<rect x="9" y="8" width="1" height="5" fill="#990000"/>'
++'<rect x="2" y="8" width="2" height="4" fill="#CC0000"/>'
++'<rect x="12" y="8" width="2" height="4" fill="#CC0000"/>'
++'<rect x="13" y="6" width="2" height="8" fill="#5C4033"/>'
++'<rect x="13" y="6" width="2" height="2" fill="#888888"/>'
++'<rect x="5" y="13" width="2" height="4" fill="#654321"/>'
++'<rect x="9" y="13" width="2" height="4" fill="#654321"/>'
++'<rect x="4" y="17" width="4" height="3" fill="#3B2314"/>'
++'<rect x="8" y="17" width="4" height="3" fill="#3B2314"/>'
++'</svg>';
 let hunterActive=false;
 function playBang(){
  try{
@@ -640,7 +780,7 @@ function startHunter(){
 }
 let hunterFirst=true;
 function scheduleHunter(){
- const dl=hunterFirst?30000:120000+Math.random()*180000;
+ const dl=hunterFirst?25000:30000;
  hunterFirst=false;
  setTimeout(startHunter,dl);
 }
@@ -655,7 +795,7 @@ cat.addEventListener("click",()=>{
   hideTaps=(now-lastTap<1500)?hideTaps+1:1;lastTap=now;
   if(hideTaps>=5){
    crittersHidden=true;
-   cat.style.display="none";document.getElementById("catname").style.display="none";
+   cat.style.display="none";document.getElementById("catname").style.display="none";document.getElementById("catsick").style.display="none";
    document.querySelectorAll("div").forEach(d=>{if(d.textContent==="\uD83D\uDC26"||d.textContent==="\uD83D\uDC15"||d.textContent==="\uD83E\uDD7A")d.style.display="none";});
   }
   return; // stay quiet during video
@@ -763,7 +903,7 @@ function updateCritterVisibility(){
     if(isCritterDiv(d))d.remove();
    });
    // Also hide the permanent cat elements
-   try{cat.style.display="none";document.getElementById("catname").style.display="none";
+   try{cat.style.display="none";document.getElementById("catname").style.display="none";document.getElementById("catsick").style.display="none";
    const zzz=document.getElementById("catzzz");if(zzz)zzz.style.display="none";}catch(e){}
   }else{
    // On Shows tab: restore cat visibility (birds/buddy respawn naturally)
@@ -825,7 +965,7 @@ function play(e){
  return;
  // STOP ALL critter animation during video - hide everything
  crittersHidden=true;
- cat.style.display="none";document.getElementById("catname").style.display="none";
+ cat.style.display="none";document.getElementById("catname").style.display="none";document.getElementById("catsick").style.display="none";
  const zzz=document.getElementById("catzzz");if(zzz)zzz.style.display="none";
  document.querySelectorAll("div").forEach(d=>{
   const t=d.textContent;
