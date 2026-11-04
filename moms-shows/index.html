@@ -567,117 +567,84 @@ function startRodeo(){
  }catch(e){rodeoActive=false;scheduleRodeo();}
 }
 let rodeoFirst=true;
-function scheduleRodeo(){const d=rodeoFirst?15000:180000+Math.random()*180000;rodeoFirst=false;setTimeout(startRodeo,d);}
+function scheduleRodeo(){const d=rodeoFirst?15000:60000+Math.random()*60000;rodeoFirst=false;setTimeout(startRodeo,d);}
 
-// ===== HUNTER (Elmer-style) — pops out and shoots birds, page 1 only =====
+// ===== HUNTER v2: peek -> stand -> shoot birds -> laugh -> run off (page 1 only) =====
 let hunterActive=false;
 function playBang(){
  try{
   const ctx=new (window.AudioContext||window.webkitAudioContext)();
-  const dur=0.25;
-  const buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);
+  const buf=ctx.createBuffer(1,ctx.sampleRate*0.3,ctx.sampleRate);
   const d=buf.getChannelData(0);
-  for(let i=0;i<d.length;i++){d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);}
+  for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
   const src=ctx.createBufferSource();src.buffer=buf;
-  const f=ctx.createBiquadFilter();f.type="lowpass";f.frequency.value=800;
+  const f=ctx.createBiquadFilter();f.type="lowpass";f.frequency.value=600;
   src.connect(f);f.connect(ctx.destination);src.start();
+ }catch(e){}
+}
+function playLaugh(){
+ try{
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  [0,0.18,0.36].forEach(function(t,i){
+   const o=ctx.createOscillator();o.type="square";o.frequency.value=180+i*20;
+   const g=ctx.createGain();g.gain.setValueAtTime(0.06,ctx.currentTime+t);
+   g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.15);
+   o.connect(g);g.connect(ctx.destination);o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.16);
+  });
  }catch(e){}
 }
 function startHunter(){
  try{
-  if(hunterActive||!petsEnabled||crittersHidden||isVideoOpen()||!isShowsTab()||typeof rodeoActive!=="undefined"&&rodeoActive){scheduleHunter();return;}
+  if(hunterActive||!petsEnabled||crittersHidden||isVideoOpen()||!isShowsTab()){scheduleHunter();return;}
   hunterActive=true;
+  const side=Math.random()<0.5?"left":"right";
   const hunter=document.createElement("div");
   hunter.id="hunterDiv";
-  const side=Math.random()<0.5?"left":"right";
-  hunter.style.cssText="position:fixed;z-index:9996;bottom:80px;"+side+":-80px;font-size:64px;transition:"+side+" 0.6s ease-out;pointer-events:none;text-align:center;line-height:1.2;";
-  hunter.innerHTML="🧔<br><span style='font-size:40px'>🔫</span>";
+  hunter.style.cssText="position:fixed;z-index:9996;bottom:60px;"+side+":-40px;font-size:56px;transition:"+side+" 0.8s ease-out;pointer-events:none;text-align:center;line-height:1.2;";
+  hunter.innerHTML="\uD83E\uDDD4";
   document.body.appendChild(hunter);
-  // Slide in
-  setTimeout(()=>{hunter.style[side]="10px";},50);
-  // Aim and shoot after 1s
-  setTimeout(()=>{
+  setTimeout(function(){
    if(!document.getElementById("hunterDiv")){hunterActive=false;scheduleHunter();return;}
-   // Muzzle flash
-   const flash=document.createElement("div");
-   flash.textContent="💥";
-   flash.style.cssText="position:fixed;z-index:9997;bottom:110px;"+side+":70px;font-size:48px;pointer-events:none;";
-   document.body.appendChild(flash);
-   playBang();
-   // Scatter birds
-   try{
-    document.querySelectorAll("div").forEach(d=>{
-     if(typeof isCritterDiv==="function"&&isCritterDiv(d)&&d.textContent==="🐦"){
-      // Make birds flee faster
-      d.style.transition="transform 0.3s";
-     }
-    });
-    // Trigger bird scatter via global
-    if(typeof scatterBirds==="function")scatterBirds();
-   }catch(e){}
-   setTimeout(()=>{if(flash.parentNode)flash.remove();},400);
-   // Hunter ducks back after 2s
-   setTimeout(()=>{
-    hunter.style[side]="-80px";
-    setTimeout(()=>{
-     if(hunter.parentNode)hunter.remove();
-     hunterActive=false;
-     scheduleHunter();
-    },700);
-   },1800);
-  },1200);
+   hunter.style[side]="-15px";
+   setTimeout(function(){
+    if(!document.getElementById("hunterDiv")){hunterActive=false;scheduleHunter();return;}
+    hunter.style[side]="15px";
+    hunter.innerHTML="\uD83E\uDDD4<br><span style='font-size:36px'>\uD83D\uDD2B</span>";
+    setTimeout(function(){
+     if(!document.getElementById("hunterDiv")){hunterActive=false;scheduleHunter();return;}
+     const flash=document.createElement("div");
+     flash.textContent="\uD83D\uDCA5";
+     flash.style.cssText="position:fixed;z-index:9997;bottom:95px;"+side+":75px;font-size:44px;pointer-events:none;";
+     document.body.appendChild(flash);
+     playBang();
+     try{if(typeof scatterBirds==="function")scatterBirds();}catch(e){}
+     setTimeout(function(){if(flash.parentNode)flash.remove();},500);
+     setTimeout(function(){
+      if(!document.getElementById("hunterDiv")){hunterActive=false;scheduleHunter();return;}
+      hunter.innerHTML="\uD83E\uDDD4<br><span style='font-size:28px'>\uD83D\uDE02</span>";
+      playLaugh();
+      setTimeout(function(){
+       hunter.style.transition=side+" 0.5s ease-in";
+       hunter.style[side]="-80px";
+       setTimeout(function(){
+        if(hunter.parentNode)hunter.remove();
+        hunterActive=false;
+        scheduleHunter();
+       },600);
+      },1500);
+     },800);
+    },2000+Math.random()*2000);
+   },1500);
+  },100);
  }catch(e){hunterActive=false;scheduleHunter();}
 }
 let hunterFirst=true;
 function scheduleHunter(){
- const delay=hunterFirst?30000:120000+Math.random()*180000;
+ const dl=hunterFirst?30000:120000+Math.random()*180000;
  hunterFirst=false;
- setTimeout(startHunter,delay);
+ setTimeout(startHunter,dl);
 }
-// Start the hunter cycle
 scheduleHunter();
- // every 3-6 min
-scheduleRodeo(); // first rodeo in 15s (rodeoFirst), then every 3-6 min
- // Buddy cycle: sleep -> walk around -> sleep
- function buddyCycle(){
-  if(bState==="sleep"&&!crittersHidden&&!isVideoOpen()&&isShowsTab()){
-   setBuddySleep(false); // wake up and walk
-   // walk for 20-40s then nap
-   setTimeout(()=>{if(bState==="walk")setBuddySleep(true);},20000+Math.random()*20000);
-  }
-  setTimeout(buddyCycle,30000+Math.random()*30000);
- }
- setTimeout(buddyCycle,15000);
- // TAP BUDDY: woof on tap, growl after 3 quick taps
- buddy.style.pointerEvents="auto";
- buddy.style.cursor="pointer";
- let buddyTaps=0, buddyTapTimer=null;
- buddy.addEventListener("click",()=>{
-  if(isVideoOpen()||crittersHidden)return;
-  buddyTaps++;
-  clearTimeout(buddyTapTimer);
-  if(buddyTaps>=3){
-   // GROWL - he's annoyed
-   try{playSnd("growl");}catch(e){}
-   buddy.textContent="\uD83D\uDC3A"; // growling face
-   buddy.animate([
-    {transform:"scale(1)"},
-    {transform:"scale(1.2)"},
-    {transform:"scale(1)"}
-   ],{duration:600});
-   setTimeout(()=>{if(bState!=="flee")buddy.textContent=bState==="sleep"?"\uD83D\uDC15":"\uD83D\uDC36";},2000);
-   buddyTaps=0;
-  }else{
-   // WOOF
-   try{playSnd("woof");}catch(e){}
-   buddy.animate([
-    {transform:"translateY(0)"},
-    {transform:"translateY(-10px)"},
-    {transform:"translateY(0)"}
-   ],{duration:300});
-   buddyTapTimer=setTimeout(()=>{buddyTaps=0;},1500);
-  }
- });
 })();
 // --- TAP ---
 cat.addEventListener("click",()=>{
