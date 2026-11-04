@@ -657,7 +657,7 @@ for(const[k,[id,idxs]]of Object.entries(rows)){
  const el=document.getElementById(id);
  idxs.forEach(i=>{const e=EP[i];
   const d=document.createElement("div");d.className="ep";
-  d.innerHTML=`<div class="ep-art"><img src="${thumbs[e.g]}" loading="lazy" alt=""><div class="ep-play">▶</div></div><div class="ep-body"><div class="ep-title">${e.t}</div><div class="ep-src">${e.s.toUpperCase()} · FREE</div><div class="ep-desc">${e.d}</div></div>`;
+  d.innerHTML=`<div class="ep-art"><img src="https://img.youtube.com/vi/${e.id}/hqdefault.jpg" loading="lazy" alt=""><div class="ep-play">▶</div></div><div class="ep-body"><div class="ep-title">${e.t}</div><div class="ep-src">${e.s.toUpperCase()} · FREE</div><div class="ep-desc">${e.d}</div></div>`;
   d.onclick=()=>play(e);el.appendChild(d);
  });
 }
