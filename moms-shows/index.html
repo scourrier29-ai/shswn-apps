@@ -183,6 +183,25 @@ a{color:inherit;text-decoration:none}
 <div id="horoscopeResult" style="padding:0 20px 32px"></div>
 </div>
 
+<!-- BILLS / FINANCIAL HOUSEKEEPING PAGE -->
+<div class="page" id="page-bills">
+<div class="hero"><h2>💰 Bills</h2><p>Keep track of monthly bills. Totals update automatically.</p></div>
+<div id="billsSummary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:4px 16px 16px"></div>
+<div style="padding:0 16px 12px">
+<button id="billsAddBtn" onclick="toggleBillForm()" style="width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 2px 12px rgba(46,204,113,.3)">+ Add a Bill</button>
+</div>
+<div id="billForm" style="display:none;margin:0 16px 16px;padding:16px;background:rgba(255,255,255,.06);border-radius:14px;border:1px solid rgba(255,255,255,.1)">
+<input id="billName" placeholder="Bill name (e.g. Hydro)" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid rgba(255,255,255,.15);border-radius:10px;background:rgba(0,0,0,.3);color:#fff;font-size:15px;box-sizing:border-box">
+<input id="billAmount" type="number" step="0.01" min="0" placeholder="Amount ($)" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid rgba(255,255,255,.15);border-radius:10px;background:rgba(0,0,0,.3);color:#fff;font-size:15px;box-sizing:border-box">
+<input id="billDue" type="date" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid rgba(255,255,255,.15);border-radius:10px;background:rgba(0,0,0,.3);color:#fff;font-size:15px;box-sizing:border-box">
+<div style="display:flex;gap:10px">
+<button onclick="saveBill()" style="flex:1;padding:12px;border:none;border-radius:10px;background:#2ecc71;color:#fff;font-size:15px;font-weight:600;cursor:pointer">Save</button>
+<button onclick="toggleBillForm()" style="flex:1;padding:12px;border:none;border-radius:10px;background:rgba(255,255,255,.12);color:#fff;font-size:15px;cursor:pointer">Cancel</button>
+</div>
+</div>
+<div id="billsList" style="padding:0 16px 32px"></div>
+</div>
+
 
 <button id="tabPrev" onclick="stepTab(-1)" style="display:none;position:fixed;z-index:9990;left:6px;top:50%;transform:translateY(-50%);width:52px;height:88px;border:none;border-radius:14px;background:rgba(229,9,20,.85);color:#fff;font-size:28px;cursor:pointer">◀</button>
 <button id="tabNext" onclick="stepTab(1)" style="display:none;position:fixed;z-index:9990;right:6px;top:50%;transform:translateY(-50%);width:52px;height:88px;border:none;border-radius:14px;background:rgba(229,9,20,.85);color:#fff;font-size:28px;cursor:pointer">▶</button>
@@ -240,6 +259,7 @@ function togglePets(){
   }
  }catch(e){}
 }
+window.togglePets=togglePets;
 // Set correct button label on page load
 try{
  const _btn=document.getElementById("petsToggle");
@@ -613,7 +633,7 @@ cat.addEventListener("click",()=>{
 </script>
 
 <script>
-const TABS=[{id:"tvguide",label:"📺 TV Guide",icon:"📺"},{id:"shows",label:"🎬 Shows",icon:"🎬"},{id:"apps",label:"📱 Apps & Sites",icon:"📱"},{id:"puzzles",label:"🧩 Puzzles",icon:"🧩"},{id:"solitaire",label:"🃏 Solitaire",icon:"🃏"},{id:"mahjong",label:"🀄 Mahjong",icon:"🀄"},{id:"classics",label:"👾 Classics",icon:"👾"},{id:"tarot",label:"🔮 Tarot",icon:"🔮"},{id:"horoscope",label:"⭐ Horoscope",icon:"⭐"}];
+const TABS=[{id:"tvguide",label:"📺 TV Guide",icon:"📺"},{id:"shows",label:"🎬 Shows",icon:"🎬"},{id:"apps",label:"📱 Apps & Sites",icon:"📱"},{id:"puzzles",label:"🧩 Puzzles",icon:"🧩"},{id:"solitaire",label:"🃏 Solitaire",icon:"🃏"},{id:"mahjong",label:"🀄 Mahjong",icon:"🀄"},{id:"classics",label:"👾 Classics",icon:"👾"},{id:"tarot",label:"🔮 Tarot",icon:"🔮"},{id:"horoscope",label:"⭐ Horoscope",icon:"⭐"},{id:"bills",label:"💰 Bills",icon:"💰"}];
 // verified live video IDs (checked 2026-11-03 via search)
 const EP=[
  // trending
@@ -667,7 +687,7 @@ TABS.forEach((t,i)=>{
  const b=document.createElement("button");b.innerHTML=`<span class="ico">${t.icon}</span>${t.label.split(" ")[1]}`;if(i===0)b.classList.add("active");b.onclick=()=>goTab(t.id);navEl.appendChild(b);
 });
 let curTab=0;
-function isShowsTab(){return typeof curTab!=="undefined"?TABS[curTab].id==="shows":true;}
+function isShowsTab(){return typeof curTab!=="undefined"?TABS[curTab].id==="tvguide":true;}
 function isCritterDiv(d){
  const t=d.textContent;
  return t==="\uD83D\uDC26"||t==="\uD83D\uDC15"||t==="\uD83D\uDC36"||t==="\uD83E\uDD7A"||t==="\uD83D\uDE31"||t==="\uD83D\uDCA4"||t==="\uD83E\uDEB6"||t==="\uD83E\uDD0D"||t==="\uD83E\uDE3A"||t==="\uD83D\uDC3A"||t==="\uD83D\ude3b"||t==="\uD83D\ude38"||t==="\uD83D\ude3e"||t==="\uD83D\ude34"||t==="\uD83D\uDC31\u200d\uD83D\uDCA8"||t==="SASHA";
@@ -699,6 +719,7 @@ function goTab(id){
  [...navEl.children].forEach((el,i)=>el.classList.toggle("active",TABS[i].id===id));
  scrollTo(0,0);
  updateCritterVisibility();
+ if(id==="bills"&&typeof renderBills==="function")renderBills();
 }
 // swipe left/right to change tabs + arrow buttons
 (function(){
@@ -883,6 +904,82 @@ function buildSignGrid(){
     g.appendChild(el);
   });
 }
+
+// ===== BILLS / FINANCIAL HOUSEKEEPING =====
+let bills=[];
+try{bills=JSON.parse(localStorage.getItem("momBills")||"[]");}catch(e){bills=[];}
+function saveBillsLS(){try{localStorage.setItem("momBills",JSON.stringify(bills));}catch(e){}}
+function toggleBillForm(){
+ const f=document.getElementById("billForm");
+ f.style.display=f.style.display==="none"?"block":"none";
+ if(f.style.display==="block")document.getElementById("billName").focus();
+}
+function saveBill(){
+ const name=document.getElementById("billName").value.trim();
+ const amt=parseFloat(document.getElementById("billAmount").value);
+ const due=document.getElementById("billDue").value;
+ if(!name){alert("Please enter a bill name.");return;}
+ if(isNaN(amt)||amt<0){alert("Please enter a valid amount.");return;}
+ bills.push({id:Date.now(),name:name,amount:amt,due:due||"",paid:false});
+ saveBillsLS();renderBills();
+ document.getElementById("billName").value="";
+ document.getElementById("billAmount").value="";
+ document.getElementById("billDue").value="";
+ toggleBillForm();
+}
+function deleteBill(id){
+ if(!confirm("Remove this bill?"))return;
+ bills=bills.filter(b=>b.id!==id);
+ saveBillsLS();renderBills();
+}
+function toggleBillPaid(id){
+ const b=bills.find(x=>x.id===id);
+ if(b){b.paid=!b.paid;saveBillsLS();renderBills();}
+}
+function fmt$(n){return "$"+n.toFixed(2);}
+function renderBills(){
+ const list=document.getElementById("billsList");
+ const sum=document.getElementById("billsSummary");
+ if(!list||!sum)return;
+ let total=0,paid=0;
+ bills.forEach(b=>{total+=b.amount;if(b.paid)paid+=b.amount;});
+ const owed=total-paid;
+ sum.innerHTML=
+  '<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:14px;padding:14px 8px;text-align:center;border:1px solid rgba(255,255,255,.08)">'+
+  '<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px">Total</div>'+
+  '<div style="font-size:20px;font-weight:700;color:#fff;margin-top:4px">'+fmt$(total)+'</div></div>'+
+  '<div style="background:linear-gradient(135deg,#0f3460,#16537e);border-radius:14px;padding:14px 8px;text-align:center;border:1px solid rgba(255,255,255,.08)">'+
+  '<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px">Paid</div>'+
+  '<div style="font-size:20px;font-weight:700;color:#2ecc71;margin-top:4px">'+fmt$(paid)+'</div></div>'+
+  '<div style="background:linear-gradient(135deg,#3d1a1a,#5e2323);border-radius:14px;padding:14px 8px;text-align:center;border:1px solid rgba(255,255,255,.08)">'+
+  '<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px">Owed</div>'+
+  '<div style="font-size:20px;font-weight:700;color:#e74c3c;margin-top:4px">'+fmt$(owed)+'</div></div>';
+ if(bills.length===0){
+  list.innerHTML='<div style="text-align:center;padding:32px 16px;color:#666"><div style="font-size:48px;margin-bottom:12px">💰</div><div style="font-size:15px">No bills yet.<br>Tap "+ Add a Bill" to get started.</div></div>';
+  return;
+ }
+ // Sort: unpaid first, then by due date
+ const sorted=[...bills].sort((a,b)=>{
+  if(a.paid!==b.paid)return a.paid?1:-1;
+  if(a.due&&b.due)return a.due.localeCompare(b.due);
+  return 0;
+ });
+ list.innerHTML=sorted.map(b=>{
+  const dueStr=b.due?new Date(b.due+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"}):"No date";
+  const overdue=!b.paid&&b.due&&new Date(b.due)<new Date(new Date().toDateString());
+  return '<div style="display:flex;align-items:center;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;margin-bottom:10px;'+(b.paid?"opacity:.55":"")+'">'+
+  '<button onclick="toggleBillPaid('+b.id+')" style="width:28px;height:28px;border-radius:50%;border:2px solid '+(b.paid?"#2ecc71":"#555")+';background:'+(b.paid?"#2ecc71":"transparent")+';color:#fff;font-size:16px;cursor:pointer;margin-right:12px;flex-shrink:0">'+(b.paid?"✓":"")+'</button>'+
+  '<div style="flex:1;min-width:0">'+
+  '<div style="font-size:16px;font-weight:600;color:#fff;'+(b.paid?"text-decoration:line-through":"")+'">'+b.name.replace(/</g,"&lt;")+'</div>'+
+  '<div style="font-size:13px;color:'+(overdue?"#e74c3c":"#888")+';margin-top:2px">'+dueStr+(overdue?" • Overdue":"")+'</div>'+
+  '</div>'+
+  '<div style="font-size:18px;font-weight:700;color:#fff;margin:0 12px">'+fmt$(b.amount)+'</div>'+
+  '<button onclick="deleteBill('+b.id+')" style="width:36px;height:36px;border:none;border-radius:10px;background:rgba(231,76,60,.15);color:#e74c3c;font-size:18px;cursor:pointer;flex-shrink:0">×</button>'+
+  '</div>';
+ }).join("");
+}
+// Render bills when the tab is shown
+const _origGoTab=typeof goTab==="function"?goTab:null;
 function showHoroscope(i){
   const s=SIGNS[i];
   const dayNum=Math.floor(Date.now()/86400000);
