@@ -225,31 +225,30 @@ function togglePets(){
  try{localStorage.setItem("petsEnabled",petsEnabled?"1":"0");}catch(e){}
  const btn=document.getElementById("petsToggle");
  if(btn)btn.textContent=petsEnabled?"🐾 Pets: ON":"🐾 Pets: OFF";
- if(!petsEnabled){
-  // KILL SWITCH: remove every critter from the DOM immediately
-  try{
-   document.querySelectorAll("div").forEach(d=>{if(typeof isCritterDiv==="function"&&isCritterDiv(d))d.remove();});
+ try{
+  if(!petsEnabled){
+   // OFF: hide cat immediately, stop sounds
    cat.style.display="none";document.getElementById("catname").style.display="none";
    const zzz=document.getElementById("catzzz");if(zzz)zzz.style.display="none";
-  }catch(e){}
- }else{
-  // Turning ON: force restore cat and reset hidden state
-  try{
+   if(typeof buddy!=="undefined"&&buddy)buddy.style.display="none";
+  }else{
+   // ON: show cat immediately if on Shows tab
    crittersHidden=false;
-   cat.style.display="";document.getElementById("catname").style.display="";
-   const zzz=document.getElementById("catzzz");if(zzz)zzz.style.display="";
-  }catch(e){}
-  updateCritterVisibility();
- }
+   if(typeof isShowsTab==="function"&&isShowsTab()&&!isVideoOpen()){
+    cat.style.display="";document.getElementById("catname").style.display="";
+   }
+  }
+ }catch(e){}
 }
 // Set correct button label on page load
 try{
  const _btn=document.getElementById("petsToggle");
  if(_btn)_btn.textContent=petsEnabled?"🐾 Pets: ON":"🐾 Pets: OFF";
- // If pets were OFF when page loaded, hide cat immediately
  if(!petsEnabled){
-  cat.style.display="none";document.getElementById("catname").style.display="none";
-  const _zzz=document.getElementById("catzzz");if(_zzz)_zzz.style.display="none";
+  setTimeout(()=>{try{
+   cat.style.display="none";document.getElementById("catname").style.display="none";
+   const _zzz=document.getElementById("catzzz");if(_zzz)_zzz.style.display="none";
+  }catch(e){}},100);
  }
 }catch(e){}
 function isVideoOpen(){return document.getElementById("player").classList.contains("show");}
