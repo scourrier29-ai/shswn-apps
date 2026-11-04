@@ -722,9 +722,9 @@ function goTab(id){
  };
 })();
 function play(e){
- document.getElementById("ptitle").textContent=e.t;
- document.getElementById("frame").src=`https://www.youtube.com/embed/${e.id}?autoplay=1&rel=0`;
- document.getElementById("player").classList.add("show");
+ // Open in browser (Brave blocks ads) instead of embed
+ window.open("https://www.youtube.com/watch?v="+e.id,"_blank");
+ return;
  // STOP ALL critter animation during video - hide everything
  crittersHidden=true;
  cat.style.display="none";document.getElementById("catname").style.display="none";
