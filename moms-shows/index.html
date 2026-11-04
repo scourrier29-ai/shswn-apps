@@ -251,10 +251,12 @@ function togglePets(){
    const zzz=document.getElementById("catzzz");if(zzz)zzz.style.display="none";
    if(typeof buddy!=="undefined"&&buddy)buddy.style.display="none";
   }else{
-   // ON: show cat immediately if on Shows tab
+   // ON: show cat immediately if on page 1
    crittersHidden=false;
    if(typeof isShowsTab==="function"&&isShowsTab()&&!isVideoOpen()){
     cat.style.display="";document.getElementById("catname").style.display="";
+    // Trigger a rodeo after 3s as a "welcome back" surprise
+    setTimeout(()=>{try{if(petsEnabled&&typeof startRodeo==="function")startRodeo();}catch(e){}},3000);
    }
   }
  }catch(e){}
@@ -541,7 +543,73 @@ function startRodeo(){
   })();
  }catch(e){rodeoActive=false;scheduleRodeo();}
 }
-function scheduleRodeo(){setTimeout(startRodeo,180000+Math.random()*180000);} // every 3-6 min
+function scheduleRodeo(){setTimeout(startRodeo,180000+Math.random()*180000);}
+
+// ===== HUNTER (Elmer-style) — pops out and shoots birds, page 1 only =====
+let hunterActive=false;
+function playBang(){
+ try{
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const dur=0.25;
+  const buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++){d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);}
+  const src=ctx.createBufferSource();src.buffer=buf;
+  const f=ctx.createBiquadFilter();f.type="lowpass";f.frequency.value=800;
+  src.connect(f);f.connect(ctx.destination);src.start();
+ }catch(e){}
+}
+function startHunter(){
+ try{
+  if(hunterActive||!petsEnabled||crittersHidden||isVideoOpen()||!isShowsTab()||typeof rodeoActive!=="undefined"&&rodeoActive){scheduleHunter();return;}
+  hunterActive=true;
+  const hunter=document.createElement("div");
+  hunter.id="hunterDiv";
+  const side=Math.random()<0.5?"left":"right";
+  hunter.style.cssText="position:fixed;z-index:9996;bottom:80px;"+side+":-80px;font-size:64px;transition:"+side+" 0.6s ease-out;pointer-events:none;text-align:center;line-height:1.2;";
+  hunter.innerHTML="🧔<br><span style='font-size:40px'>🔫</span>";
+  document.body.appendChild(hunter);
+  // Slide in
+  setTimeout(()=>{hunter.style[side]="10px";},50);
+  // Aim and shoot after 1s
+  setTimeout(()=>{
+   if(!document.getElementById("hunterDiv")){hunterActive=false;scheduleHunter();return;}
+   // Muzzle flash
+   const flash=document.createElement("div");
+   flash.textContent="💥";
+   flash.style.cssText="position:fixed;z-index:9997;bottom:110px;"+side+":70px;font-size:48px;pointer-events:none;";
+   document.body.appendChild(flash);
+   playBang();
+   // Scatter birds
+   try{
+    document.querySelectorAll("div").forEach(d=>{
+     if(typeof isCritterDiv==="function"&&isCritterDiv(d)&&d.textContent==="🐦"){
+      // Make birds flee faster
+      d.style.transition="transform 0.3s";
+     }
+    });
+    // Trigger bird scatter via global
+    if(typeof scatterBirds==="function")scatterBirds();
+   }catch(e){}
+   setTimeout(()=>{if(flash.parentNode)flash.remove();},400);
+   // Hunter ducks back after 2s
+   setTimeout(()=>{
+    hunter.style[side]="-80px";
+    setTimeout(()=>{
+     if(hunter.parentNode)hunter.remove();
+     hunterActive=false;
+     scheduleHunter();
+    },700);
+   },1800);
+  },1200);
+ }catch(e){hunterActive=false;scheduleHunter();}
+}
+function scheduleHunter(){
+ setTimeout(startHunter,120000+Math.random()*180000); // every 2-5 min
+}
+// Start the hunter cycle
+scheduleHunter();
+ // every 3-6 min
 setTimeout(startRodeo,120000+Math.random()*120000); // first rodeo in 2-4 min
  // Buddy cycle: sleep -> walk around -> sleep
  function buddyCycle(){
