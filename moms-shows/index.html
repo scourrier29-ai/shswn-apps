@@ -226,24 +226,15 @@ a{color:inherit;text-decoration:none}
 </div>
 
 
-<button id="tabPrev" onclick="stepTab(-1)" style="display:none;position:fixed;z-index:9990;left:6px;top:50%;transform:translateY(-50%);width:52px;height:88px;border:none;border-radius:14px;background:rgba(229,9,20,.85);color:#fff;font-size:28px;cursor:pointer">◀</button>
-<button id="tabNext" onclick="stepTab(1)" style="display:none;position:fixed;z-index:9990;right:6px;top:50%;transform:translateY(-50%);width:52px;height:88px;border:none;border-radius:14px;background:rgba(229,9,20,.85);color:#fff;font-size:28px;cursor:pointer">▶</button>
+
+
 <script>
 function stepTab(d){
  const n=(curTab+d+TABS.length)%TABS.length;
  goTab(TABS[n].id);
 }
-function updateArrows(){
- // show arrows only on iframe tabs (puzzles, solitaire, mahjong) since iframes eat swipes
- const id=TABS[curTab].id;
- const show=(id==="puzzles"||id==="solitaire"||id==="mahjong");
- document.getElementById("tabPrev").style.display=show?"block":"none";
- document.getElementById("tabNext").style.display=show?"block":"none";
-}
-// hook into goTab
-const _goTab=goTab;
-goTab=function(id){_goTab(id);updateArrows();};
-updateArrows();
+
+
 </script>
 <div id="player"><div id="backbar"><button onclick="closePlayer()">‹ Back</button><span id="ptitle"></span></div><iframe id="frame" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
 
@@ -812,11 +803,11 @@ function goTab(id){
  updateCritterVisibility();
  if(id==="bills"&&typeof renderBills==="function")renderBills();
 }
-// swipe left/right to change tabs + arrow buttons
+// swipe left/right to change tabs
 (function(){
  let sx=0,sy=0,swiping=false;
  // swipe works everywhere except inside the video player and game iframes
- // (iframes eat touch events, so game tabs get arrow buttons instead)
+ // (iframes eat touch events, so swipes starting inside a game iframe stay in the game)
  document.addEventListener("touchstart",e=>{
   if(e.target.closest("#player.show"))return;
   sx=e.touches[0].clientX;sy=e.touches[0].clientY;swiping=true;
@@ -829,24 +820,7 @@ function goTab(id){
   if(dx<0&&curTab<TABS.length-1)goTab(TABS[curTab+1].id);
   else if(dx>0&&curTab>0)goTab(TABS[curTab-1].id);
  },{passive:true});
- // arrow buttons for game tabs (where swipe can't reach through iframes)
- const css=document.createElement("style");
- css.textContent=".tabarrow{position:fixed;top:50%;z-index:200;background:rgba(229,9,20,.85);color:#fff;border:none;border-radius:50%;width:52px;height:52px;font-size:24px;font-weight:900;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.5)}";
- document.head.appendChild(css);
- const left=document.createElement("button");left.className="tabarrow";left.innerHTML="‹";left.style.left="8px";
- const right=document.createElement("button");right.className="tabarrow";right.innerHTML="›";right.style.right="8px";
- left.onclick=()=>{if(curTab>0)goTab(TABS[curTab-1].id);};
- right.onclick=()=>{if(curTab<TABS.length-1)goTab(TABS[curTab+1].id);};
- document.body.appendChild(left);document.body.appendChild(right);
- // show arrows only on game tabs (puzzles, solitaire, mahjong)
- const _goTab=goTab;
- goTab=function(id){
-  _goTab(id);
-  const gameTabs=["puzzles","solitaire","mahjong"];
-  const show=gameTabs.includes(id);
-  left.style.display=show&&curTab>0?"flex":"none";
-  right.style.display=show&&curTab<TABS.length-1?"flex":"none";
- };
+
 })();
 function play(e){
  // Open in browser (Brave blocks ads) instead of embed
