@@ -940,7 +940,7 @@ cat.addEventListener("click",()=>{
 </script>
 
 <script>
-const TABS=[{id:"tvguide",label:"📺 TV Guide",icon:"📺"},{id:"shows",label:"🎬 Shows",icon:"🎬"},{id:"apps",label:"📱 Apps & Sites",icon:"📱"},{id:"puzzles",label:"🧩 Puzzles",icon:"🧩"},{id:"solitaire",label:"🃏 Solitaire",icon:"🃏"},{id:"mahjong",label:"🀄 Mahjong",icon:"🀄"},{id:"classics",label:"👾 Classics",icon:"👾"},{id:"tarot",label:"🔮 Tarot",icon:"🔮"},{id:"horoscope",label:"⭐ Horoscope",icon:"⭐"},{id:"bills",label:"💰 Bills",icon:"💰"}];
+const TABS=[{id:"news",label:"📰 News",icon:"📰"},{id:"tvguide",label:"📺 TV Guide",icon:"📺"},{id:"shows",label:"🎬 Shows",icon:"🎬"},{id:"apps",label:"📱 Apps & Sites",icon:"📱"},{id:"puzzles",label:"🧩 Puzzles",icon:"🧩"},{id:"solitaire",label:"🃏 Solitaire",icon:"🃏"},{id:"mahjong",label:"🀄 Mahjong",icon:"🀄"},{id:"classics",label:"👾 Classics",icon:"👾"},{id:"tarot",label:"🔮 Tarot",icon:"🔮"},{id:"horoscope",label:"⭐ Horoscope",icon:"⭐"},{id:"bills",label:"💰 Bills",icon:"💰"}];
 // verified live video IDs (checked 2026-11-03 via search)
 const EP=[
  // trending
@@ -1029,6 +1029,7 @@ function goTab(id){
  if(id==="bills"&&typeof renderBills==="function")renderBills();
 }
 updateCritterVisibility(); // hide critters on the news landing page
+goTab("news"); // News is the first tab and default landing view
 // swipe left/right to change tabs (nested: row swipes scroll the row)
 (function(){
  let sx=0,sy=0,swiping=false,rowEl=null;
