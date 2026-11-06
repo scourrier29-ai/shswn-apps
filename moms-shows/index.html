@@ -57,6 +57,25 @@ a{color:inherit;text-decoration:none}
 .bottomnav button{flex:1;background:none;border:none;color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px}
 .bottomnav button.active{color:#fff}
 .bottomnav .ico{font-size:22px}
+/* ============ NEWS FEED — Google Discover style (plain white) ============ */
+#page-news{background:#fff;color:#202124}
+.newsfeed{max-width:640px;margin:0 auto;padding:10px 0 16px}
+.newscard{background:#fff;border:1px solid #e8eaed;border-radius:16px;overflow:hidden;margin:0 16px 16px;cursor:pointer;box-shadow:0 1px 3px rgba(60,64,67,.14)}
+.newscard:active{transform:scale(.99)}
+.newscard .news-thumb{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#f1f3f4}
+.news-body{padding:14px 16px 4px}
+.news-title{font-size:20px;line-height:1.3;font-weight:700;color:#202124;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.news-excerpt{font-size:14px;line-height:1.45;color:#5f6368;margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.news-foot{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 14px}
+.news-src{font-size:13px;color:#5f6368;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.news-acts{display:flex;align-items:center;gap:16px;flex-shrink:0;margin-left:12px}
+.news-acts button{background:none;border:none;padding:4px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.news-acts svg{width:22px;height:22px}
+.news-acts svg.heart{fill:none;stroke:#5f6368;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.news-acts svg.share{fill:#5f6368}
+.news-acts svg.dots{fill:#5f6368}
+.news-acts button.liked svg.heart{fill:#e0245e;stroke:#e0245e}
+
 </style>
 </head>
 <body>
@@ -64,7 +83,133 @@ a{color:inherit;text-decoration:none}
 <div class="tabs" id="tabs"></div>
 
 <!-- TV GUIDE PAGE -->
-<div class="page active" id="page-tvguide">
+<!-- NEWS FEED (Google Discover style) — default landing view -->
+<div class="page active" id="page-news">
+ <div class="newsfeed">
+<article class="newscard" onclick="go('https://scoop.upworthy.com/man-walks-31000-miles-home-to-mom-after-28-years')">
+  <img class="news-thumb" src="https://media.pubninja.com/articles/brand-16/covers/1793689529195_e6eb438691a4.jpg_1200_630" alt="" loading="lazy">
+  <div class="news-body">
+    <div class="news-title">Man walks 31,000 miles home to Mom. It took 28 years</div>
+    <div class="news-excerpt">Karl Bushby, 57, finally hugged his mother Angela in Hull after setting off from Chile in 1998. “Where have you been?” she asked.</div>
+  </div>
+  <div class="news-foot">
+    <span class="news-src">Upworthy</span>
+    <span class="news-acts">
+      <button aria-label="Like" onclick="event.stopPropagation();this.classList.toggle('liked')"><svg class="heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>
+      <button aria-label="Share" onclick="event.stopPropagation();shareNews('https://scoop.upworthy.com/man-walks-31000-miles-home-to-mom-after-28-years','Man walks 31,000 miles home to Mom')"><svg class="share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></button>
+      <button aria-label="More" onclick="event.stopPropagation();go('https://scoop.upworthy.com/man-walks-31000-miles-home-to-mom-after-28-years')"><svg class="dots" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
+    </span>
+  </div>
+</article>
+<article class="newscard" onclick="go('https://www.newscaststudio.com/2026/09/17/nbcuniversal-local-clear-the-shelters-2026/?og=1')">
+  <img class="news-thumb" src="https://www.newscaststudio.com/wp-content/uploads/2026/07/clear-the-shelters-nbcu.png" alt="" loading="lazy">
+  <div class="news-body">
+    <div class="news-title">Clear the Shelters helps more than 135,000 pets find homes</div>
+    <div class="news-excerpt">The 2026 campaign found loving homes for 135,000+ pets and raised nearly $500,000 for shelters — almost 1.5 million adoptions since 2015.</div>
+  </div>
+  <div class="news-foot">
+    <span class="news-src">NewscastStudio</span>
+    <span class="news-acts">
+      <button aria-label="Like" onclick="event.stopPropagation();this.classList.toggle('liked')"><svg class="heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>
+      <button aria-label="Share" onclick="event.stopPropagation();shareNews('https://www.newscaststudio.com/2026/09/17/nbcuniversal-local-clear-the-shelters-2026/?og=1','Clear the Shelters helps 135,000 pets find homes')"><svg class="share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></button>
+      <button aria-label="More" onclick="event.stopPropagation();go('https://www.newscaststudio.com/2026/09/17/nbcuniversal-local-clear-the-shelters-2026/?og=1')"><svg class="dots" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
+    </span>
+  </div>
+</article>
+<article class="newscard" onclick="go('https://billboardphilippines.com/music/news/olivia-rodrigo-announces-first-ever-christmas-song/')">
+  <img class="news-thumb" src="https://assets.billboardphilippines.com/wp-content/uploads/2026/11/olivia-rodrigo-announces-christmas-single-billboard-ph-socials-img.jpg" alt="" loading="lazy">
+  <div class="news-body">
+    <div class="news-title">Olivia Rodrigo Announces First-Ever Christmas Song ‘Take Me Home (4 Christmas)’</div>
+    <div class="news-excerpt">Out tonight at 8pm ET, with a music video starring Cynthia Nixon and SNL’s Ben Marshall — her first-ever holiday song.</div>
+  </div>
+  <div class="news-foot">
+    <span class="news-src">Billboard Philippines</span>
+    <span class="news-acts">
+      <button aria-label="Like" onclick="event.stopPropagation();this.classList.toggle('liked')"><svg class="heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>
+      <button aria-label="Share" onclick="event.stopPropagation();shareNews('https://billboardphilippines.com/music/news/olivia-rodrigo-announces-first-ever-christmas-song/','Olivia Rodrigo first Christmas song')"><svg class="share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></button>
+      <button aria-label="More" onclick="event.stopPropagation();go('https://billboardphilippines.com/music/news/olivia-rodrigo-announces-first-ever-christmas-song/')"><svg class="dots" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
+    </span>
+  </div>
+</article>
+<article class="newscard" onclick="go('https://www.udiscovermusic.com/news/elton-john-sacrifice-youtube-billion-views/')">
+  <img class="news-thumb" src="https://www.udiscovermusic.com/wp-content/uploads/2017/08/Sleeping-With-The-Past.jpg" alt="" loading="lazy">
+  <div class="news-body">
+    <div class="news-title">Elton John’s ‘Sacrifice’ Video Surpasses One Billion YouTube Views</div>
+    <div class="news-excerpt">The 1989 ballad becomes the pop legend’s first video to reach the milestone — 35 years after topping the UK charts for five weeks.</div>
+  </div>
+  <div class="news-foot">
+    <span class="news-src">uDiscover Music</span>
+    <span class="news-acts">
+      <button aria-label="Like" onclick="event.stopPropagation();this.classList.toggle('liked')"><svg class="heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>
+      <button aria-label="Share" onclick="event.stopPropagation();shareNews('https://www.udiscovermusic.com/news/elton-john-sacrifice-youtube-billion-views/','Elton John Sacrifice hits one billion views')"><svg class="share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></button>
+      <button aria-label="More" onclick="event.stopPropagation();go('https://www.udiscovermusic.com/news/elton-john-sacrifice-youtube-billion-views/')"><svg class="dots" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
+    </span>
+  </div>
+</article>
+<article class="newscard" onclick="go('https://www.capitalxtra.com/news/im-a-celeb-2026-full-celebrity-lineup-start-date/')">
+  <img class="news-thumb" src="https://imgs.capitalxtra.com/images/853086?width=998&crop=16_9&signature=DsWhGN_oE3S917OFt2M-qs6xoNM=" alt="" loading="lazy">
+  <div class="news-body">
+    <div class="news-title">I’m A Celeb 2026: Full celebrity lineup &amp; when does it start?</div>
+    <div class="news-excerpt">The jungle returns Monday 16 November, with Wayne Rooney, Joanna Page and Keith Lemon tipped to enter camp for three weeks of Bushtucker Trials.</div>
+  </div>
+  <div class="news-foot">
+    <span class="news-src">Capital Xtra</span>
+    <span class="news-acts">
+      <button aria-label="Like" onclick="event.stopPropagation();this.classList.toggle('liked')"><svg class="heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>
+      <button aria-label="Share" onclick="event.stopPropagation();shareNews('https://www.capitalxtra.com/news/im-a-celeb-2026-full-celebrity-lineup-start-date/','Im A Celeb 2026 lineup')"><svg class="share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></button>
+      <button aria-label="More" onclick="event.stopPropagation();go('https://www.capitalxtra.com/news/im-a-celeb-2026-full-celebrity-lineup-start-date/')"><svg class="dots" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
+    </span>
+  </div>
+</article>
+<article class="newscard" onclick="go('https://www.hollywoodreporterindia.com/amp/story/features/insight/ramayana-part-one-gets-mumbai-premiere-with-alia-bhatt-sunny-deol-and-neetu-kapoor-joining-ranbir-kapoor')">
+  <img class="news-thumb" src="https://media.assettype.com/hollywoodreporterindia%2F2026-11-04%2Fxcsqcrim%2FRanbir-Kapoor-Alia-Bhatt-and-Neetu-Kapoor-for-Ramayana-Part-One-Mumbai-Premiere?w=1200&ar=40%3A21&auto=format%2Ccompress&ogImage=true&mode=crop&enlarge=true&overlay=false&overlay_position=bottom&overlay_width=100" alt="" loading="lazy">
+  <div class="news-body">
+    <div class="news-title">Ramayana: Part One gets star-studded Mumbai premiere ahead of today’s release</div>
+    <div class="news-excerpt">Ranbir Kapoor, Alia Bhatt, Sunny Deol and Neetu Kapoor celebrated the mythological epic, in cinemas today with Yash as Ravana and Sai Pallavi as Sita.</div>
+  </div>
+  <div class="news-foot">
+    <span class="news-src">The Hollywood Reporter India</span>
+    <span class="news-acts">
+      <button aria-label="Like" onclick="event.stopPropagation();this.classList.toggle('liked')"><svg class="heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>
+      <button aria-label="Share" onclick="event.stopPropagation();shareNews('https://www.hollywoodreporterindia.com/amp/story/features/insight/ramayana-part-one-gets-mumbai-premiere-with-alia-bhatt-sunny-deol-and-neetu-kapoor-joining-ranbir-kapoor','Ramayana Part One Mumbai premiere')"><svg class="share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></button>
+      <button aria-label="More" onclick="event.stopPropagation();go('https://www.hollywoodreporterindia.com/amp/story/features/insight/ramayana-part-one-gets-mumbai-premiere-with-alia-bhatt-sunny-deol-and-neetu-kapoor-joining-ranbir-kapoor')"><svg class="dots" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
+    </span>
+  </div>
+</article>
+<article class="newscard" onclick="go('https://happynewsoftheday.com/animals/kazakhstan-releases-second-tiger-amur-ile-balkhash/')">
+  <img class="news-thumb" src="https://happynewsoftheday.com/_astro/kazajistan-tigre-amur-suelta-ile-balkhash.Ctn80DI6_2ilhrE.jpg" alt="" loading="lazy">
+  <div class="news-body">
+    <div class="news-title">Kazakhstan releases its second tiger into the wild, 70 years after losing its own</div>
+    <div class="news-excerpt">Amur joined Umit in the Ile-Balkhash reserve — the first wild tigers in Kazakhstan since 1948, with a goal of around 50 by 2035.</div>
+  </div>
+  <div class="news-foot">
+    <span class="news-src">Happy News of the Day</span>
+    <span class="news-acts">
+      <button aria-label="Like" onclick="event.stopPropagation();this.classList.toggle('liked')"><svg class="heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>
+      <button aria-label="Share" onclick="event.stopPropagation();shareNews('https://happynewsoftheday.com/animals/kazakhstan-releases-second-tiger-amur-ile-balkhash/','Kazakhstan releases second tiger into the wild')"><svg class="share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></button>
+      <button aria-label="More" onclick="event.stopPropagation();go('https://happynewsoftheday.com/animals/kazakhstan-releases-second-tiger-amur-ile-balkhash/')"><svg class="dots" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
+    </span>
+  </div>
+</article>
+<article class="newscard" onclick="go('https://www.primetimer.com/features/pierce-brosnan-enthusiastically-backs-callum-turner-for-the-iconic-007-role')">
+  <img class="news-thumb" src="https://d1rldr9jdodfaa.cloudfront.net/images/01M6M63Z3R6PK236XJ5MGG9NB1/20261104_210556_2207857802.webp" alt="" loading="lazy">
+  <div class="news-body">
+    <div class="news-title">Pierce Brosnan enthusiastically backs Callum Turner for the iconic 007 role</div>
+    <div class="news-excerpt">The former 007 told Vanity Fair his ex-co-star is “so strong” — and he’s excited for Denis Villeneuve to direct the next Bond film.</div>
+  </div>
+  <div class="news-foot">
+    <span class="news-src">Primetimer</span>
+    <span class="news-acts">
+      <button aria-label="Like" onclick="event.stopPropagation();this.classList.toggle('liked')"><svg class="heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>
+      <button aria-label="Share" onclick="event.stopPropagation();shareNews('https://www.primetimer.com/features/pierce-brosnan-enthusiastically-backs-callum-turner-for-the-iconic-007-role','Pierce Brosnan backs Callum Turner for Bond')"><svg class="share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></button>
+      <button aria-label="More" onclick="event.stopPropagation();go('https://www.primetimer.com/features/pierce-brosnan-enthusiastically-backs-callum-turner-for-the-iconic-007-role')"><svg class="dots" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
+    </span>
+  </div>
+</article>
+ </div>
+</div>
+
+<div class="page" id="page-tvguide">
 <div style="background:linear-gradient(180deg,#0a1628 0%,#0d1b2e 100%);padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.06)">
 <div style="display:flex;align-items:center;gap:16px;max-width:600px;margin:0 auto">
 <canvas id="momClock" width="120" height="120" style="width:84px;height:84px;flex-shrink:0"></canvas>
@@ -845,11 +990,11 @@ for(const[k,[id,idxs]]of Object.entries(rows)){
 }
 const tabsEl=document.getElementById("tabs"),navEl=document.getElementById("bottomnav");
 TABS.forEach((t,i)=>{
- const d=document.createElement("div");d.className="tab"+(i===0?" active":"");d.textContent=t.label;d.onclick=()=>goTab(t.id);tabsEl.appendChild(d);
- const b=document.createElement("button");b.innerHTML=`<span class="ico">${t.icon}</span>${t.label.split(" ")[1]}`;if(i===0)b.classList.add("active");b.onclick=()=>goTab(t.id);navEl.appendChild(b);
+ const d=document.createElement("div");d.className="tab";d.textContent=t.label;d.onclick=()=>goTab(t.id);tabsEl.appendChild(d);
+ const b=document.createElement("button");b.innerHTML=`<span class="ico">${t.icon}</span>${t.label.split(" ")[1]}`;b.onclick=()=>goTab(t.id);navEl.appendChild(b);
 });
 let curTab=0;
-function isShowsTab(){return typeof curTab!=="undefined"?TABS[curTab].id==="tvguide":true;}
+function isShowsTab(){return typeof curTab!=="undefined"?TABS[curTab].id==="tvguide"&&!document.getElementById("page-news").classList.contains("active"):true;}
 function isCritterDiv(d){
  const t=d.textContent;
  return t==="\uD83D\uDC26"||t==="\uD83D\uDC15"||t==="\uD83D\uDC36"||t==="\uD83E\uDD7A"||t==="\uD83D\uDE31"||t==="\uD83D\uDCA4"||t==="\uD83E\uDEB6"||t==="\uD83E\uDD0D"||t==="\uD83E\uDE3A"||t==="\uD83D\uDC3A"||t==="\uD83D\ude3b"||t==="\uD83D\ude38"||t==="\uD83D\ude3e"||t==="\uD83D\ude34"||t==="\uD83D\uDC31\u200d\uD83D\uDCA8"||t==="SASHA";
@@ -883,6 +1028,7 @@ function goTab(id){
  updateCritterVisibility();
  if(id==="bills"&&typeof renderBills==="function")renderBills();
 }
+updateCritterVisibility(); // hide critters on the news landing page
 // swipe left/right to change tabs (nested: row swipes scroll the row)
 (function(){
  let sx=0,sy=0,swiping=false,rowEl=null;
@@ -924,6 +1070,7 @@ function closePlayer(){document.getElementById("player").classList.remove("show"
  if(crittersHidden){crittersHidden=false;hideTaps=0;cat.style.display="";document.getElementById("catname").style.display="";
   document.querySelectorAll("div").forEach(d=>{if(d.textContent==="🐦"||d.textContent==="🐕"||d.textContent==="🥺")d.style.display="";});}}
 function go(u){window.open(u,"_blank")}
+function shareNews(u,t){if(navigator.share){navigator.share({title:t,url:u}).catch(function(){});}else{go(u);}}
 addEventListener("scroll",()=>document.getElementById("topbar").classList.toggle("solid",scrollY>40));
 
 /* ============ MOM'S CLOCK + WEATHER (Apple-style) ============ */
