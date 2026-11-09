@@ -1568,5 +1568,29 @@ function showHoroscope(i){
 buildSignGrid();
 
 </script>
+
+<div id="dbg" style="position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#ff0;color:#000;font-size:13px;padding:6px;white-space:pre-wrap;word-break:break-all;font-family:monospace"></div>
+<script>
+window.__errs=[];
+window.onerror=function(m,s,l,c){var t=m+" @ "+(s||"")+" : "+l+":"+c;window.__errs.push(t);var d=document.getElementById("dbg");if(d){d.textContent="ERR: "+t+"\n"+d.textContent;}return false;};
+function dbgUpdate(){
+  try{
+    var ep=document.querySelectorAll(".ep").length;
+    var tabs=document.querySelectorAll(".tab").length;
+    var act=document.querySelector(".page.active");
+    var actId=act?act.id:"NONE";
+    var ivo=typeof isVideoOpen;
+    var rows={};
+    ["row-trending","row-romance","row-secretbaby","row-revenge","row-billionaire","row-fantasy","row-divorce","row-comedy"].forEach(function(id){var el=document.getElementById(id);rows[id]=el?el.children.length:"NOEL";});
+    var d=document.getElementById("dbg");
+    if(d){d.textContent="EP:"+ep+" TABS:"+tabs+" ACTIVE:"+actId+" isVideoOpen:"+ivo+"\nROWS:"+JSON.stringify(rows)+"\nERRS:"+(window.__errs.join(" | ")||"none");}
+  }catch(e){
+    var d=document.getElementById("dbg");
+    if(d){d.textContent="DBG ERROR: "+e.message;}
+  }
+}
+setInterval(dbgUpdate,1000); dbgUpdate();
+</script>
+
 </body>
 </html>
