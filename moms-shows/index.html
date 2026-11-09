@@ -79,12 +79,6 @@ a{color:inherit;text-decoration:none}
 </style>
 </head>
 <body>
-<div id="errtrap" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:#ff0;color:#000;font-size:12px;padding:4px;display:none;white-space:pre-wrap;word-break:break-all"></div>
-<script>
-window.__errs=[];
-window.onerror=function(m,s,l,c){var t=m+" @ "+(s||"")+" : "+l+":"+c;window.__errs.push(t);var d=document.getElementById("errtrap");if(d){d.style.display="block";d.textContent=window.__errs.join("\n");}document.title="ERR: "+t;return false;};
-window.addEventListener("unhandledrejection",function(e){var t="PROMISE: "+(e.reason&&e.reason.message?e.reason.message:e.reason);window.__errs.push(t);var d=document.getElementById("errtrap");if(d){d.style.display="block";d.textContent=window.__errs.join("\n");}document.title="ERR: "+t;});
-</script>
 <div class="topbar" id="topbar"><div class="logo" style="font-size:15px;line-height:1.2;text-align:center">Real Drama<br><span style="font-size:11px;color:#ccc">for Jo-Anne by MCSYN Productions</span></div><button id="petsToggle" onclick="togglePets()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#222;border:1px solid #444;color:#fff;border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer">🐾 Pets: ON</button><button id="careBtn" onclick="openCare()" style="position:absolute;right:115px;top:50%;transform:translateY(-50%);background:#222;border:1px solid #444;color:#fff;border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer">🐾 Care</button></div>
 <div class="tabs" id="tabs"></div>
 
@@ -1282,6 +1276,7 @@ function isCritterDiv(d){
  const t=d.textContent;
  return t==="\uD83D\uDC26"||t==="\uD83D\uDC15"||t==="\uD83D\uDC36"||t==="\uD83E\uDD7A"||t==="\uD83D\uDE31"||t==="\uD83D\uDCA4"||t==="\uD83E\uDEB6"||t==="\uD83E\uDD0D"||t==="\uD83E\uDE3A"||t==="\uD83D\uDC3A"||t==="\uD83D\ude3b"||t==="\uD83D\ude38"||t==="\uD83D\ude3e"||t==="\uD83D\ude34"||t==="\uD83D\uDC31\u200d\uD83D\uDCA8"||t==="SASHA";
 }
+function isVideoOpen(){var p=document.getElementById("player");return !!(p&&p.classList.contains("show"));}
 function updateCritterVisibility(){
  const show=isShowsTab()&&!isVideoOpen();
  try{
